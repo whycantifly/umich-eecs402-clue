@@ -80,4 +80,7 @@ const int TILE_HEIGHT = 25;
 
 const int ROOM_STORAGE_WIDTH = 3;
 
+const int MIN_PLAYERS = 3;
+const int MAX_PLAYERS = 6;
+
 #endif

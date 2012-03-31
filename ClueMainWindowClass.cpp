@@ -112,17 +112,28 @@ void ClueMainWindowClass::drawMove(const BoardLocationClass &oldLocation,
 
 void ClueMainWindowClass::dealCards()
 {
-  //Code
+  //Variable Declarations
+  list<PlayerClass>::iterator playerBeingDealtTo = gameParticipants.begin();
+
+  while(cardDeck.getDeckSize() > 0)
+  {
+    playerBeingDealtTo->addCardToHand(cardDeck.drawRandomCard());
+
+    playerBeingDealtTo++;
+    if(playerBeingDealtTo == gameParticipants.end())
+    {
+      playerBeingDealtTo = gameParticipants.begin();
+    }
+  }
 }
 
 void ClueMainWindowClass::setupGame()
 {
+  //Variable Declarations
   list<CardEnum> availableCharacters;
   list<CardEnum>::iterator charIterator;
   list<PlayerClass>::iterator participantIterator;
   int randomCharacterNumber;
-
-  caseFile.createCaseFile(cardDeck);
 
   //Initialize availableCharacters
   for(CardEnum i = CardEnum(0); i < NUMBER_OF_SUSPECTS;
@@ -132,8 +143,8 @@ void ClueMainWindowClass::setupGame()
   }
 
   //Make sure there are between 3 and 6 players
-  if((humanPlayersSpin->value() + computerPlayersSpin->value()) < 3 ||
-      (humanPlayersSpin->value() + computerPlayersSpin->value() > 6))
+  if((humanPlayersSpin->value() + computerPlayersSpin->value()) < MIN_PLAYERS ||
+      (humanPlayersSpin->value() + computerPlayersSpin->value() > MAX_PLAYERS))
   {
 //    throw(ExceptionClass("Error setting up game", "You must have a minimum of "
 //        "3 and a maximum of 6 players to start a game."));
@@ -166,7 +177,7 @@ void ClueMainWindowClass::setupGame()
     //Set thisPlayerChar
     if(i == 0)
     {
-      thisPlayerChar = *charIterator;
+      thisPlayerPtr = charIterator;
     }
 
     //Erase the character in availableCharacters
@@ -174,6 +185,11 @@ void ClueMainWindowClass::setupGame()
   }
 
   currentPlayerIter = gameParticipants.begin();
+
+  //Make the case file and deal out the remaining cards
+  caseFile.createCaseFile(cardDeck);
+  dealCards();
+
   drawStartingPieces();
 }
 
@@ -346,7 +362,6 @@ void ClueMainWindowClass::movePlayer(const DirectionEnum &direction)
       drawMove(currentPlayerIter->getPlayerLocation(), newLocation);
       currentPlayerIter->move(direction);
     }
-
   }
   catch(ExceptionClass exception)
   {

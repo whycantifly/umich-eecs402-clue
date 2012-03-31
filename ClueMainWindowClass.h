@@ -23,8 +23,8 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     std::list<PlayerClass>::iterator currentPlayerIter; //Current player
     DeckClass cardDeck;                 //Deck of cards
     CaseFileClass caseFile;             //Case file of details of the crime
-    CardEnum thisPlayerChar ;           //Character corresponding to the human
-                                        //Player at this computer
+    PlayerClass *thisPlayerPtr;         //Pointer to the player class object
+                                        //for this human player
 
   public:
     //Constructors

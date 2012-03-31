@@ -16,7 +16,7 @@ PlayerClass::PlayerClass(QString name, CardEnum suspect, bool aiValue,
 
 void PlayerClass::addCardToHand(CardEnum cardToAdd)
 {
-  //Code
+  hand.push_front(cardToAdd);
 }
 
 void PlayerClass::setStartingLocation()
