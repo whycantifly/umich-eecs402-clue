@@ -16,9 +16,9 @@
   <widget class="QPushButton" name="okayButton">
    <property name="geometry">
     <rect>
-     <x>870</x>
-     <y>210</y>
-     <width>97</width>
+     <x>885</x>
+     <y>200</y>
+     <width>95</width>
      <height>27</height>
     </rect>
    </property>
@@ -72,8 +72,8 @@
    <property name="geometry">
     <rect>
      <x>600</x>
-     <y>100</y>
-     <width>371</width>
+     <y>95</y>
+     <width>381</width>
      <height>101</height>
     </rect>
    </property>
@@ -211,6 +211,19 @@
     </property>
     <property name="text">
      <string>Make a Suggestion</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="EndTurnOption">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>70</y>
+      <width>116</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>End Turn</string>
     </property>
    </widget>
   </widget>
@@ -917,52 +930,6 @@ p, li { white-space: pre-wrap; }
      <string>Unknown</string>
     </property>
    </widget>
-   <zorder>label_29</zorder>
-   <zorder>label_30</zorder>
-   <zorder>label_31</zorder>
-   <zorder>label_32</zorder>
-   <zorder>label_33</zorder>
-   <zorder>label_34</zorder>
-   <zorder>label_35</zorder>
-   <zorder>label_36</zorder>
-   <zorder>label_37</zorder>
-   <zorder>label_38</zorder>
-   <zorder>label_39</zorder>
-   <zorder>label_40</zorder>
-   <zorder>label_41</zorder>
-   <zorder>label_42</zorder>
-   <zorder>label_43</zorder>
-   <zorder>label_44</zorder>
-   <zorder>label_45</zorder>
-   <zorder>label_46</zorder>
-   <zorder>label_47</zorder>
-   <zorder>label_48</zorder>
-   <zorder>label_49</zorder>
-   <zorder>label_50</zorder>
-   <zorder>label_51</zorder>
-   <zorder>label_52</zorder>
-   <zorder>label_55</zorder>
-   <zorder>label_56</zorder>
-   <zorder>label_57</zorder>
-   <zorder>label_58</zorder>
-   <zorder>label_59</zorder>
-   <zorder>label_60</zorder>
-   <zorder>label_61</zorder>
-   <zorder>label_62</zorder>
-   <zorder>label_63</zorder>
-   <zorder>label_64</zorder>
-   <zorder>label_65</zorder>
-   <zorder>label_66</zorder>
-   <zorder>label_72</zorder>
-   <zorder>label_70</zorder>
-   <zorder>label_67</zorder>
-   <zorder>label_71</zorder>
-   <zorder>label_69</zorder>
-   <zorder>label_68</zorder>
-   <zorder>label_73</zorder>
-   <zorder>label_74</zorder>
-   <zorder>label_75</zorder>
-   <zorder>plainTextEdit</zorder>
   </widget>
   <widget class="QPlainTextEdit" name="personalNotes">
    <property name="geometry">
@@ -1042,7 +1009,7 @@ p, li { white-space: pre-wrap; }
      <x>600</x>
      <y>110</y>
      <width>381</width>
-     <height>111</height>
+     <height>116</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -1055,7 +1022,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>270</x>
-      <y>60</y>
+      <y>70</y>
       <width>51</width>
       <height>21</height>
      </rect>
@@ -1071,7 +1038,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>30</y>
+      <y>50</y>
       <width>116</width>
       <height>22</height>
      </rect>
@@ -1080,11 +1047,11 @@ p, li { white-space: pre-wrap; }
      <string>Local play</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="humanPlayersLabel">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>60</y>
+      <y>70</y>
       <width>211</width>
       <height>17</height>
      </rect>
@@ -1097,7 +1064,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>10</y>
+      <y>30</y>
       <width>141</width>
       <height>22</height>
      </rect>
@@ -1106,11 +1073,11 @@ p, li { white-space: pre-wrap; }
      <string>Networked play</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_2">
+   <widget class="QLabel" name="computerPlayersLabel">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>80</y>
+      <y>90</y>
       <width>232</width>
       <height>17</height>
      </rect>
@@ -1123,7 +1090,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>160</x>
-      <y>10</y>
+      <y>30</y>
       <width>97</width>
       <height>22</height>
      </rect>
@@ -1136,7 +1103,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>270</x>
-      <y>80</y>
+      <y>90</y>
       <width>51</width>
       <height>21</height>
      </rect>
@@ -1145,13 +1112,65 @@ p, li { white-space: pre-wrap; }
      <number>5</number>
     </property>
    </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>15</x>
+      <y>5</y>
+      <width>126</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Enter your name:</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit">
+    <property name="geometry">
+     <rect>
+      <x>135</x>
+      <y>5</y>
+      <width>236</width>
+      <height>21</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="hostIPLabel">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>75</y>
+      <width>161</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Host/server IP address:</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="hostIPEdit">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>75</y>
+      <width>111</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="inputMask">
+     <string>000.000.000.000;_</string>
+    </property>
+    <property name="text">
+     <string>...</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QPushButton" name="startGameButton">
    <property name="geometry">
     <rect>
-     <x>870</x>
+     <x>885</x>
      <y>230</y>
-     <width>97</width>
+     <width>95</width>
      <height>27</height>
     </rect>
    </property>
@@ -1175,11 +1194,12 @@ p, li { white-space: pre-wrap; }
     <bool>true</bool>
    </property>
   </widget>
-  <zorder>gameWelcomeLabel</zorder>
+  <zorder>gameBoard</zorder>
+  <zorder>errorMessageLabel</zorder>
   <zorder>gameSetupFrame</zorder>
   <zorder>actionOptionsFrame</zorder>
+  <zorder>gameWelcomeLabel</zorder>
   <zorder>okayButton</zorder>
-  <zorder>gameBoard</zorder>
   <zorder>rollInfoText</zorder>
   <zorder>selectActionLabel</zorder>
   <zorder>currentTurnText</zorder>
@@ -1194,7 +1214,6 @@ p, li { white-space: pre-wrap; }
   <zorder>detectiveNotesLabel</zorder>
   <zorder>personalNotesLabel</zorder>
   <zorder>startGameButton</zorder>
-  <zorder>errorMessageLabel</zorder>
  </widget>
  <tabstops>
   <tabstop>networkedPlayOption</tabstop>

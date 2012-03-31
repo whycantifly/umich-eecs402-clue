@@ -109,11 +109,20 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     //invalid.
     void movePlayer(const DirectionEnum &direction);
 
+    //Moves the player to the designated location.
+    void movePlayer(const BoardLocationClass &newLocation);
+
     //Moves the player through the secret passage.
     void movePlayerToSecretPassage();
 
     //Throws an exception if the move to newLocation is invalid.
     void checkIfValidMove(BoardLocationClass &newLocation);
+
+    //Gets the first empty designated piece storage area in the room and
+    //returns the location.
+    const BoardLocationClass getEmptyRoomTile(
+        const BoardLocationClass &boardLocation
+        );
 
   public slots:
     //Function Prototypes
@@ -129,6 +138,16 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     {
       humanPlayersSpin->setValue(humanPlayersSpin->minimum());
     }
+
+    //Makes things visible/invisible or enabled/disabled depending on the
+    //option buttons and check boxes selected during game setup for networked
+    //play.
+    void setNetworkOptVis();
+
+    //Makes things visible/invisible or enabled/disabled depending on the
+    //option buttons and check boxes selected during game setup for local
+    //play.
+    void setLocalOptVis();
 };
 
 #endif

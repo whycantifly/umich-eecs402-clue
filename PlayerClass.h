@@ -18,9 +18,8 @@ class PlayerClass
     BoardLocationClass currentLocation; //Current location on the board
     bool gameHost;                      //True = host (or local play);
                                         //False = not host
-    bool ai;                            //True = AI; false = human player
-    bool activePlayer;                  //True = has not lost yet;
-                                        //False = has lost (cannot move or win)
+    bool aiFlag;                        //True = AI; false = human player
+    bool movedBySuggestion;             //True = moved last turn; false = not
     std::list<CardEnum> hand;           //Cards in the players hand; ordered in
                                         //order of CardEnum
     int dieRollThisTurn;                //Value of the die roll this turn
@@ -66,12 +65,6 @@ class PlayerClass
       return character;
     }
 
-    //Gets whether the player is active or not.
-    const bool getActivePlayer() const
-    {
-      return activePlayer;
-    }
-
     //Returns a random int between 1 and 6.
     int rollDie() const
     {
@@ -84,6 +77,7 @@ class PlayerClass
     {
       currentLocation.move(direction);
     }
+
     //Sets currentLocation to newLocation.
     void setPlayerLocation(BoardLocationClass newLocation)
     {

@@ -2,6 +2,7 @@
 #include <string>
 #include <stdlib.h>
 
+#include "AuxSignalClass.h"
 #include "ClueMainWindowClass.h"
 #include "constants.h"
 #include "BoardLocationClass.h"
@@ -14,19 +15,11 @@ ClueMainWindowClass::ClueMainWindowClass(QWidget *parent)
   //Set up the GUI
   setupUi(this);
 
-  //Assign signals/slots
-  connect(networkedPlayOption, SIGNAL(toggled(bool)), gameHostCheck,
-      SLOT(setVisible(bool)));
-  connect(networkedPlayOption, SIGNAL(toggled(bool)), humanPlayersSpin,
-      SLOT(setEnabled(bool)));
-  connect(gameHostCheck, SIGNAL(toggled(bool)), humanPlayersSpin,
-      SLOT(setEnabled(bool)));
-  connect(gameHostCheck, SIGNAL(toggled(bool)), computerPlayersSpin,
-      SLOT(setEnabled(bool)));
-  connect(localPlayOption, SIGNAL(pressed()), computerPlayersSpin,
-      SLOT(enable()));
-  connect(localPlayOption, SIGNAL(pressed()), this,
-      SLOT(resetHumanPlayersSpin()));
+  connect(networkedPlayOption, SIGNAL(clicked()), this,
+      SLOT(setNetworkOptVis()));
+  connect(localPlayOption, SIGNAL(clicked()), this, SLOT(setLocalOptVis()));
+  connect(gameHostCheck, SIGNAL(clicked()), this, SLOT(setNetworkOptVis()));
+
   connect(okayButton, SIGNAL(clicked()), this, SLOT(submitMove()));
   connect(startGameButton, SIGNAL(clicked()), this, SLOT(startGame()));
 
@@ -70,6 +63,8 @@ void ClueMainWindowClass::setupNewBoard()
   networkedPlayOption->setFocus();
 
   gameHostCheck->setChecked(true);
+  hostIPEdit->setVisible(false);
+  hostIPLabel->setVisible(false);
 }
 
 void ClueMainWindowClass::drawPieceToBoard(const CardEnum &character,
@@ -112,7 +107,6 @@ void ClueMainWindowClass::drawMove(const BoardLocationClass &oldLocation,
   drawPieceToBoard(currentPlayerIter->getCharacter(), newLocation);
   eraseTileContents(oldLocation);
   gameBoard->setPixmap(QPixmap::fromImage(inProgressBoardImage));
-
 }
 
 void ClueMainWindowClass::makeCaseFile()
@@ -321,10 +315,19 @@ void ClueMainWindowClass::movePlayer(const DirectionEnum &direction)
     checkIfValidMove(newLocation);
 
     //Draw the move
-    drawMove(currentPlayerIter->getPlayerLocation(), newLocation);
+    try
+    {
+      newLocation.getRoom();
+      newLocation = getEmptyRoomTile(newLocation);
+      drawMove(currentPlayerIter->getPlayerLocation(), newLocation);
+      currentPlayerIter->setPlayerLocation(newLocation);
+    }
+    catch(ExceptionClass exception)
+    {
+      drawMove(currentPlayerIter->getPlayerLocation(), newLocation);
+      currentPlayerIter->move(direction);
+    }
 
-    //Update the player's current location
-    currentPlayerIter->move(direction);
   }
   catch(ExceptionClass exception)
   {
@@ -468,4 +471,77 @@ void ClueMainWindowClass::startGame()
   {
     displayExceptionMessageBox(exception);
   }
+}
+
+void ClueMainWindowClass::setNetworkOptVis()
+{
+  gameHostCheck->setVisible(true);
+  if(gameHostCheck->isChecked() == true)
+  {
+    hostIPEdit->setVisible(false);
+    hostIPLabel->setVisible(false);
+    computerPlayersSpin->setVisible(true);
+    computerPlayersLabel->setVisible(true);
+    humanPlayersSpin->setVisible(true);
+    humanPlayersLabel->setVisible(true);
+
+    humanPlayersSpin->setEnabled(true);
+    computerPlayersSpin->setEnabled(true);
+  }
+  else
+  {
+    hostIPEdit->setVisible(true);
+    hostIPLabel->setVisible(true);
+    computerPlayersSpin->setVisible(false);
+    computerPlayersLabel->setVisible(false);
+    humanPlayersSpin->setVisible(false);
+    humanPlayersLabel->setVisible(false);
+  }
+}
+
+void ClueMainWindowClass::setLocalOptVis()
+{
+  gameHostCheck->setVisible(false);
+  hostIPEdit->setVisible(false);
+  hostIPLabel->setVisible(false);
+  computerPlayersSpin->setVisible(true);
+  computerPlayersLabel->setVisible(true);
+  humanPlayersSpin->setVisible(true);
+  humanPlayersLabel->setVisible(true);
+
+  computerPlayersSpin->setEnabled(true);
+  humanPlayersSpin->setEnabled(false);
+  humanPlayersSpin->setValue(1);
+}
+
+const BoardLocationClass ClueMainWindowClass::getEmptyRoomTile(
+    const BoardLocationClass &boardLocation)
+{
+  //Variable Declarations
+  bool emptyTileFlag = false;
+  BoardLocationClass currentLocation;
+  int i;
+  int j;
+
+  i = 0;
+  while(i < ROOM_STORAGE_WIDTH && emptyTileFlag == false)
+  {
+    j = 0;
+    while(j < NUMBER_OF_SUSPECTS / ROOM_STORAGE_WIDTH && emptyTileFlag == false)
+    {
+      currentLocation =
+          BoardLocationClass(ROOM_PIECE_LOCATIONS[int(boardLocation.getRoom()) -
+          NUMBER_OF_SUSPECTS - NUMBER_OF_WEAPONS].getXCoord() + i,
+          ROOM_PIECE_LOCATIONS[int(boardLocation.getRoom()) -
+          NUMBER_OF_SUSPECTS - NUMBER_OF_WEAPONS].getYCoord() + j);
+      if(currentLocation.getTileType(inProgressBoardImage) == ROOM_TILE)
+      {
+        emptyTileFlag = true;
+      }
+      j++;
+    }
+    i++;
+  }
+
+  return currentLocation;
 }

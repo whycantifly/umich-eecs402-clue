@@ -8,9 +8,9 @@ PlayerClass::PlayerClass(QString name, CardEnum suspect, bool aiValue,
 {
   playerName = name;
   character = suspect;
-  ai = aiValue;
+  aiFlag = aiValue;
   gameHostValue = gameHost;
-  activePlayer = true;
+  movedBySuggestion = false;
   setStartingLocation();
 }
 

@@ -82,7 +82,8 @@ const CardEnum BoardLocationClass::getRoom() const
 
   if(getTileType(CLUE_BOARD_IMAGE) != ROOM_TILE)
   {
-    throw(ExceptionClass(QString("No room")));
+    throw(ExceptionClass(QString("That tile is not a room tile.  Please try "
+        "again.")));
   }
   else
   {
