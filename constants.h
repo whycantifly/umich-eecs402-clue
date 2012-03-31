@@ -39,6 +39,19 @@ const QImage CHAR_PIECE_IMAGES[6] = {QImage("images/scarlet.png"),
     QImage("images/green.png"), QImage("images/peacock.png"),
     QImage("images/plum.png")};
 
+//Card images
+const QImage CARD_IMAGES[21] = {QImage("images/miss_scarlet.png"),
+    QImage("images/col_mustard.png"), QImage("images/mrs_white.png"),
+    QImage("images/mr_green.png"), QImage("images/mrs_peacock"),
+    QImage("images/prof_plum.png"), QImage("images/knife.png"),
+    QImage("images/candlestick.png"), QImage("images/revolver.png"),
+    QImage("images/rope.png"), QImage("images/lead_pipe.png"),
+    QImage("images/wrench.png"), QImage("images/hall.png"),
+    QImage("images/lounge.png"), QImage("images/dining_room.png"),
+    QImage("images/kitchen.png"), QImage("images/ballroom.png"),
+    QImage("images/conservatory.png"), QImage("images/billiard_room.png"),
+    QImage("images/library.png"), QImage("images/study.png")};
+
 //Door locations
 const BoardLocationClass DOOR_LOCATIONS[16] = {BoardLocationClass(11, 7),
     BoardLocationClass(12, 7), BoardLocationClass(17, 6),

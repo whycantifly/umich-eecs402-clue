@@ -10,7 +10,9 @@ DeckClass::DeckClass()
 
 CardEnum DeckClass::drawRandomCard()
 {
-  removeCard(getRandomCard());
+  CardEnum card = getRandomCard();
+  removeCard(card);
+  return card;
 }
 
 CardEnum DeckClass::getRandomCard()

@@ -27,6 +27,38 @@ ClueMainWindowClass::ClueMainWindowClass(QWidget *parent)
   setupNewBoard();
 }
 
+void ClueMainWindowClass::displayCardsInHand()
+{
+  //Variable Declarations
+  list<CardEnum>hand = thisPlayerPtr->getHand();
+  list<CardEnum>::iterator currentCardIter = hand.begin();
+
+//  for(int i = 1; currentCardIter != hand.end(); i++)
+//  {
+//    switch(i)
+//    {
+//      case 1:
+//        cardDisplayPtr = &cardInHand1;
+//        break;
+//      case 2:
+//        cardDisplayPtr = &cardInHand2;
+//        break;
+//      case 3:
+//        cardDisplayPtr = &cardInHand3;
+//        break;
+//      case 4:
+//        cardDisplayPtr = &cardInHand4;
+//        break;
+//      case 5:
+//        cardDisplayPtr = &cardInHand5;
+//        break;
+//      case 6:
+//        cardDisplayPtr = &cardInHand6;
+//        break;
+//    }
+    cardInHand1->setPixmap(QPixmap::fromImage(CARD_IMAGES[int(*currentCardIter)]));
+}
+
 void ClueMainWindowClass::setupNewBoard()
 {
   gameOver = false;
@@ -170,14 +202,14 @@ void ClueMainWindowClass::setupGame()
 
     //Add the player to gameParticipants.  Human participants (and the host) are
     //added first.
-    gameParticipants.insert(participantIterator,
-        PlayerClass("Some name", *charIterator, i >= humanPlayersSpin->value(),
-            i == 0));
+    gameParticipants.insert(participantIterator, PlayerClass("Some name",
+        *charIterator, i >= humanPlayersSpin->value(), i == 0));
 
     //Set thisPlayerChar
     if(i == 0)
     {
-      thisPlayerPtr = charIterator;
+      participantIterator--;
+      thisPlayerPtr = &*participantIterator;
     }
 
     //Erase the character in availableCharacters
@@ -189,6 +221,8 @@ void ClueMainWindowClass::setupGame()
   //Make the case file and deal out the remaining cards
   caseFile.createCaseFile(cardDeck);
   dealCards();
+
+  displayCardsInHand();
 
   drawStartingPieces();
 }
@@ -342,6 +376,10 @@ void ClueMainWindowClass::movePlayer(const DirectionEnum &direction)
   //Variable Declarations
   BoardLocationClass newLocation = currentPlayerIter->getPlayerLocation();
 
+  const QString CARD_VALUES[21] = {"Miss Scarlet", "Col. Mustard", "Mrs. White",
+      "Mr. Green", "Mrs. Peacock", "Prof. Plum", "Knife", "Candlestick",
+      "Revolver", "Rope", "Lead Pipe", "Wrench", "Hall", "Lounge", "Dining Room",
+      "Kitchen", "Ballroom", "Conservatory", "Billiard Room", "Library", "Study"};
   try
   {
     newLocation.move(direction);

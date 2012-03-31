@@ -30,6 +30,11 @@ class PlayerClass
   public:
     //Constructors
 
+
+    PlayerClass()
+    {
+
+    }
     //Constructor (QString, CardEnum, bool, bool)
     PlayerClass(
         QString name,           //Player name
@@ -82,6 +87,11 @@ class PlayerClass
     void setPlayerLocation(BoardLocationClass newLocation)
     {
       currentLocation = newLocation;
+    }
+
+    std::list<CardEnum> getHand()
+    {
+      return hand;
     }
 };
 
