@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>suggestionDialogWindow</class>
+ <widget class="QDialog" name="suggestionDialogWindow">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>252</width>
+    <height>143</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Suggestion</string>
+  </property>
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>110</y>
+     <width>181</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="roomCombo">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>30</y>
+     <width>171</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string>Hall</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Lounge</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Dining Room</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Kitchen</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Ballroom</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Conservatory</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Billiard Room</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Library</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Study</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>5</y>
+     <width>241</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>I suggest the crime was committed</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>80</y>
+     <width>41</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>by</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="suspectCombo">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>55</y>
+     <width>171</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string>Miss Scarlet</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Col. Mustard</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Mrs. White</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Mr. Green</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Mrs. Peacock</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Prof. Plum</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>55</y>
+     <width>71</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>with the</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="weaponCombo">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>80</y>
+     <width>171</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string>Knife</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Candlestick</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Revolver</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Rope</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Lead Pipe</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Wrench</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>30</y>
+     <width>67</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>in the</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>30</y>
+     <width>67</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>in the</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_6">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>5</y>
+     <width>241</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>I suggest the crime was committed</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>suggestionDialogWindow</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>suggestionDialogWindow</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
