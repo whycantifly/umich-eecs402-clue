@@ -1,4 +1,4 @@
-QT download link: http://qt.nokia.com/downloads
-QT documentation: http://doc.qt.nokia.com/4.7-snapshot/index.html
+QT download link: http://qt.nokia.com/downloads</p>
+QT documentation: http://doc.qt.nokia.com/4.7-snapshot/index.html</p>
 
-Basic QT tutorial: http://sector.ynet.sk/qt4-tutorial/my-first-qt-gui-application.html
+Basic QT tutorial: http://sector.ynet.sk/qt4-tutorial/my-first-qt-gui-application.html</p>
