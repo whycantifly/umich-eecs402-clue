@@ -2,7 +2,6 @@
 #include <string>
 #include <stdlib.h>
 
-#include "AuxSignalClass.h"
 #include "ClueMainWindowClass.h"
 #include "constants.h"
 #include "BoardLocationClass.h"
@@ -19,7 +18,8 @@ ClueMainWindowClass::ClueMainWindowClass(QWidget *parent)
       SLOT(setNetworkOptVis()));
   connect(localPlayOption, SIGNAL(clicked()), this, SLOT(setLocalOptVis()));
   connect(gameHostCheck, SIGNAL(clicked()), this, SLOT(setNetworkOptVis()));
-
+  connect(doorNumberSpin, SIGNAL(valueChanged(int)), this,
+      SLOT(toggleLeaveRoomOpt(int)));
   connect(okayButton, SIGNAL(clicked()), this, SLOT(submitMove()));
   connect(startGameButton, SIGNAL(clicked()), this, SLOT(startGame()));
 
@@ -298,10 +298,33 @@ void ClueMainWindowClass::makePlayerSuggestion()
 {
   //Code
 }
-void ClueMainWindowClass::movePlayerToDoor(int doorNumber)
+void ClueMainWindowClass::movePlayerOutDoor(int doorNumber)
 {
-  //Code
+  //Variable Declarations
+  int firstDoor = 0;
+
+  //Check if the door number exists for the room
+  if(doorNumber >=
+        NUMBER_OF_DOORS[currentPlayerIter->getPlayerLocation().getRoom()])
+  {
+    throw(ExceptionClass("The door you have selected does not exist for the "
+        "room you are in.  Please select another door and try again."));
+  }
+
+  for(int i = 0; i < int(currentPlayerIter->getPlayerLocation().getRoom()) -
+      NUMBER_OF_SUSPECTS - NUMBER_OF_WEAPONS; i++)
+  {
+    firstDoor += NUMBER_OF_DOORS[i];
+  }
+
+  drawMove(currentPlayerIter->getPlayerLocation(),
+      DOOR_LOCATIONS[firstDoor + doorNumber - 1]);
+  currentPlayerIter->setPlayerLocation(DOOR_LOCATIONS
+      [firstDoor + doorNumber - 1]);
+
+
 }
+
 void ClueMainWindowClass::movePlayer(const DirectionEnum &direction)
 {
   //Variable Declarations
@@ -343,6 +366,8 @@ void ClueMainWindowClass::checkIfValidMove(BoardLocationClass &newLocation)
   TileTypeEnum originalTileType = newLocation.getTileType(CLUE_BOARD_IMAGE);
   int totalNumberOfDoors = 0;
   int i;
+  int j;
+  int runningNumberOfDoors = 0;
   bool isDoorTile = false;
 
   //Get the totalNumberOfDoors
@@ -361,9 +386,17 @@ void ClueMainWindowClass::checkIfValidMove(BoardLocationClass &newLocation)
     i = 0;
     while(i < totalNumberOfDoors && isDoorTile == false)
     {
-      if(newLocation == DOOR_LOCATIONS[i])
+      if(currentPlayerIter->getPlayerLocation() == DOOR_LOCATIONS[i])
       {
-        isDoorTile = true;
+        for(j = 0; runningNumberOfDoors <= i; j++)
+        {
+          runningNumberOfDoors += NUMBER_OF_DOORS[j];
+        }
+        if(CardEnum(j + NUMBER_OF_SUSPECTS + NUMBER_OF_WEAPONS - 1) ==
+            newLocation.getRoom())
+        {
+          isDoorTile = true;
+        }
       }
       i++;
     }
@@ -427,7 +460,7 @@ void ClueMainWindowClass::submitMove()
     }
     else if(leaveRoomOption->isChecked() == true)
     {
-      movePlayerToDoor(doorNumberSpin->value());
+      movePlayerOutDoor(doorNumberSpin->value());
     }
     else if(makeSuggestionOption->isChecked() == true)
     {

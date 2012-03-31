@@ -54,7 +54,7 @@ class PlayerClass
     //Inline Functions
 
     //Gets the current player location.
-    const BoardLocationClass getPlayerLocation() const
+    BoardLocationClass getPlayerLocation() const
     {
       return currentLocation;
     }

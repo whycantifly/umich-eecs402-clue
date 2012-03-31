@@ -38,15 +38,15 @@ const QImage CHAR_PIECE_IMAGES[6] = {QImage("images/scarlet.png"),
     QImage("images/plum.png")};
 
 //Door locations
-const BoardLocationClass DOOR_LOCATIONS[16] = {BoardLocationClass(11, 6),
-    BoardLocationClass(12, 6), BoardLocationClass(17, 5),
-    BoardLocationClass(17, 9), BoardLocationClass(16, 12),
-    BoardLocationClass(19, 18), BoardLocationClass(9, 17),
-    BoardLocationClass(14, 17), BoardLocationClass(8, 19),
-    BoardLocationClass(15, 19), BoardLocationClass(4, 19),
-    BoardLocationClass(6, 15), BoardLocationClass(1, 12),
-    BoardLocationClass(3, 10), BoardLocationClass(6, 8),
-    BoardLocationClass(6, 3)};
+const BoardLocationClass DOOR_LOCATIONS[16] = {BoardLocationClass(11, 7),
+    BoardLocationClass(12, 7), BoardLocationClass(17, 7),
+    BoardLocationClass(16, 9), BoardLocationClass(16, 11),
+    BoardLocationClass(19, 17), BoardLocationClass(9, 16),
+    BoardLocationClass(14, 16), BoardLocationClass(7, 19),
+    BoardLocationClass(16, 19), BoardLocationClass(5, 19),
+    BoardLocationClass(7, 15), BoardLocationClass(1, 11),
+    BoardLocationClass(7, 8), BoardLocationClass(3, 11),
+    BoardLocationClass(6, 4)};
 
 //Piece starting locations
 const BoardLocationClass STARTING_LOCATIONS[6] = {BoardLocationClass(16, 0),

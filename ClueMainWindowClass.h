@@ -101,16 +101,13 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     //Moves the current player out of the room through a door; throws an
     //exception if the door number selected is not a valid door number for the
     //room.
-    void movePlayerToDoor(
+    void movePlayerOutDoor(
         int doorNumber        //Door number of the door
         );
 
     //Moves the player one tile over; throws an exception if the move is
     //invalid.
     void movePlayer(const DirectionEnum &direction);
-
-    //Moves the player to the designated location.
-    void movePlayer(const BoardLocationClass &newLocation);
 
     //Moves the player through the secret passage.
     void movePlayerToSecretPassage();
@@ -125,8 +122,6 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
         );
 
   public slots:
-    //Function Prototypes
-
     //Starts the game.
     void startGame();
 
@@ -148,6 +143,12 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     //option buttons and check boxes selected during game setup for local
     //play.
     void setLocalOptVis();
+
+    //Toggles the option to leave the room.
+    void toggleLeaveRoomOpt(int dummyVar)
+    {
+      leaveRoomOption->setChecked(true);
+    }
 };
 
 #endif
