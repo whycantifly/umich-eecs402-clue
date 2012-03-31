@@ -4,11 +4,8 @@
 #include <list>
 #include "constants.h"
 
-class DeckClass
+class DeckClass : private std::list<CardEnum>
 {
-  private:
-    std::list<CardEnum> deck;     //Card deck
-
   public:
     //Constructors
 
@@ -35,7 +32,7 @@ class DeckClass
     //Returns the deck size
     int getDeckSize() const
     {
-      return deck.size();
+      return size();
     }
 };
 

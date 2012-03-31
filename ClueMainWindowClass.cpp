@@ -32,31 +32,36 @@ void ClueMainWindowClass::displayCardsInHand()
   //Variable Declarations
   list<CardEnum>hand = thisPlayerPtr->getHand();
   list<CardEnum>::iterator currentCardIter = hand.begin();
+  QLabel *cardDisplayPtr;
+  CardEnum card;
 
-//  for(int i = 1; currentCardIter != hand.end(); i++)
-//  {
-//    switch(i)
-//    {
-//      case 1:
-//        cardDisplayPtr = &cardInHand1;
-//        break;
-//      case 2:
-//        cardDisplayPtr = &cardInHand2;
-//        break;
-//      case 3:
-//        cardDisplayPtr = &cardInHand3;
-//        break;
-//      case 4:
-//        cardDisplayPtr = &cardInHand4;
-//        break;
-//      case 5:
-//        cardDisplayPtr = &cardInHand5;
-//        break;
-//      case 6:
-//        cardDisplayPtr = &cardInHand6;
-//        break;
-//    }
-    cardInHand1->setPixmap(QPixmap::fromImage(CARD_IMAGES[int(*currentCardIter)]));
+  for(int i = 1; currentCardIter != hand.end(); i++, currentCardIter++)
+  {
+    switch(i)
+    {
+      case 1:
+        cardDisplayPtr = cardInHand1;
+        break;
+      case 2:
+        cardDisplayPtr = cardInHand2;
+        break;
+      case 3:
+        cardDisplayPtr = cardInHand3;
+        break;
+      case 4:
+        cardDisplayPtr = cardInHand4;
+        break;
+      case 5:
+        cardDisplayPtr = cardInHand5;
+        break;
+      case 6:
+        cardDisplayPtr = cardInHand6;
+        break;
+    }
+    card = *currentCardIter;
+    cardDisplayPtr->setPixmap(QPixmap::fromImage(
+        CARD_IMAGES[int(*currentCardIter)]));
+  }
 }
 
 void ClueMainWindowClass::setupNewBoard()

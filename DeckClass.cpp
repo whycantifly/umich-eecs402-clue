@@ -11,15 +11,16 @@ DeckClass::DeckClass()
 CardEnum DeckClass::drawRandomCard()
 {
   CardEnum card = getRandomCard();
-  removeCard(card);
+
+  remove(card);
   return card;
 }
 
 CardEnum DeckClass::getRandomCard()
 {
-  std::list<CardEnum>::iterator cardIter = deck.begin();
+  std::list<CardEnum>::iterator cardIter = begin();
   CardEnum randomCard;
-  int cardIndex = rand() % deck.size();
+  int cardIndex = rand() % size();
 
   for(int i = 0; i < cardIndex; i++)
   {
@@ -32,15 +33,15 @@ CardEnum DeckClass::getRandomCard()
 
 void DeckClass::removeCard(CardEnum cardToRemove)
 {
-  deck.remove(cardToRemove);
+  remove(cardToRemove);
 }
 
 void DeckClass::resetDeck()
 {
-  deck.clear();
+  clear();
   for(int i = 0; i < NUMBER_OF_SUSPECTS + NUMBER_OF_WEAPONS + NUMBER_OF_ROOMS;
       i++)
   {
-    deck.push_back(CardEnum(i));
+    push_back(CardEnum(i));
   }
 }
