@@ -121,6 +121,10 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
         const BoardLocationClass &boardLocation
         );
 
+    const BoardLocationClass getEmptyRoomTile(
+        const CardEnum &room
+        );
+
   public slots:
     //Starts the game.
     void startGame();

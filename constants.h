@@ -39,8 +39,8 @@ const QImage CHAR_PIECE_IMAGES[6] = {QImage("images/scarlet.png"),
 
 //Door locations
 const BoardLocationClass DOOR_LOCATIONS[16] = {BoardLocationClass(11, 7),
-    BoardLocationClass(12, 7), BoardLocationClass(17, 7),
-    BoardLocationClass(16, 9), BoardLocationClass(16, 11),
+    BoardLocationClass(12, 7), BoardLocationClass(17, 6),
+    BoardLocationClass(17, 8), BoardLocationClass(15, 12),
     BoardLocationClass(19, 17), BoardLocationClass(9, 16),
     BoardLocationClass(14, 16), BoardLocationClass(7, 19),
     BoardLocationClass(16, 19), BoardLocationClass(5, 19),

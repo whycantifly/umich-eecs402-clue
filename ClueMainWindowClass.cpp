@@ -304,8 +304,9 @@ void ClueMainWindowClass::movePlayerOutDoor(int doorNumber)
   int firstDoor = 0;
 
   //Check if the door number exists for the room
-  if(doorNumber >=
-        NUMBER_OF_DOORS[currentPlayerIter->getPlayerLocation().getRoom()])
+  if(doorNumber >
+        NUMBER_OF_DOORS[currentPlayerIter->getPlayerLocation().getRoom() -
+        NUMBER_OF_SUSPECTS - NUMBER_OF_WEAPONS])
   {
     throw(ExceptionClass("The door you have selected does not exist for the "
         "room you are in.  Please select another door and try again."));
@@ -321,8 +322,6 @@ void ClueMainWindowClass::movePlayerOutDoor(int doorNumber)
       DOOR_LOCATIONS[firstDoor + doorNumber - 1]);
   currentPlayerIter->setPlayerLocation(DOOR_LOCATIONS
       [firstDoor + doorNumber - 1]);
-
-
 }
 
 void ClueMainWindowClass::movePlayer(const DirectionEnum &direction)
@@ -416,7 +415,26 @@ void ClueMainWindowClass::checkIfValidMove(BoardLocationClass &newLocation)
 
 void ClueMainWindowClass::movePlayerToSecretPassage()
 {
+  BoardLocationClass newLocation;
 
+  switch(currentPlayerIter->getPlayerLocation().getRoom())
+  {
+    case LOUNGE:
+      newLocation = getEmptyRoomTile(CONSERVATORY);
+      break;
+    case KITCHEN:
+      newLocation = getEmptyRoomTile(STUDY);
+      break;
+    case CONSERVATORY:
+      newLocation = getEmptyRoomTile(LOUNGE);
+      break;
+    case STUDY:
+      newLocation = getEmptyRoomTile(KITCHEN);
+      break;
+  }
+
+  drawMove(currentPlayerIter->getPlayerLocation(), newLocation);
+  currentPlayerIter->setPlayerLocation(newLocation);
 }
 
 void ClueMainWindowClass::displayExceptionMessageBox(ExceptionClass
@@ -473,7 +491,8 @@ void ClueMainWindowClass::submitMove()
   }
   catch(ExceptionClass exception)
   {
-
+    errorMessageLabel->setText("<span style=' font-weight:600; color:#ff0000;'>"
+        + exception.getErrorMessage() + "</span>");
   }
 }
 
@@ -547,8 +566,15 @@ void ClueMainWindowClass::setLocalOptVis()
   humanPlayersSpin->setValue(1);
 }
 
+
 const BoardLocationClass ClueMainWindowClass::getEmptyRoomTile(
     const BoardLocationClass &boardLocation)
+{
+  return getEmptyRoomTile(boardLocation.getRoom());
+}
+
+const BoardLocationClass ClueMainWindowClass::getEmptyRoomTile(
+    const CardEnum &room)
 {
   //Variable Declarations
   bool emptyTileFlag = false;
@@ -563,9 +589,9 @@ const BoardLocationClass ClueMainWindowClass::getEmptyRoomTile(
     while(j < NUMBER_OF_SUSPECTS / ROOM_STORAGE_WIDTH && emptyTileFlag == false)
     {
       currentLocation =
-          BoardLocationClass(ROOM_PIECE_LOCATIONS[int(boardLocation.getRoom()) -
+          BoardLocationClass(ROOM_PIECE_LOCATIONS[int(room) -
           NUMBER_OF_SUSPECTS - NUMBER_OF_WEAPONS].getXCoord() + i,
-          ROOM_PIECE_LOCATIONS[int(boardLocation.getRoom()) -
+          ROOM_PIECE_LOCATIONS[int(room) -
           NUMBER_OF_SUSPECTS - NUMBER_OF_WEAPONS].getYCoord() + j);
       if(currentLocation.getTileType(inProgressBoardImage) == ROOM_TILE)
       {
