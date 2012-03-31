@@ -6,8 +6,10 @@
 
 #include "BoardLocationClass.h"
 
-const QString CHARACTER_NAMES[6] = {"Miss Scarlet", "Colonel Mustard",
-    "Mrs. White", "Mr. Green", "Ms. Peacock", "Professor Plum"};
+const QString CARD_VALUES[21] = {"Miss Scarlet", "Col. Mustard", "Mrs. White",
+    "Mr. Green", "Mrs. Peacock", "Prof. Plum", "Knife", "Candlestick",
+    "Revolver", "Rope", "Lead Pipe", "Wrench", "Hall", "Lounge", "Dining Room",
+    "Kitchen", "Ballroom", "Conservatory", "Billiard Room", "Library", "Study"};
 
 //RGB value for transparency
 const QRgb TRANSPARENT_RGB = qRgb(255, 255, 255);
@@ -63,6 +65,8 @@ const BoardLocationClass ROOM_PIECE_LOCATIONS[9] = {BoardLocationClass(12, 0),
 
 //Number of doors per room
 const int NUMBER_OF_DOORS[9] = {2, 1, 2, 1, 4, 1, 2, 2, 1};
+
+const int NUMBER_OF_CARD_TYPES = 3;
 
 const int NUMBER_OF_ROOMS = 9;
 const int NUMBER_OF_SUSPECTS = 6;

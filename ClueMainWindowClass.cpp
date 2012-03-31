@@ -5,6 +5,7 @@
 #include "ClueMainWindowClass.h"
 #include "constants.h"
 #include "BoardLocationClass.h"
+#include "CaseFileClass.h"
 #include "ExceptionClass.h"
 
 using namespace std;
@@ -109,11 +110,6 @@ void ClueMainWindowClass::drawMove(const BoardLocationClass &oldLocation,
   gameBoard->setPixmap(QPixmap::fromImage(inProgressBoardImage));
 }
 
-void ClueMainWindowClass::makeCaseFile()
-{
-  //Code
-}
-
 void ClueMainWindowClass::dealCards()
 {
   //Code
@@ -125,7 +121,8 @@ void ClueMainWindowClass::setupGame()
   list<CardEnum>::iterator charIterator;
   list<PlayerClass>::iterator participantIterator;
   int randomCharacterNumber;
-  QMessageBox hi;
+
+  caseFile.createCaseFile(cardDeck);
 
   //Initialize availableCharacters
   for(CardEnum i = CardEnum(0); i < NUMBER_OF_SUSPECTS;

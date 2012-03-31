@@ -7,6 +7,7 @@
 #include "ui_ClueMainWindowClass.h"
 #include "constants.h"
 #include "BoardLocationClass.h"
+#include "CaseFileClass.h"
 #include "DeckClass.h"
 #include "ExceptionClass.h"
 #include "PlayerClass.h"
@@ -21,7 +22,7 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     std::list<PlayerClass> gameParticipants;  //Players in order of turn
     std::list<PlayerClass>::iterator currentPlayerIter; //Current player
     DeckClass cardDeck;                 //Deck of cards
-    std::list<CardEnum> caseFile;       //Case file of details of the crime
+    CaseFileClass caseFile;             //Case file of details of the crime
     CardEnum thisPlayerChar ;           //Character corresponding to the human
                                         //Player at this computer
 
