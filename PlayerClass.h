@@ -9,14 +9,15 @@
 
 #include "constants.h"
 #include "BoardLocationClass.h"
+#include "SuggestionClass.h"
 
 class PlayerClass
 {
   private:
     QString playerName;                 //Player name
-    CardEnum character;                 //Assigned character piece
+    SuspectEnum character;              //Assigned character piece
     BoardLocationClass currentLocation; //Current location on the board
-    bool gameHost;                      //True = host (or local play);
+    bool hostFlag;                      //True = host (or local play);
                                         //False = not host
     bool aiFlag;                        //True = AI; false = human player
     bool movedBySuggestion;             //True = moved last turn; false = not
@@ -38,7 +39,7 @@ class PlayerClass
     //Constructor (QString, CardEnum, bool, bool)
     PlayerClass(
         QString name,           //Player name
-        CardEnum suspect,       //Character piece
+        SuspectEnum suspect,       //Character piece
         bool aiValue,           //AI or human
         bool gameHostValue      //Game host or not
         );
@@ -53,15 +54,39 @@ class PlayerClass
     //Sets the piece's starting location based on CHAR_STARTING_LOCATION.
     void setStartingLocation();
 
-    //Moves the AI.
-    void moveAi();
-
     //Inline Functions
 
+    bool getSuggestMove() const
+    {
+      return movedBySuggestion;
+    }
+
+    void setSuggestMove(bool newValue)
+    {
+      movedBySuggestion = newValue;
+    }
+
     //Sets the AI flag.
-    void setAi(bool aiValue)
+    void setAiFlag(bool aiValue)
     {
       aiFlag = aiValue;
+    }
+
+    //Gets the AI flag.
+    bool getAiFlag() const
+    {
+      return aiFlag;
+    }
+
+    //Gets the host flag.
+    bool getHostFlag() const
+    {
+      return hostFlag;
+    }
+
+    QString getName() const
+    {
+      return playerName;
     }
 
     //Gets the current player location.
@@ -71,7 +96,7 @@ class PlayerClass
     }
 
     //Gets the player's character piece.
-    const CardEnum getCharacter() const
+    const SuspectEnum getCharacter() const
     {
       return character;
     }
@@ -99,6 +124,19 @@ class PlayerClass
     {
       return hand;
     }
+
+//DUMMY AI CODE/////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+    //Moves the AI.
+    void moveAi();
+
+    //Handles suggestions passed to the AI.
+    CardEnum handleSuggestionAi(SuggestionClass suggestion);
+
+    void handlePrerollAi();
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
 };
 
 #endif

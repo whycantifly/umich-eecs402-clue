@@ -43,7 +43,7 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     //Draws the character piece indicated to the tile indicated on
     //inProgressBoardImage.
     void drawPieceToBoard(
-        const CardEnum &character,
+        const SuspectEnum &character,
         const BoardLocationClass &tile
         );
 
@@ -74,14 +74,15 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     //Starts the current player's turn.
     void startPlayerTurn();
 
-    //Gets a dice roll and displays it on the Gui.
-    const int getAndDisplayDieRoll() const;
-
     //Displays gameplay options from a corner room.
     void displayCornerRoomOptions();
 
+    void displayRoomOptions();
+
     //Displays default gameplay options.
     void displayDefaultOptions();
+
+    void disableAllControls();
 
     //Draws the pieces in the game on their starting tiles.
     void drawStartingPieces();
@@ -108,6 +109,8 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
         int doorNumber        //Door number of the door
         );
 
+    void rollDieAndMove();
+
     //Moves the player one tile over; throws an exception if the move is
     //invalid.
     void movePlayer(const DirectionEnum &direction);
@@ -129,6 +132,7 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
         );
 
   public slots:
+
     //Starts the game.
     void startGame();
 
