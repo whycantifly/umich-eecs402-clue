@@ -12,7 +12,7 @@ inline WeaponEnum cardToWeapon(CardEnum card)
   {
     throw(ExceptionClass("The weapon for this card is an invalid value."));
   }
-  return WeaponEnum(int(card));
+  return WeaponEnum(int(card) - NUMBER_OF_SUSPECTS);
 }
 
 #endif
