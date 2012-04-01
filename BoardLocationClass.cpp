@@ -131,3 +131,42 @@ void BoardLocationClass::move(const DirectionEnum &direction)
   }
   checkBoardBounds();
 }
+
+CardEnum BoardLocationClass::getRoomDoor() const
+{
+  int i;
+  int j;
+  bool isDoorTile = false;
+  int totalNumberOfDoors = 0;
+  int runningNumberOfDoors = 0;
+  CardEnum room;
+
+  for(i = 0; i < NUMBER_OF_ROOMS; i++)
+  {
+    totalNumberOfDoors += NUMBER_OF_DOORS[i];
+  }
+
+  i = 0;
+  while(i < totalNumberOfDoors && isDoorTile == false)
+  {
+    if(BoardLocationClass(xCoord, yCoord) == DOOR_LOCATIONS[i])
+    {
+      j = 0;
+      for(j = 0; runningNumberOfDoors <= i; j++)
+      {
+        runningNumberOfDoors += NUMBER_OF_DOORS[j];
+      }
+      room = CardEnum(j + NUMBER_OF_SUSPECTS + NUMBER_OF_WEAPONS - 1);
+      isDoorTile = true;
+    }
+    i++;
+
+  }
+  if(isDoorTile == false)
+  {
+    throw(ExceptionClass("That tile is on the other side of a wall.  You "
+        "must use a door to enter a room.  Please try another move."));
+  }
+
+  return room;
+}

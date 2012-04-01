@@ -91,8 +91,7 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
         ExceptionClass exceptionText    //Exception
         );
 
-    //Ends the game.
-    void endGame();
+    CardEnum getCurrentPlayerRoom();
 
     //Displays the accusation window and either eliminates the player from the
     //game or ends the game with the player as the winner.

@@ -58,6 +58,12 @@ class PlayerClass
 
     //Inline Functions
 
+    //Sets the AI flag.
+    void setAi(bool aiValue)
+    {
+      aiFlag = aiValue;
+    }
+
     //Gets the current player location.
     BoardLocationClass getPlayerLocation() const
     {

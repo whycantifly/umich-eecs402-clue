@@ -3,14 +3,10 @@
 
 #include "enums.h"
 #include "DeckClass.h"
+#include "SuggestionClass.h"
 
-class CaseFileClass
+class CaseFileClass : public SuggestionClass
 {
-  private:
-    CardEnum suspectCard;
-    CardEnum weaponCard;
-    CardEnum roomCard;
-
   public:
     //Constructors
     CaseFileClass()
@@ -20,20 +16,6 @@ class CaseFileClass
     CaseFileClass(DeckClass &deck);
 
     void createCaseFile(DeckClass &deck);
-
-    //Inline functions
-    const CardEnum getSuspectCard() const
-    {
-      return suspectCard;
-    }
-    const CardEnum getWeaponCard() const
-    {
-      return weaponCard;
-    }
-    const CardEnum getRoomCard() const
-    {
-      return roomCard;
-    }
 };
 
 #endif

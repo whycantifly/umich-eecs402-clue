@@ -4,9 +4,11 @@
 
 #include "ClueMainWindowClass.h"
 #include "constants.h"
+#include "AccusationDialogClass.h"
 #include "BoardLocationClass.h"
 #include "CaseFileClass.h"
 #include "ExceptionClass.h"
+#include "SuggestionDialogClass.h"
 
 using namespace std;
 
@@ -188,6 +190,7 @@ void ClueMainWindowClass::setupGame()
   }
 
   //Add players to gameParticipants
+  gameParticipants.clear();
   for(int i = 0; i < humanPlayersSpin->value() + computerPlayersSpin->value();
       i++)
   {
@@ -224,6 +227,7 @@ void ClueMainWindowClass::setupGame()
   currentPlayerIter = gameParticipants.begin();
 
   //Make the case file and deal out the remaining cards
+  cardDeck.resetDeck();
   caseFile.createCaseFile(cardDeck);
   dealCards();
 
@@ -344,12 +348,50 @@ void ClueMainWindowClass::drawStartingPieces()
 
 void ClueMainWindowClass::makePlayerAccusation()
 {
-  //Code
+  //Variable Declarations
+  SuggestionClass accusation;
+  QMessageBox endGame;
+  AccusationDialogClass accusationDialog(&accusation, this);
+
+  if(accusationDialog.exec() == QDialog::Accepted)
+  {
+    endGame.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
+    if(accusation != caseFile)
+    {
+      endGame.setWindowTitle("Game Over");
+      endGame.setText("You have made an incorrect accusation and can make "
+          "no further moves this game. Would you like to play again?");
+      currentPlayerIter->setAi(true);
+    }
+    else
+    {
+      endGame.setWindowTitle("Congratulations!");
+      endGame.setText("You have made a correct accusation and have won the "
+          "game!  Would you like to play again?");
+    }
+    if(endGame.exec() == QMessageBox::Yes)
+    {
+      setupNewBoard();
+    }
+    else
+    {
+      close();
+    }
+  }
 }
+
 void ClueMainWindowClass::makePlayerSuggestion()
 {
-  //Code
+  //Variable Declarations
+  SuggestionClass suggestion;
+  SuggestionDialogClass suggestionDialog(&suggestion, this);
+
+  if(suggestionDialog.exec() == QDialog::Accepted)
+  {
+
+  }
 }
+
 void ClueMainWindowClass::movePlayerOutDoor(int doorNumber)
 {
   //Variable Declarations
@@ -424,12 +466,6 @@ void ClueMainWindowClass::checkIfValidMove(BoardLocationClass &newLocation)
   int runningNumberOfDoors = 0;
   bool isDoorTile = false;
 
-  //Get the totalNumberOfDoors
-  for(i = 0; i < NUMBER_OF_ROOMS; i++)
-  {
-    totalNumberOfDoors += NUMBER_OF_DOORS[i];
-  }
-
   if(originalTileType == OUT_OF_BOUNDS_TILE)
   {
     throw(ExceptionClass("That tile is not within the bounds of the "
@@ -437,25 +473,8 @@ void ClueMainWindowClass::checkIfValidMove(BoardLocationClass &newLocation)
   }
   else if(originalTileType == ROOM_TILE)
   {
-    i = 0;
-    while(i < totalNumberOfDoors && isDoorTile == false)
-    {
-      if(currentPlayerIter->getPlayerLocation() == DOOR_LOCATIONS[i])
-      {
-        for(j = 0; runningNumberOfDoors <= i; j++)
-        {
-          runningNumberOfDoors += NUMBER_OF_DOORS[j];
-        }
-        if(CardEnum(j + NUMBER_OF_SUSPECTS + NUMBER_OF_WEAPONS - 1) ==
-            newLocation.getRoom())
-        {
-          isDoorTile = true;
-        }
-      }
-      i++;
-    }
-
-    if(isDoorTile == false)
+    if(currentPlayerIter->getPlayerLocation().getRoomDoor() !=
+        newLocation.getRoom())
     {
       throw(ExceptionClass("That tile is on the other side of a wall.  You "
           "must use a door to enter a room.  Please try another move."));
@@ -658,4 +677,9 @@ const BoardLocationClass ClueMainWindowClass::getEmptyRoomTile(
   }
 
   return currentLocation;
+}
+
+CardEnum ClueMainWindowClass::getCurrentPlayerRoom()
+{
+  return currentPlayerIter->getPlayerLocation().getRoom();
 }

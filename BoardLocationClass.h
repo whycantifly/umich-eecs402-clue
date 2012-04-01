@@ -75,6 +75,10 @@ class BoardLocationClass
         const DirectionEnum &direction    //Direction to move
         );
 
+    //If the tile is a door tile, gets the room that it belongs to.  If the tile
+    //is not a room tile, throws an exception.
+    CardEnum getRoomDoor() const;
+
     //Inline functions
 
     //Gets the x-coordinate.

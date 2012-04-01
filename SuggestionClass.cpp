@@ -1,0 +1,1 @@
+#include "SuggestionClass.h"

@@ -7,12 +7,14 @@
 int main(int argc, char *argv[])
 {
   QApplication app(argc, argv);
-  ClueMainWindowClass *dialog = new ClueMainWindowClass;
+  ClueMainWindowClass *clueGame = new ClueMainWindowClass;
 
   srand(time(0));
 
-  dialog->show();
+  clueGame->show();
 
   return app.exec();
+
+  delete clueGame;
 }
 
