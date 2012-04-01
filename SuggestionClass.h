@@ -7,31 +7,31 @@
 class SuggestionClass
 {
   protected:
-    CardEnum suspectCard;
-    CardEnum weaponCard;
-    CardEnum roomCard;
+    SuspectEnum suspect;
+    WeaponEnum weapon;
+    RoomEnum room;
 
   public:
     //Constructors
     SuggestionClass(int suspect = 0, int weapon = 0, int room = 0)
     {
-      suspectCard = CardEnum(suspect);
-      weaponCard = CardEnum(weapon);
-      roomCard = CardEnum(room);
+      suspect = SuspectEnum(suspect);
+      weapon = WeaponEnum(weapon);
+      room = RoomEnum(room);
     }
 
-    SuggestionClass(CardEnum suspect, CardEnum weapon, CardEnum room)
+    SuggestionClass(SuspectEnum suspect, WeaponEnum weapon, RoomEnum room)
     {
-      suspectCard = suspect;
-      weaponCard = weapon;
-      roomCard = room;
+      suspect = suspect;
+      weapon = weapon;
+      room = room;
     }
 
     //Overloaded operators
     bool operator==(const SuggestionClass &rhs) const
     {
-      return(suspectCard == rhs.suspectCard && weaponCard == rhs.weaponCard &&
-          roomCard == rhs.roomCard);
+      return(suspect == rhs.suspect && weapon == rhs.weapon &&
+          room == rhs.room);
     }
 
     bool operator!=(const SuggestionClass &rhs) const
@@ -40,17 +40,17 @@ class SuggestionClass
     }
 
     //Inline functions
-    const CardEnum getSuspectCard() const
+    const SuspectEnum getSuspect() const
     {
-      return suspectCard;
+      return suspect;
     }
-    const CardEnum getWeaponCard() const
+    const WeaponEnum getWeapon() const
     {
-      return weaponCard;
+      return weapon;
     }
-    const CardEnum getRoomCard() const
+    const RoomEnum getRoom() const
     {
-      return roomCard;
+      return room;
     }
 };
 

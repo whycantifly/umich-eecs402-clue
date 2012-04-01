@@ -35,7 +35,6 @@ void ClueMainWindowClass::displayCardsInHand()
   list<CardEnum>hand = thisPlayerPtr->getHand();
   list<CardEnum>::iterator currentCardIter = hand.begin();
   QLabel *cardDisplayPtr;
-  CardEnum card;
 
   for(int i = 1; currentCardIter != hand.end(); i++, currentCardIter++)
   {
@@ -60,7 +59,7 @@ void ClueMainWindowClass::displayCardsInHand()
         cardDisplayPtr = cardInHand6;
         break;
     }
-    card = *currentCardIter;
+
     cardDisplayPtr->setPixmap(QPixmap::fromImage(
         CARD_IMAGES[int(*currentCardIter)]));
   }
@@ -173,6 +172,8 @@ void ClueMainWindowClass::setupGame()
   list<CardEnum>::iterator charIterator;
   list<PlayerClass>::iterator participantIterator;
   int randomCharacterNumber;
+  QString playerName;
+  int defaultNameCounter = 1;
 
   //Initialize availableCharacters
   for(CardEnum i = CardEnum(0); i < NUMBER_OF_SUSPECTS;
@@ -210,6 +211,19 @@ void ClueMainWindowClass::setupGame()
 
     //Add the player to gameParticipants.  Human participants (and the host) are
     //added first.
+    if(i == 0)
+    {
+      playerName = playerNameText->text();
+    }
+    else if(i < humanPlayersSpin->value())
+    {
+      //Networked player names
+    }
+    else
+    {
+      playerName = "Player " + QString(defaultNameCounter);
+      defaultNameCounter++;
+    }
     gameParticipants.insert(participantIterator, PlayerClass("Some name",
         *charIterator, i >= humanPlayersSpin->value(), i == 0));
 
@@ -385,6 +399,7 @@ void ClueMainWindowClass::makePlayerSuggestion()
   //Variable Declarations
   SuggestionClass suggestion;
   SuggestionDialogClass suggestionDialog(&suggestion, this);
+//  list<CardEnum>:
 
   if(suggestionDialog.exec() == QDialog::Accepted)
   {
@@ -399,15 +414,13 @@ void ClueMainWindowClass::movePlayerOutDoor(int doorNumber)
 
   //Check if the door number exists for the room
   if(doorNumber >
-        NUMBER_OF_DOORS[currentPlayerIter->getPlayerLocation().getRoom() -
-        NUMBER_OF_SUSPECTS - NUMBER_OF_WEAPONS])
+      NUMBER_OF_DOORS[currentPlayerIter->getPlayerLocation().getRoom()])
   {
     throw(ExceptionClass("The door you have selected does not exist for the "
         "room you are in.  Please select another door and try again."));
   }
 
-  for(int i = 0; i < int(currentPlayerIter->getPlayerLocation().getRoom()) -
-      NUMBER_OF_SUSPECTS - NUMBER_OF_WEAPONS; i++)
+  for(int i = 0; i < int(currentPlayerIter->getPlayerLocation().getRoom()); i++)
   {
     firstDoor += NUMBER_OF_DOORS[i];
   }
@@ -423,10 +436,6 @@ void ClueMainWindowClass::movePlayer(const DirectionEnum &direction)
   //Variable Declarations
   BoardLocationClass newLocation = currentPlayerIter->getPlayerLocation();
 
-  const QString CARD_VALUES[21] = {"Miss Scarlet", "Col. Mustard", "Mrs. White",
-      "Mr. Green", "Mrs. Peacock", "Prof. Plum", "Knife", "Candlestick",
-      "Revolver", "Rope", "Lead Pipe", "Wrench", "Hall", "Lounge", "Dining Room",
-      "Kitchen", "Ballroom", "Conservatory", "Billiard Room", "Library", "Study"};
   try
   {
     newLocation.move(direction);
@@ -460,11 +469,6 @@ void ClueMainWindowClass::checkIfValidMove(BoardLocationClass &newLocation)
   //Variable Declarations
   TileTypeEnum currentTileType = newLocation.getTileType(inProgressBoardImage);
   TileTypeEnum originalTileType = newLocation.getTileType(CLUE_BOARD_IMAGE);
-  int totalNumberOfDoors = 0;
-  int i;
-  int j;
-  int runningNumberOfDoors = 0;
-  bool isDoorTile = false;
 
   if(originalTileType == OUT_OF_BOUNDS_TILE)
   {
@@ -504,6 +508,8 @@ void ClueMainWindowClass::movePlayerToSecretPassage()
       break;
     case STUDY:
       newLocation = getEmptyRoomTile(KITCHEN);
+      break;
+    default:
       break;
   }
 
@@ -648,7 +654,7 @@ const BoardLocationClass ClueMainWindowClass::getEmptyRoomTile(
 }
 
 const BoardLocationClass ClueMainWindowClass::getEmptyRoomTile(
-    const CardEnum &room)
+    const RoomEnum &room)
 {
   //Variable Declarations
   bool emptyTileFlag = false;
@@ -663,10 +669,8 @@ const BoardLocationClass ClueMainWindowClass::getEmptyRoomTile(
     while(j < NUMBER_OF_SUSPECTS / ROOM_STORAGE_WIDTH && emptyTileFlag == false)
     {
       currentLocation =
-          BoardLocationClass(ROOM_PIECE_LOCATIONS[int(room) -
-          NUMBER_OF_SUSPECTS - NUMBER_OF_WEAPONS].getXCoord() + i,
-          ROOM_PIECE_LOCATIONS[int(room) -
-          NUMBER_OF_SUSPECTS - NUMBER_OF_WEAPONS].getYCoord() + j);
+          BoardLocationClass(ROOM_PIECE_LOCATIONS[int(room)].getXCoord() + i,
+          ROOM_PIECE_LOCATIONS[int(room)].getYCoord() + j);
       if(currentLocation.getTileType(inProgressBoardImage) == ROOM_TILE)
       {
         emptyTileFlag = true;
@@ -679,7 +683,7 @@ const BoardLocationClass ClueMainWindowClass::getEmptyRoomTile(
   return currentLocation;
 }
 
-CardEnum ClueMainWindowClass::getCurrentPlayerRoom()
+RoomEnum ClueMainWindowClass::getCurrentPlayerRoom()
 {
   return currentPlayerIter->getPlayerLocation().getRoom();
 }

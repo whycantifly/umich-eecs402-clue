@@ -1,6 +1,11 @@
 #include "CaseFileClass.h"
 #include "constants.h"
 #include "enums.h"
+#include "cardToSuspect.h"
+#include "cardToWeapon.h"
+#include "cardToRoom.h"
+
+using namespace std;
 
 CaseFileClass::CaseFileClass(DeckClass &deck)
 {
@@ -20,26 +25,38 @@ void CaseFileClass::createCaseFile(DeckClass &deck)
   {
     randomCard = deck.getRandomCard();
 
-    if(int(randomCard) < NUMBER_OF_SUSPECTS && haveSuspectFlag == false)
+    try
     {
-      suspectCard = randomCard;
-      deck.removeCard(randomCard);
-      haveSuspectFlag = true;
+      cardToSuspect(randomCard);
+      if(haveSuspectFlag == false)
+      {
+        suspect = cardToSuspect(randomCard);
+        deck.removeCard(randomCard);
+        haveSuspectFlag = true;
+      }
     }
-    else if(int(randomCard) < NUMBER_OF_SUSPECTS + NUMBER_OF_WEAPONS &&
-        int(randomCard) >= NUMBER_OF_SUSPECTS && haveWeaponFlag == false)
+    catch(ExceptionClass notASuspect)
     {
-      weaponCard = randomCard;
-      deck.removeCard(randomCard);
-      haveWeaponFlag = true;
-    }
-    else if(int(randomCard) < NUMBER_OF_SUSPECTS + NUMBER_OF_WEAPONS +
-        NUMBER_OF_ROOMS && int(randomCard) >= NUMBER_OF_SUSPECTS +
-        NUMBER_OF_WEAPONS && haveRoomFlag == false)
-    {
-      roomCard = randomCard;
-      deck.removeCard(randomCard);
-      haveRoomFlag = true;
+      try
+      {
+        cardToWeapon(randomCard);
+        if(haveWeaponFlag == false)
+        {
+          weapon = cardToWeapon(randomCard);
+          deck.removeCard(randomCard);
+          haveWeaponFlag = true;
+        }
+      }
+      catch(ExceptionClass notAWeapon)
+      {
+        if(haveRoomFlag == false)
+        {
+          room = cardToRoom(randomCard);
+          deck.removeCard(randomCard);
+          haveRoomFlag = true;
+        }
+      }
     }
   }
+  int i = 0;
 }

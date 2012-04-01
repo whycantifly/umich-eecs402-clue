@@ -58,7 +58,7 @@ class BoardLocationClass
         ) const;
 
     //Gets the room of the tile at this location based on ROOM_TILE_RGB.
-    const CardEnum getRoom() const;
+    const RoomEnum getRoom() const;
 
     //Gets the top left pixel of this tile.
     const QPoint getTopLeftPixel() const;
@@ -77,7 +77,7 @@ class BoardLocationClass
 
     //If the tile is a door tile, gets the room that it belongs to.  If the tile
     //is not a room tile, throws an exception.
-    CardEnum getRoomDoor() const;
+    RoomEnum getRoomDoor() const;
 
     //Inline functions
 

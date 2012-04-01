@@ -72,11 +72,11 @@ const QPoint BoardLocationClass::getMiddlePixel() const
       yCoord * (TILE_HEIGHT - 1) + TILE_HEIGHT / 2);
 }
 
-const CardEnum BoardLocationClass::getRoom() const
+const RoomEnum BoardLocationClass::getRoom() const
 {
   //Variable Declarations
   QRgb tileColor;
-  CardEnum room;
+  RoomEnum room;
   bool foundRoom = false;
   int i;
 
@@ -95,7 +95,7 @@ const CardEnum BoardLocationClass::getRoom() const
       if(tileColor == ROOM_TILE_RGB[i])
       {
         foundRoom = true;
-        room = CardEnum(NUMBER_OF_SUSPECTS + NUMBER_OF_WEAPONS + i);
+        room = RoomEnum(i);
       }
       i++;
     }
@@ -132,14 +132,14 @@ void BoardLocationClass::move(const DirectionEnum &direction)
   checkBoardBounds();
 }
 
-CardEnum BoardLocationClass::getRoomDoor() const
+RoomEnum BoardLocationClass::getRoomDoor() const
 {
   int i;
   int j;
   bool isDoorTile = false;
   int totalNumberOfDoors = 0;
   int runningNumberOfDoors = 0;
-  CardEnum room;
+  RoomEnum room;
 
   for(i = 0; i < NUMBER_OF_ROOMS; i++)
   {
@@ -156,7 +156,7 @@ CardEnum BoardLocationClass::getRoomDoor() const
       {
         runningNumberOfDoors += NUMBER_OF_DOORS[j];
       }
-      room = CardEnum(j + NUMBER_OF_SUSPECTS + NUMBER_OF_WEAPONS - 1);
+      room = RoomEnum(j - 1);
       isDoorTile = true;
     }
     i++;

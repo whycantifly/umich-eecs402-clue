@@ -91,7 +91,7 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
         ExceptionClass exceptionText    //Exception
         );
 
-    CardEnum getCurrentPlayerRoom();
+    RoomEnum getCurrentPlayerRoom();
 
     //Displays the accusation window and either eliminates the player from the
     //game or ends the game with the player as the winner.
@@ -125,7 +125,7 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
         );
 
     const BoardLocationClass getEmptyRoomTile(
-        const CardEnum &room
+        const RoomEnum &room
         );
 
   public slots:
