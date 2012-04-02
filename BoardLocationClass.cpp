@@ -72,6 +72,20 @@ const QPoint BoardLocationClass::getMiddlePixel() const
       yCoord * (TILE_HEIGHT - 1) + TILE_HEIGHT / 2);
 }
 
+bool BoardLocationClass::checkCornerRoom() const
+{
+  if(getRoom() == LOUNGE || getRoom() == KITCHEN || getRoom() == CONSERVATORY ||
+      getRoom() == STUDY)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+
 const RoomEnum BoardLocationClass::getRoom() const
 {
   //Variable Declarations
@@ -103,12 +117,15 @@ const RoomEnum BoardLocationClass::getRoom() const
   return room;
 }
 
-void BoardLocationClass::checkBoardBounds()
+bool BoardLocationClass::checkBoardBounds() const
 {
   if(xCoord < 0 || xCoord > BOARD_WIDTH || yCoord < 0 || yCoord > BOARD_HEIGHT)
   {
-    throw(ExceptionClass("Invalid Move", "That tile is not within the bounds of "
-        "the board.  Please try another move."));
+    return false;
+  }
+  else
+  {
+    return true;
   }
 }
 
@@ -129,7 +146,11 @@ void BoardLocationClass::move(const DirectionEnum &direction)
       xCoord += 1;
       break;
   }
-  checkBoardBounds();
+  if(checkBoardBounds() == false)
+  {
+    throw(ExceptionClass("Invalid Move", "That tile is not within the bounds "
+        "of the board.  Please try another move."));
+  }
 }
 
 RoomEnum BoardLocationClass::getRoomDoor() const

@@ -20,13 +20,17 @@ class PlayerClass
     bool hostFlag;                      //True = host (or local play);
                                         //False = not host
     bool aiFlag;                        //True = AI; false = human player
-    bool movedBySuggestion;             //True = moved last turn; false = not
+    bool movedSinceLastTurnFlag;        //True = moved since last turn;
+                                        //False = not moved since last turn
+    bool enteredRoomThisMoveFlag;       //True = just entered a room;
+                                        //False = did not just enter a room
     std::list<CardEnum> hand;           //Cards in the players hand; ordered in
                                         //order of CardEnum
     int dieRollThisTurn;                //Value of the die roll this turn
     int movesLeftThisTurn;              //Moves left to make this turn
     std::vector<BoardLocationClass> movesThisTurn;  //List of moves player has
                                                     //made this turn
+    std::pair<CardEnum, SuspectEnum> detectiveNotes[NUMBER_OF_CARDS];
 
   public:
     //Constructors
@@ -56,16 +60,27 @@ class PlayerClass
 
     //Inline Functions
 
-    bool getSuggestMove() const
+    bool getMovedSinceLastTurnFlag() const
     {
-      return movedBySuggestion;
+      return movedSinceLastTurnFlag;
     }
 
-    void setSuggestMove(bool newValue)
+    void setMovedSinceLastTurnFlag(bool newValue)
     {
-      movedBySuggestion = newValue;
+      movedSinceLastTurnFlag = newValue;
     }
 
+
+
+    bool getEnteredRoomThisMoveFlag() const
+    {
+      return enteredRoomThisMoveFlag;
+    }
+
+    void setEnteredRoomThisMoveFlag(bool newValue)
+    {
+      enteredRoomThisMoveFlag = newValue;
+    }
     //Sets the AI flag.
     void setAiFlag(bool aiValue)
     {
@@ -101,11 +116,38 @@ class PlayerClass
       return character;
     }
 
-    //Returns a random int between 1 and 6.
-    int rollDie() const
+    //Sets dieRollThisTurn and movesLeftThisTurn to a die roll.
+    void rollDie()
     {
-      return ((rand() % 6) + 1);
+      dieRollThisTurn = ((rand() % 6) + 1);
+      movesLeftThisTurn = dieRollThisTurn;
     }
+
+    void setDieRoll(int dieRoll)
+    {
+      dieRollThisTurn = dieRoll;
+    }
+
+    int getDieRoll()
+    {
+      return dieRollThisTurn;
+    }
+
+    void setMovesLeft(int movesLeft)
+    {
+      movesLeftThisTurn = movesLeft;
+    }
+
+    int getMovesLeft()
+    {
+      return movesLeftThisTurn;
+    }
+
+    void decrementMovesLeft()
+    {
+      movesLeftThisTurn--;
+    }
+
 
     //Moves the player over one tile; throws an exception if the move is
     //outside the bounds of the board.
@@ -133,7 +175,10 @@ class PlayerClass
     //Handles suggestions passed to the AI.
     CardEnum handleSuggestionAi(SuggestionClass suggestion);
 
-    void handlePrerollAi();
+    AiActionEnum handlePrerollAi(SuggestionClass &aiSuggestion,
+        DirectionEnum &direction, bool &secretPassageFlag);
+
+    SuggestionClass makeSuggestionAi();
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -7,6 +7,10 @@
 
 inline CardEnum suspectToCard(SuspectEnum suspect)
 {
+  if(int(suspect) >= NUMBER_OF_SUSPECTS)
+  {
+    throw(ExceptionClass("That suspect does not have a card value."));
+  }
   return CardEnum(int(suspect));
 }
 

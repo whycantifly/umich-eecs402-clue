@@ -7,8 +7,7 @@ SuggestionDialogClass::SuggestionDialogClass(SuggestionClass *suggestionPtr,
 {
   setupUi(this);
 
-  roomCombo->setCurrentIndex(int(parent->getCurrentPlayerRoom()) -
-      NUMBER_OF_SUSPECTS - NUMBER_OF_WEAPONS);
+  roomCombo->setCurrentIndex(int(parent->getCurrentPlayerRoom()));
   roomCombo->setEnabled(false);
 
   playerSugPtr = suggestionPtr;

@@ -80,6 +80,7 @@ const BoardLocationClass ROOM_PIECE_LOCATIONS[9] = {BoardLocationClass(12, 0),
 const int NUMBER_OF_DOORS[9] = {2, 1, 2, 1, 4, 1, 2, 2, 1};
 
 const int NUMBER_OF_CARD_TYPES = 3;
+const int NUMBER_OF_CARDS = 21;
 
 const int NUMBER_OF_ROOMS = 9;
 const int NUMBER_OF_SUSPECTS = 6;

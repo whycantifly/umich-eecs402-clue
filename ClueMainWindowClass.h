@@ -71,8 +71,15 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     //Displays the gameplay interface.
     void displayGameInterface();
 
+    //Refreshes the display with available options
+    void refreshDisplay();
+
     //Starts the current player's turn.
     void startPlayerTurn();
+
+    void continuePlayerTurn();
+
+    void updateRollInfoText();
 
     //Displays gameplay options from a corner room.
     void displayCornerRoomOptions();
@@ -109,7 +116,7 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
         int doorNumber        //Door number of the door
         );
 
-    void rollDieAndMove();
+    void finishMove();
 
     //Moves the player one tile over; throws an exception if the move is
     //invalid.

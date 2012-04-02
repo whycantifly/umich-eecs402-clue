@@ -14,7 +14,10 @@ PlayerClass::PlayerClass(QString name, SuspectEnum suspect, bool aiValue,
   character = suspect;
   aiFlag = aiValue;
   hostFlag = gameHostValue;
-  movedBySuggestion = false;
+  movedSinceLastTurnFlag = false;
+  dieRollThisTurn = 0;
+  movesLeftThisTurn = 0;
+  enteredRoomThisMoveFlag = false;
   setStartingLocation();
 }
 
@@ -34,7 +37,7 @@ void PlayerClass::setStartingLocation()
 
 //DUMMY AI CODE/////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-void moveAi()
+void PlayerClass::moveAi()
 {
 
 }
@@ -57,9 +60,24 @@ CardEnum PlayerClass::handleSuggestionAi(SuggestionClass suggestion)
   return matchingCard;
 }
 
-void PlayerClass::handlePrerollAi()
+AiActionEnum PlayerClass::handlePrerollAi(SuggestionClass &aiSuggestion,
+    DirectionEnum &direction, bool &secretPassageFlag)
 {
+  //Make a suggestion if possible
+  if(movedSinceLastTurnFlag == true)
+  {
+//    aiSuggestion = makeSuggestionAi();
+  }
+  //Roll if not blocked
+  else if(0 == 0)
+  {
 
+  }
+  //Use secret passage otherwise
+  else
+  {
+
+  }
 }
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////

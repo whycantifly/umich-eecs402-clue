@@ -10,6 +10,7 @@
 #include "ExceptionClass.h"
 #include "SuggestionDialogClass.h"
 #include "SuggestionClass.h"
+#include "roomToCard.h"
 #include "suspectToCard.h"
 
 using namespace std;
@@ -289,11 +290,78 @@ void ClueMainWindowClass::displayGameInterface()
   startGameButton->setVisible(false);
 }
 
+void ClueMainWindowClass::refreshDisplay()
+{
+  list<PlayerClass>::iterator nextPlayerIter;
+
+  if(thisPlayerPtr->getPlayerLocation().getTileType(CLUE_BOARD_IMAGE) == ROOM_TILE)
+  {
+    //Player is in a corner room
+    if(thisPlayerPtr->getPlayerLocation().checkCornerRoom() == true)
+    {
+      displayCornerRoomOptions();
+    }
+    else
+    {
+      displayRoomOptions();
+    }
+  }
+  else
+  {
+    displayDefaultOptions();
+  }
+
+  if(thisPlayerPtr->getMovedSinceLastTurnFlag() == true)
+  {
+    makeSuggestionOption->setEnabled(true);
+  }
+
+  //Check if the current player is this player
+  nextPlayerIter = currentPlayerIter;
+  nextPlayerIter++;
+  if(nextPlayerIter == gameParticipants.end())
+  {
+    nextPlayerIter = gameParticipants.begin();
+  }
+
+  //Current player is this player.
+  if(&*currentPlayerIter == &*thisPlayerPtr)
+  {
+    currentTurnText->setText("It is your turn.  " +
+        CARD_VALUES[int(suspectToCard(nextPlayerIter->getCharacter()))] +
+        "'s (" + nextPlayerIter->getName() + ") turn is next.");
+  }
+  else
+  {
+    if(&*nextPlayerIter == &*thisPlayerPtr)
+    {
+      currentTurnText->setText("It is " +
+          CARD_VALUES[int(suspectToCard(currentPlayerIter->getCharacter()))]
+          + "'s (" + currentPlayerIter->getName() + ") turn.  "
+          "Your turn is next.");
+    }
+    else
+    {
+      currentTurnText->setText("It is " +
+          CARD_VALUES[int(suspectToCard(currentPlayerIter->getCharacter()))]
+          + "'s (" + currentPlayerIter->getName() + ") turn.  " +
+          CARD_VALUES[int(suspectToCard(nextPlayerIter->getCharacter()))] +
+          "'s (" + nextPlayerIter->getName() + ") turn is next.");
+    }
+    disableAllControls();
+  }
+  updateRollInfoText();
+}
+
 void ClueMainWindowClass::startPlayerTurn()
 {
-  int dieRoll;
   list<PlayerClass>::iterator nextPlayerIter;
   QString textManipString;
+  SuggestionClass aiSuggestion;
+  DirectionEnum aiDirection;
+  bool aiSecretPassageFlag;
+
+  refreshDisplay();
 
   if(gameOver == true)
   {
@@ -301,122 +369,166 @@ void ClueMainWindowClass::startPlayerTurn()
   }
   else
   {
-    //Set up the display
-    if(thisPlayerPtr->getPlayerLocation().getTileType(inProgressBoardImage)
-        == ROOM_TILE)
+    //Current player is this player or this player is the host and current
+    //player is an ai.
+    if(&*currentPlayerIter == &*thisPlayerPtr ||
+        (currentPlayerIter->getAiFlag() == true &&
+        thisPlayerPtr->getHostFlag() == true))
     {
-      //Player is in a corner room
-      if(thisPlayerPtr->getPlayerLocation().getRoom() == LOUNGE ||
-          thisPlayerPtr->getPlayerLocation().getRoom() == KITCHEN ||
-          thisPlayerPtr->getPlayerLocation().getRoom() == CONSERVATORY ||
-          thisPlayerPtr->getPlayerLocation().getRoom() == STUDY)
+      //Player is not in any special situation (corner room or can make
+      //suggestion).
+      if(currentPlayerIter->getPlayerLocation().getTileType(CLUE_BOARD_IMAGE)
+          != ROOM_TILE || currentPlayerIter->getPlayerLocation().
+          getTileType(CLUE_BOARD_IMAGE) == false)
       {
-        displayCornerRoomOptions();
+        continuePlayerTurn();
+      }
+      else if(currentPlayerIter->getAiFlag() == true)
+      {
+        currentPlayerIter->handlePrerollAi(aiSuggestion, aiDirection,
+            aiSecretPassageFlag);
+      }
+    }
+    //Other player or Ai controlled by other player is up
+    else
+    {
+      //Do networky stuff
+    }
+  }
+}
+
+//Only applies to me and computers if I'm the host
+void ClueMainWindowClass::continuePlayerTurn()
+{
+  //Roll die and display die roll
+  if(currentPlayerIter->getDieRoll() == 0)
+  {
+    currentPlayerIter->rollDie();
+    refreshDisplay();
+  }
+
+}
+
+void ClueMainWindowClass::updateRollInfoText()
+{
+  QString textManip;
+  QString suspectName =
+      CARD_VALUES[int(suspectToCard(currentPlayerIter->getCharacter()))];
+
+  switch(currentPlayerIter->getEnteredRoomThisMoveFlag())
+  {
+    case true:
+      rollInfoText->setText("You just entered the " +
+          CARD_VALUES[int(roomToCard(currentPlayerIter->getPlayerLocation().
+          getRoom()))] + " and have no moves left.");
+      break;
+    case false:
+      textManip.setNum(currentPlayerIter->getDieRoll());
+      if(&*currentPlayerIter == &*thisPlayerPtr)
+      {
+        rollInfoText->setText("You rolled a " + textManip + ".  You have ");
+        textManip.setNum(currentPlayerIter->getMovesLeft());
+        rollInfoText->setText(rollInfoText->text() + textManip + " moves left.");
       }
       else
       {
-        displayRoomOptions();
-      }
-
-      if(thisPlayerPtr->getSuggestMove() == true)
-      {
-        makeSuggestionOption->setEnabled(true);
-      }
-    }
-    else
-    {
-      displayDefaultOptions();
-    }
-
-    //Check if the current player is this player
-    nextPlayerIter = currentPlayerIter;
-    nextPlayerIter++;
-    if(nextPlayerIter == gameParticipants.end())
-    {
-      nextPlayerIter = gameParticipants.begin();
-    }
-
-    if(&*currentPlayerIter == &*thisPlayerPtr || (currentPlayerIter->getAiFlag()
-        == true && thisPlayerPtr->getHostFlag() == true))
-    {
-      currentTurnText->setText("It is your turn.  " +
-          CARD_VALUES[int(suspectToCard(nextPlayerIter->getCharacter()))] +
-          "'s (" + nextPlayerIter->getName() + ") turn is next.");
-      if(currentPlayerIter->getPlayerLocation().getRoom() != LOUNGE &&
-          currentPlayerIter->getPlayerLocation().getRoom() != KITCHEN &&
-          currentPlayerIter->getPlayerLocation().getRoom() != CONSERVATORY &&
-          currentPlayerIter->getPlayerLocation().getRoom() != STUDY &&
-          currentPlayerIter->getSuggestMove() == false)
-      {
-        currentPlayerIter->rollDie();
-      }
-      else if(currentPlayerIter->getAiFlag() == true &&
-          thisPlayerPtr->getHostFlag() == true)
-      {
-        currentPlayerIter->handlePrerollAi();
-      }
-    }
-    else
-    {
-      if(&*nextPlayerIter == &*thisPlayerPtr)
-      {
-        currentTurnText->setText("It is " +
-            CARD_VALUES[int(suspectToCard(currentPlayerIter->getCharacter()))]
-            + "'s (" + currentPlayerIter->getName() + ") turn.  "
-            "Your turn is next.");
-      }
-      else
-      {
-        currentTurnText->setText("It is " +
-            CARD_VALUES[int(suspectToCard(currentPlayerIter->getCharacter()))]
-            + "'s (" + currentPlayerIter->getName() + ") turn.  " +
-            CARD_VALUES[int(suspectToCard(nextPlayerIter->getCharacter()))] +
-            "'s (" + nextPlayerIter->getName() + ") turn is next.");
-      }
-      disableAllControls();
-
-      if(currentPlayerIter->getAiFlag() == true)
-      {
-        if(thisPlayerPtr->getHostFlag() == true)
+        rollInfoText->setText(suspectName + " rolled a " + textManip + ".  " +
+            suspectName);
+        if(currentPlayerIter->getMovesLeft() == 1)
         {
-          dieRoll = thisPlayerPtr->rollDie();
+          rollInfoText->setText(rollInfoText->text() + " have ");
         }
         else
         {
-          //Wait for the host of send the AI's moves
+          rollInfoText->setText(rollInfoText->text() + " has ");
         }
+        textManip.setNum(currentPlayerIter->getMovesLeft());
+
+        rollInfoText->setText(rollInfoText->text() + textManip + " moves left.");
       }
-    }
+      break;
   }
 }
 
 void ClueMainWindowClass::displayCornerRoomOptions()
 {
-  rollDieOption->setVisible(true);
-  useSecretPassageOption->setVisible(true);
-  moveUpOption->setVisible(false);
-  moveDownOption->setVisible(false);
-  moveLeftOption->setVisible(false);
-  moveRightOption->setVisible(false);
-  leaveRoomOption->setVisible(false);
-  doorNumberSpin->setVisible(false);
-  makeSuggestionOption->setVisible(false);
+  displayRoomOptions();
 
+  if(currentPlayerIter->getEnteredRoomThisMoveFlag() == false)
+  {
+    useSecretPassageOption->setVisible(true);
+  }
 }
 
 void ClueMainWindowClass::displayRoomOptions()
 {
+  if(currentPlayerIter->getEnteredRoomThisMoveFlag() == true)
+  {
+    rollDieOption->setVisible(false);
+    leaveRoomOption->setVisible(false);
+    doorNumberSpin->setVisible(false);
+    moveDownOption->setVisible(true);
+    moveUpOption->setVisible(true);
+    moveLeftOption->setVisible(true);
+    moveRightOption->setVisible(true);
+    moveDownOption->setEnabled(false);
+    moveUpOption->setEnabled(false);
+    moveLeftOption->setEnabled(false);
+    moveRightOption->setEnabled(false);
 
+    makeSuggestionOption->setFocus();
+    makeSuggestionOption->toggle();
+  }
+  else
+  {
+    if(currentPlayerIter->getDieRoll() == 0)
+    {
+      rollDieOption->setVisible(true);
+      leaveRoomOption->setVisible(false);
+      doorNumberSpin->setVisible(false);
+      moveDownOption->setVisible(false);
+      moveUpOption->setVisible(false);
+      moveLeftOption->setVisible(false);
+      moveRightOption->setVisible(false);
+
+      rollDieOption->setFocus();
+      rollDieOption->toggle();
+    }
+    else
+    {
+      rollDieOption->setVisible(false);
+      leaveRoomOption->setVisible(true);
+      doorNumberSpin->setVisible(true);
+      moveDownOption->setVisible(false);
+      moveUpOption->setVisible(false);
+      moveLeftOption->setVisible(false);
+      moveRightOption->setVisible(false);
+
+      leaveRoomOption->setFocus();
+      leaveRoomOption->toggle();
+    }
+  }
+
+  useSecretPassageOption->setVisible(false);
 }
 
 void ClueMainWindowClass::displayDefaultOptions()
 {
   rollDieOption->setVisible(false);
   useSecretPassageOption->setVisible(false);
+  leaveRoomOption->setVisible(false);
+  doorNumberSpin->setVisible(false);
   moveUpOption->setVisible(true);
   moveDownOption->setVisible(true);
   moveLeftOption->setVisible(true);
   moveRightOption->setVisible(true);
+  moveDownOption->setEnabled(true);
+  moveUpOption->setEnabled(true);
+  moveLeftOption->setEnabled(true);
+  moveRightOption->setEnabled(true);
+
+  moveUpOption->setFocus();
+  moveUpOption->toggle();
 }
 
 void ClueMainWindowClass::disableAllControls()
@@ -495,6 +607,8 @@ void ClueMainWindowClass::makePlayerAccusation()
   }
 }
 
+
+//Only applies to you
 void ClueMainWindowClass::makePlayerSuggestion()
 {
   //Variable Declarations
@@ -504,11 +618,20 @@ void ClueMainWindowClass::makePlayerSuggestion()
   QMessageBox matchingMessage;
   list<CardEnum> playerHand;
   CardEnum revealedCard;
+  bool revealedCardFlag = false;
+  int i;
 
-  playerIter++;
+  currentPlayerIter->setMovedSinceLastTurnFlag(false);
+
 
   if(suggestionDialog.exec() == QDialog::Accepted)
   {
+    playerIter++;
+    if(playerIter == gameParticipants.end())
+    {
+      playerIter = gameParticipants.begin();
+    }
+
     while(playerIter != currentPlayerIter)
     {
       playerHand = playerIter->getHand();
@@ -523,17 +646,20 @@ void ClueMainWindowClass::makePlayerSuggestion()
           revealedCard = playerIter->handleSuggestionAi(suggestion);
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
+
+
         }
         else
         {
           //Get player input
         }
         //Show message
-//        matchingMessage.setWindowTitle();
-//
-//        matchingMessage.setText(playerIter->getName() + "(" +
-//            CARD_VALUES[int(suspectToCard(playerIter->getCharacter()))] +
-//            ") shows you the " + CARD_VALUES[int(revealedCard)] + "card.")
+        matchingMessage.setWindowTitle("Card Revealed");
+
+        matchingMessage.setText(playerIter->getName() + "(" +
+            CARD_VALUES[int(suspectToCard(playerIter->getCharacter()))] +
+            ") reveals the " + CARD_VALUES[int(revealedCard)] +
+            " card to you.");
 //
       }
       else
@@ -541,12 +667,16 @@ void ClueMainWindowClass::makePlayerSuggestion()
         matchingMessage.setText(playerIter->getName() + " cannot disprove " +
             currentPlayerIter->getName() + "'s suggestion.");
       }
+
       playerIter++;
       if(playerIter == gameParticipants.end())
       {
         playerIter = gameParticipants.begin();
       }
     }
+    currentPlayerIter->setEnteredRoomThisMoveFlag(false);
+    currentPlayerIter->setMovesLeft(0);
+    finishMove();
   }
 }
 
@@ -572,11 +702,27 @@ void ClueMainWindowClass::movePlayerOutDoor(int doorNumber)
       DOOR_LOCATIONS[firstDoor + doorNumber - 1]);
   currentPlayerIter->setPlayerLocation(DOOR_LOCATIONS
       [firstDoor + doorNumber - 1]);
+
+  currentPlayerIter->setEnteredRoomThisMoveFlag(false);
+  finishMove();
+  refreshDisplay();
 }
 
-void ClueMainWindowClass::rollDieAndMove()
+void ClueMainWindowClass::finishMove()
 {
-
+  currentPlayerIter->decrementMovesLeft();
+  if(currentPlayerIter->getMovesLeft() <= 0 &&
+      currentPlayerIter->getEnteredRoomThisMoveFlag() == false)
+  {
+    currentPlayerIter->setDieRoll(0);
+    currentPlayerIter++;
+    if(currentPlayerIter == gameParticipants.end())
+    {
+      currentPlayerIter = gameParticipants.begin();
+    }
+    startPlayerTurn();
+  }
+  updateRollInfoText();
 }
 
 void ClueMainWindowClass::movePlayer(const DirectionEnum &direction)
@@ -592,18 +738,23 @@ void ClueMainWindowClass::movePlayer(const DirectionEnum &direction)
     checkIfValidMove(newLocation);
 
     //Draw the move
-    try
+    if(newLocation.getTileType(inProgressBoardImage) == ROOM_TILE)
     {
-      newLocation.getRoom();
       newLocation = getEmptyRoomTile(newLocation);
       drawMove(currentPlayerIter->getPlayerLocation(), newLocation);
       currentPlayerIter->setPlayerLocation(newLocation);
+
+      currentPlayerIter->setEnteredRoomThisMoveFlag(true);
+      currentPlayerIter->setMovesLeft(0);
+      refreshDisplay();
     }
-    catch(ExceptionClass exception)
+    else
     {
       drawMove(currentPlayerIter->getPlayerLocation(), newLocation);
       currentPlayerIter->move(direction);
+      //
     }
+    finishMove();
   }
   catch(ExceptionClass exception)
   {
@@ -663,6 +814,11 @@ void ClueMainWindowClass::movePlayerToSecretPassage()
 
   drawMove(currentPlayerIter->getPlayerLocation(), newLocation);
   currentPlayerIter->setPlayerLocation(newLocation);
+
+  currentPlayerIter->setEnteredRoomThisMoveFlag(true);
+  currentPlayerIter->setMovesLeft(0);
+  finishMove();
+  refreshDisplay();
 }
 
 void ClueMainWindowClass::displayExceptionMessageBox(ExceptionClass
@@ -682,7 +838,7 @@ void ClueMainWindowClass::submitMove()
     errorMessageLabel->setText("");
     if(rollDieOption->isChecked() == true)
     {
-      //Roll die
+      continuePlayerTurn();
     }
     else if(useSecretPassageOption->isChecked() == true)
     {
@@ -715,6 +871,12 @@ void ClueMainWindowClass::submitMove()
     else if(makeAccusationOption->isChecked() == true)
     {
       makePlayerAccusation();
+    }
+    else if(endTurnOption->isChecked() == true)
+    {
+      currentPlayerIter->setMovesLeft(0);
+      currentPlayerIter->setEnteredRoomThisMoveFlag(false);
+      finishMove();
     }
   }
   catch(ExceptionClass exception)
@@ -835,3 +997,12 @@ RoomEnum ClueMainWindowClass::getCurrentPlayerRoom()
 {
   return currentPlayerIter->getPlayerLocation().getRoom();
 }
+
+
+//Dummy AI code
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////

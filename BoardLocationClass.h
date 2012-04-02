@@ -54,7 +54,8 @@ class BoardLocationClass
 
     //Gets the tile type of the tile at this location on gameBoard.
     const TileTypeEnum getTileType(
-        const QImage &gameBoard   //Board to get the tile type from
+        const QImage &gameBoard
+                                              //Board to get the tile type from
         ) const;
 
     //Gets the room of the tile at this location based on ROOM_TILE_RGB.
@@ -66,8 +67,11 @@ class BoardLocationClass
     //Gets the middle pixel of this tile.
     const QPoint getMiddlePixel() const;
 
-    //Thows an exception if the location is outside of the bounds of the board.
-    void checkBoardBounds();
+    bool checkCornerRoom() const;
+
+    //Returns true if the location is within the bounds of the board, false
+    //otherwise.
+    bool checkBoardBounds() const;
 
     //Moves this location over one tile; throws an exception if this exceeds
     //the bounds of the board.
