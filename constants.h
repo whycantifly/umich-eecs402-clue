@@ -55,13 +55,17 @@ const QImage CARD_IMAGES[21] = {QImage("images/miss_scarlet.png"),
 //Door locations
 const BoardLocationClass DOOR_LOCATIONS[16] = {BoardLocationClass(11, 7),
     BoardLocationClass(12, 7), BoardLocationClass(17, 6),
-    BoardLocationClass(17, 8), BoardLocationClass(15, 12),
+    BoardLocationClass(15, 12), BoardLocationClass(17, 8),
     BoardLocationClass(19, 17), BoardLocationClass(9, 16),
     BoardLocationClass(14, 16), BoardLocationClass(7, 19),
     BoardLocationClass(16, 19), BoardLocationClass(5, 19),
     BoardLocationClass(7, 15), BoardLocationClass(1, 11),
     BoardLocationClass(7, 8), BoardLocationClass(3, 11),
     BoardLocationClass(6, 4)};
+
+//Directions to move to get into the room
+const DirectionEnum DOOR_DIRECTIONS[16] = {UP, UP, UP, RIGHT, DOWN, DOWN, DOWN,
+    DOWN, RIGHT, LEFT, LEFT, LEFT, DOWN, UP, LEFT, UP};
 
 //Piece starting locations
 const BoardLocationClass STARTING_LOCATIONS[6] = {BoardLocationClass(16, 0),
@@ -78,6 +82,8 @@ const BoardLocationClass ROOM_PIECE_LOCATIONS[9] = {BoardLocationClass(12, 0),
 
 //Number of doors per room
 const int NUMBER_OF_DOORS[9] = {2, 1, 2, 1, 4, 1, 2, 2, 1};
+
+const int TOTAL_NUMBER_OF_DOORS = 16;
 
 const int NUMBER_OF_CARD_TYPES = 3;
 const int NUMBER_OF_CARDS = 21;

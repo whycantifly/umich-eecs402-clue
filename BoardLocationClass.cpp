@@ -1,7 +1,12 @@
+#include <cmath>
+#include <queue>
+
 #include "BoardLocationClass.h"
 #include "constants.h"
 #include "enums.h"
 #include "ExceptionClass.h"
+
+using namespace std;
 
 const QRgb BoardLocationClass::getTileColor(const QImage &currentBoard) const
 {
@@ -129,21 +134,73 @@ bool BoardLocationClass::checkBoardBounds() const
   }
 }
 
-void BoardLocationClass::move(const DirectionEnum &direction)
+bool BoardLocationClass::checkPlayerBlocked(const QImage &currentBoard) const
 {
+  bool blockedFlag = true;
+  BoardLocationClass newLocation;
+  DirectionEnum moveDir = UP;
+  int doorStart = 0;
+  int i;
+
+  if(getTileType(CLUE_BOARD_IMAGE) == ROOM_TILE)
+  {
+    for(i = 0; i < int(getRoom()); i++)
+    {
+      doorStart += NUMBER_OF_DOORS[i];
+    }
+
+    i = 0;
+    while(i < NUMBER_OF_DOORS[int(getRoom())] && blockedFlag == true)
+    {
+      if(DOOR_LOCATIONS[doorStart + i].getTileType(currentBoard) !=
+          OCCUPIED_TILE)
+      {
+        blockedFlag == false;
+      }
+
+      i++;
+    }
+  }
+  else
+  {
+    while(moveDir <= RIGHT && blockedFlag == true)
+    {
+      newLocation = *this;
+      newLocation.move(currentBoard, moveDir);
+
+      if(newLocation.getTileType(CLUE_BOARD_IMAGE) == ROOM_TILE ||
+          newLocation.getTileType(currentBoard) == UNOCCUPIED_TILE)
+      {
+        blockedFlag = false;
+      }
+
+      moveDir = DirectionEnum(moveDir + 1);
+    }
+  }
+
+  return blockedFlag;
+}
+
+void BoardLocationClass::move(const QImage &currentBoard,
+    const DirectionEnum &direction)
+{
+  BoardLocationClass newLocation = *this;
+  bool enteredRoomFlag = false;
+  int i;
+
   switch(direction)
   {
     case UP:
-      yCoord -= 1;
+      newLocation.yCoord -= 1;
       break;
     case DOWN:
-      yCoord += 1;
+      newLocation.yCoord += 1;
       break;
     case LEFT:
-      xCoord -= 1;
+      newLocation.xCoord -= 1;
       break;
     case RIGHT:
-      xCoord += 1;
+      newLocation.xCoord += 1;
       break;
   }
   if(checkBoardBounds() == false)
@@ -151,6 +208,39 @@ void BoardLocationClass::move(const DirectionEnum &direction)
     throw(ExceptionClass("Invalid Move", "That tile is not within the bounds "
         "of the board.  Please try another move."));
   }
+
+  if(newLocation.getTileType(currentBoard) == OUT_OF_BOUNDS_TILE)
+  {
+    throw(ExceptionClass("That tile is not within the bounds of the "
+        "board.  Please try another move."));
+  }
+
+  if(newLocation.getTileType(currentBoard) == OCCUPIED_TILE)
+  {
+    throw(ExceptionClass("That tile is occupied by another player.  "
+        "Please try another move."));
+  }
+
+  if(newLocation.getTileType(currentBoard) == ROOM_TILE)
+  {
+    i = 0;
+    while(i < TOTAL_NUMBER_OF_DOORS && enteredRoomFlag == false)
+    {
+      if(*this == DOOR_LOCATIONS[i] && direction == DOOR_DIRECTIONS[i])
+      {
+        enteredRoomFlag == true;
+        newLocation = newLocation.getEmptyRoomTile(currentBoard);
+      }
+      i++;
+    }
+
+    if(enteredRoomFlag == false)
+    {
+      throw(ExceptionClass("That tile is on the other side of a wall.  You "
+          "must use a door to enter a room.  Please try another move."));
+    }
+  }
+  *this = newLocation;
 }
 
 RoomEnum BoardLocationClass::getRoomDoor() const
@@ -158,17 +248,11 @@ RoomEnum BoardLocationClass::getRoomDoor() const
   int i;
   int j;
   bool isDoorTile = false;
-  int totalNumberOfDoors = 0;
   int runningNumberOfDoors = 0;
   RoomEnum room;
 
-  for(i = 0; i < NUMBER_OF_ROOMS; i++)
-  {
-    totalNumberOfDoors += NUMBER_OF_DOORS[i];
-  }
-
   i = 0;
-  while(i < totalNumberOfDoors && isDoorTile == false)
+  while(i < TOTAL_NUMBER_OF_DOORS && isDoorTile == false)
   {
     if(BoardLocationClass(xCoord, yCoord) == DOOR_LOCATIONS[i])
     {
@@ -190,4 +274,82 @@ RoomEnum BoardLocationClass::getRoomDoor() const
   }
 
   return room;
+}
+
+BoardLocationClass BoardLocationClass::getClosestDoor()
+{
+  BoardLocationClass closestDoor = DOOR_LOCATIONS[0];
+
+  for(int i = 1; i < TOTAL_NUMBER_OF_DOORS; i++)
+  {
+    if(abs(DOOR_LOCATIONS[i].xCoord - xCoord) +
+        abs(DOOR_LOCATIONS[i].yCoord - yCoord) <
+        abs(closestDoor.xCoord - xCoord) + abs(closestDoor.yCoord - yCoord))
+    {
+      closestDoor = DOOR_LOCATIONS[i];
+    }
+  }
+}
+
+queue<DirectionEnum> BoardLocationClass::getMovesTo(const QImage &currentBoard,
+    int movesLeft, BoardLocationClass origin) const
+{
+  queue<DirectionEnum> moveList;
+
+  for(int i = 0; i < movesLeft; i++)
+  {
+    if(origin.xCoord < xCoord)
+    {
+
+    }
+    else if(origin.xCoord > xCoord)
+    {
+
+    }
+    else
+    {
+      if(origin.yCoord < yCoord)
+      {
+
+      }
+      else if(origin.yCoord > yCoord)
+      {
+
+      }
+      else
+      {
+
+      }
+    }
+  }
+}
+
+const BoardLocationClass BoardLocationClass::getEmptyRoomTile(
+    const QImage &currentBoard) const
+{
+  //Variable Declarations
+  bool emptyTileFlag = false;
+  BoardLocationClass currentLocation;
+  int i;
+  int j;
+
+  i = 0;
+  while(i < ROOM_STORAGE_WIDTH && emptyTileFlag == false)
+  {
+    j = 0;
+    while(j < NUMBER_OF_SUSPECTS / ROOM_STORAGE_WIDTH && emptyTileFlag == false)
+    {
+      currentLocation =
+          BoardLocationClass(ROOM_PIECE_LOCATIONS[int(getRoom())].getXCoord() +
+          i, ROOM_PIECE_LOCATIONS[int(getRoom())].getYCoord() + j);
+      if(currentLocation.getTileType(currentBoard) == ROOM_TILE)
+      {
+        emptyTileFlag = true;
+      }
+      j++;
+    }
+    i++;
+  }
+
+  return currentLocation;
 }

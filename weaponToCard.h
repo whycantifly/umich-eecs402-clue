@@ -7,7 +7,7 @@
 
 inline CardEnum weaponToCard(WeaponEnum weapon)
 {
-  return WeaponEnum(int(card) + NUMBER_OF_SUSPECTS);
+  return CardEnum(int(weapon) + NUMBER_OF_SUSPECTS);
 }
 
 #endif

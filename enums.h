@@ -25,6 +25,6 @@ enum TileTypeEnum{UNOCCUPIED_TILE, ROOM_TILE, OCCUPIED_TILE,
 //Directions
 enum DirectionEnum{UP, DOWN, LEFT, RIGHT};
 
-enum AiActionEnum{ROLL, USE_SECRET_PASSAGE, SUGGEST, ACCUSE, MOVE};
+enum AiActionEnum{ROLL, USE_SECRET_PASSAGE, SUGGEST, ACCUSE, MOVE, END_TURN};
 
 #endif

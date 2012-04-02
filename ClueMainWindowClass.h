@@ -3,6 +3,8 @@
 
 #include <QtGui>
 #include <list>
+#include <queue>
+#include <set>
 #include <vector>
 #include "ui_ClueMainWindowClass.h"
 #include "constants.h"
@@ -74,6 +76,8 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     //Refreshes the display with available options
     void refreshDisplay();
 
+    void updateDetectiveNotes(CardEnum card);
+
     //Starts the current player's turn.
     void startPlayerTurn();
 
@@ -124,19 +128,6 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
 
     //Moves the player through the secret passage.
     void movePlayerToSecretPassage();
-
-    //Throws an exception if the move to newLocation is invalid.
-    void checkIfValidMove(BoardLocationClass &newLocation);
-
-    //Gets the first empty designated piece storage area in the room and
-    //returns the location.
-    const BoardLocationClass getEmptyRoomTile(
-        const BoardLocationClass &boardLocation
-        );
-
-    const BoardLocationClass getEmptyRoomTile(
-        const RoomEnum &room
-        );
 
   public slots:
 

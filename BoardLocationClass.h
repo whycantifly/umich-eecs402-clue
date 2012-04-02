@@ -3,6 +3,7 @@
 
 #include <QImage>
 #include <QPoint>
+#include <queue>
 
 #include "enums.h"
 
@@ -73,15 +74,29 @@ class BoardLocationClass
     //otherwise.
     bool checkBoardBounds() const;
 
+    bool checkPlayerBlocked(const QImage &currentBoard) const;
+
     //Moves this location over one tile; throws an exception if this exceeds
     //the bounds of the board.
     void move(
+        const QImage &currentBoard,
         const DirectionEnum &direction    //Direction to move
         );
+
+    BoardLocationClass getClosestDoor();
+
+    std::queue<DirectionEnum> getMovesTo(
+        const QImage &currentBoard,
+        int movesLeft,
+        BoardLocationClass origin
+        ) const;
+
 
     //If the tile is a door tile, gets the room that it belongs to.  If the tile
     //is not a room tile, throws an exception.
     RoomEnum getRoomDoor() const;
+
+    const BoardLocationClass getEmptyRoomTile(const QImage &currentBoard) const;
 
     //Inline functions
 

@@ -1,7 +1,7 @@
 #ifndef _SUGGESTIONCLASS_H_
 #define _SUGGESTIONCLASS_H_
 
-#include <list>
+#include <set>
 
 #include "enums.h"
 #include "DeckClass.h"
@@ -15,18 +15,19 @@ class SuggestionClass
 
   public:
     //Constructors
-    SuggestionClass(int suspect = 0, int weapon = 0, int room = 0)
+    SuggestionClass(int suspectSug = 0, int weaponSug = 0, int roomSug = 0)
     {
-      suspect = SuspectEnum(suspect);
-      weapon = WeaponEnum(weapon);
-      room = RoomEnum(room);
+      suspect = SuspectEnum(suspectSug);
+      weapon = WeaponEnum(weaponSug);
+      room = RoomEnum(roomSug);
     }
 
-    SuggestionClass(SuspectEnum suspect, WeaponEnum weapon, RoomEnum room)
+    SuggestionClass(SuspectEnum suspectSug, WeaponEnum weaponSug,
+        RoomEnum roomSug)
     {
-      suspect = suspect;
-      weapon = weapon;
-      room = room;
+      suspect = suspectSug;
+      weapon = weaponSug;
+      room = roomSug;
     }
 
     //Overloaded operators
@@ -41,9 +42,7 @@ class SuggestionClass
       return !(*this == rhs);
     }
 
-    bool operator==(std::list<CardEnum> &playerHand) const;
-
-    bool operator==(const CardEnum &card) const;
+    bool operator==(std::set<CardEnum> &playerHand) const;
 
     //Inline functions
     const SuspectEnum getSuspect() const

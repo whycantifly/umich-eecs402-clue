@@ -2,52 +2,22 @@
 
 #include "SuggestionClass.h"
 #include "enums.h"
-#include "cardToSuspect.h"
-#include "cardToWeapon.h"
-#include "cardToRoom.h"
+#include "roomToCard.h"
+#include "suspectToCard.h"
+#include "weaponToCard.h"
 
 using namespace std;
 
-bool SuggestionClass::operator==(list<CardEnum> &playerHand) const
+bool SuggestionClass::operator==(set<CardEnum> &playerHand) const
 {
-  list<CardEnum>::iterator currentCardIter = playerHand.begin();
-  bool matchFlag = false;
-
-  while(currentCardIter != playerHand.end() && matchFlag == false)
+  if(playerHand.find(suspectToCard(suspect)) == playerHand.end() &&
+      playerHand.find(weaponToCard(weapon)) == playerHand.end() &&
+      playerHand.find(roomToCard(room)) == playerHand.end())
   {
-    matchFlag = (*this == *currentCardIter);
+    return false;
   }
-  return matchFlag;
-}
-
-
-bool SuggestionClass::operator==(const CardEnum &card) const
-{
-  bool matchFlag = false;
-
-  try
+  else
   {
-    if(suspect == cardToSuspect(card))
-    {
-      matchFlag = true;
-    }
+    return true;
   }
-  catch(ExceptionClass notASuspect)
-  {
-    try
-    {
-      if(weapon == cardToWeapon(card))
-      {
-        matchFlag = true;
-      }
-    }
-    catch(ExceptionClass notAWeapon)
-    {
-      if(room == cardToRoom(card))
-      {
-        matchFlag = true;
-      }
-    }
-  }
-  return matchFlag;
 }
