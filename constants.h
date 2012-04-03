@@ -6,6 +6,8 @@
 
 #include "BoardLocationClass.h"
 
+const int AI_DELAY = 500;
+
 const QString CARD_VALUES[21] = {"Miss Scarlet", "Col. Mustard", "Mrs. White",
     "Mr. Green", "Mrs. Peacock", "Prof. Plum", "Knife", "Candlestick",
     "Revolver", "Rope", "Lead Pipe", "Wrench", "Hall", "Lounge", "Dining Room",

@@ -47,15 +47,15 @@ class SuggestionClass
     bool operator!=(std::set<CardEnum> &playerHand) const;
 
     //Inline functions
-    const SuspectEnum getSuspect() const
+    SuspectEnum getSuspect() const
     {
       return suspect;
     }
-    const WeaponEnum getWeapon() const
+    WeaponEnum getWeapon() const
     {
       return weapon;
     }
-    const RoomEnum getRoom() const
+    RoomEnum getRoom() const
     {
       return room;
     }

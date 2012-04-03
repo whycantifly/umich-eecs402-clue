@@ -46,6 +46,11 @@ class BoardLocationClass
       }
     }
 
+    bool operator !=(const BoardLocationClass &rhs)
+    {
+      return !(*this == rhs);
+    }
+
     //Function Prototypes
 
     //Gets the tile color of the tile at this location on gameBoard.

@@ -1,4 +1,5 @@
 #include <QtGui> 
+#include <QTest>
 #include <string>
 #include <stdlib.h>
 
@@ -21,6 +22,8 @@ ClueMainWindowClass::ClueMainWindowClass(QWidget *parent)
 {
   //Set up the GUI
   setupUi(this);
+
+  cardsEnabledFlag = false;
 
   connect(networkedPlayOption, SIGNAL(clicked()), this,
       SLOT(setNetworkOptVis()));
@@ -340,6 +343,7 @@ void ClueMainWindowClass::refreshDisplay()
   //Current player is this player.
   if(&*currentPlayerIter == &*thisPlayerPtr)
   {
+    enableAllControls();
     currentTurnText->setText("It is your turn.  " +
         CARD_VALUES[int(suspectToCard(nextPlayerIter->getCharacter()))] +
         "'s (" + nextPlayerIter->getName() + ") turn is next.");
@@ -444,9 +448,9 @@ void ClueMainWindowClass::updateDetectiveNotes(CardEnum updatedCard)
 void ClueMainWindowClass::startPlayerTurn()
 {
   SuggestionClass aiSuggestion;
-  AiActionEnum aiPrerollAction;
-  queue<DirectionEnum> dummyMoveList;
-
+  AiActionEnum aiAction;
+  queue<DirectionEnum> aiMoveList;
+  int aiExitDoor;
   refreshDisplay();
 
   if(gameOver == true)
@@ -461,22 +465,39 @@ void ClueMainWindowClass::startPlayerTurn()
         (currentPlayerIter->getAiFlag() == true &&
         thisPlayerPtr->getHostFlag() == true))
     {
-      //Player is not in any special situation (corner room or can make
+      //THIS player is not in any special situation (corner room or can make
       //suggestion).
-      if(currentPlayerIter->getPlayerLocation().getTileType(CLUE_BOARD_IMAGE)
+      if((currentPlayerIter->getPlayerLocation().getTileType(CLUE_BOARD_IMAGE)
           != ROOM_TILE || currentPlayerIter->getPlayerLocation().
           getTileType(CLUE_BOARD_IMAGE) == false ||
           (currentPlayerIter->getPlayerLocation().checkCornerRoom() == false
-          && currentPlayerIter->getMovedSinceLastTurnFlag() == false))
+          && currentPlayerIter->getMovedSinceLastTurnFlag() == false)) &&
+          &*currentPlayerIter == &*thisPlayerPtr)
       {
         continuePlayerTurn();
       }
-      //Ai pre roll
+      //Ai's
       else if(currentPlayerIter->getAiFlag() == true)
       {
-        aiPrerollAction = currentPlayerIter->handlePrerollAi(
-            inProgressBoardImage, aiSuggestion);
-        takeAiAction(aiPrerollAction, aiSuggestion, dummyMoveList);
+        //Ai can either make suggestions or is in a corner room
+        if(currentPlayerIter->getPlayerLocation().getTileType(CLUE_BOARD_IMAGE)
+            == ROOM_TILE && currentPlayerIter->getPlayerLocation().
+            getTileType(CLUE_BOARD_IMAGE) == true &&
+            (currentPlayerIter->getPlayerLocation().checkCornerRoom() == true
+            || currentPlayerIter->getMovedSinceLastTurnFlag() == true))
+        {
+          aiAction = currentPlayerIter->handlePrerollAi(
+              inProgressBoardImage, aiSuggestion);
+          takeAiAction(aiAction, aiSuggestion, aiMoveList, aiExitDoor);
+          currentPlayerIter->setMovedSinceLastTurnFlag(false);
+        }
+
+        currentPlayerIter->rollDie();
+        updateRollInfoText();
+
+        aiAction = currentPlayerIter->handleAfterRollAi(inProgressBoardImage,
+            aiSuggestion, aiMoveList, aiExitDoor);
+        takeAiAction(aiAction, aiSuggestion, aiMoveList, aiExitDoor);
       }
     }
     //Other player or Ai controlled by other player is up
@@ -490,18 +511,38 @@ void ClueMainWindowClass::startPlayerTurn()
 }
 
 void ClueMainWindowClass::takeAiAction(AiActionEnum action,
-    SuggestionClass &aiSuggestion, queue<DirectionEnum> &aiMoves,
+    SuggestionClass aiSuggestion, queue<DirectionEnum> aiMoves,
     int aiExitDoorNumber)
 {
+  int i;
+  int j = currentPlayerIter->getDieRoll();
+  BoardLocationClass lastLocation = currentPlayerIter->getPlayerLocation();
+
   switch(action)
   {
     case ROLL:
       continuePlayerTurn();
       break;
     case USE_SECRET_PASSAGE:
-
+      moveCurrentPlayerToSecretPassage();
       break;
     case MOVE:
+      i = aiMoves.size();
+      while(aiMoves.size() > 0)
+      {
+        QTest::qWait(AI_DELAY);
+        moveCurrentPlayer(aiMoves.front());
+        aiMoves.pop();
+        drawMove(lastLocation, currentPlayerIter->getPlayerLocation(),
+            currentPlayerIter);
+        lastLocation = currentPlayerIter->getPlayerLocation();
+      }
+
+      if(currentPlayerIter->getPlayerLocation().getTileType(CLUE_BOARD_IMAGE) == ROOM_TILE)
+      {
+        aiSuggestion = currentPlayerIter->makeSuggestionAi();
+        handleSuggestion(aiSuggestion);
+      }
       break;
     case SUGGEST:
       aiSuggestion = currentPlayerIter->makeSuggestionAi();
@@ -514,24 +555,26 @@ void ClueMainWindowClass::takeAiAction(AiActionEnum action,
   }
 }
 
-//Only applies to me and computers if I'm the host
+//Only applies to THIS player and Ai's if THIS player is the host
 void ClueMainWindowClass::continuePlayerTurn()
 {
+  AiActionEnum aiAction;
+
   //Roll die and display die roll
   if(currentPlayerIter->getDieRoll() == 0)
   {
     currentPlayerIter->rollDie();
   }
 
-  //Me
+  //THIS player
   if(&*currentPlayerIter == &*thisPlayerPtr)
   {
     refreshDisplay();
   }
-  //Ai
+  //Ai's
   else
   {
-//    if(currentPlayerIter->get)
+
   }
 
   updateRollInfoText();
@@ -663,7 +706,14 @@ void ClueMainWindowClass::displayDefaultOptions()
 
 void ClueMainWindowClass::disableAllControls()
 {
+  actionOptionsFrame->setEnabled(false);
+  okayButton->setEnabled(false);
+}
 
+void ClueMainWindowClass::enableAllControls()
+{
+  actionOptionsFrame->setEnabled(true);
+  okayButton->setEnabled(true);
 }
 
 void ClueMainWindowClass::drawStartingPieces()
@@ -814,6 +864,7 @@ void ClueMainWindowClass::handleSuggestion(SuggestionClass &playerSuggestion)
             " reveal to " + CARD_VALUES[int(suspectToCard(
             currentPlayerIter->getCharacter()))] +
             " to disprove the suggestion.");
+        cardsEnabledFlag = true;
         suggestionMessage.exec();
       }
       else
@@ -866,11 +917,8 @@ void ClueMainWindowClass::handleSuggestion(SuggestionClass &playerSuggestion)
             getCharacter()))] + " cannot disprove the suggestion.");
       }
       suggestionMessage.exec();
-    }
 
-    if((suggestion != playerHand || &*playerIter != &*thisPlayerPtr) &&
-        playerIter != currentPlayerIter)
-    {
+
       handleSuggestion(suggestion);
     }
   }
@@ -883,34 +931,38 @@ void ClueMainWindowClass::handleCardClicked(const QPixmap *cardClicked)
   int i;
   SuggestionClass dummySuggestion;
 
-  i = 0;
-  while(i < NUMBER_OF_CARDS && foundMatch == false)
+  if(cardsEnabledFlag == true)
   {
-    if(cardClicked->toImage() == CARD_IMAGES[i])
+    i = 0;
+    while(i < NUMBER_OF_CARDS && foundMatch == false)
     {
-      foundMatch = true;
+      if(cardClicked->toImage() == CARD_IMAGES[i])
+      {
+        foundMatch = true;
+      }
+      else
+      {
+        i++;
+      }
+    }
+
+    if(foundMatch == false)
+    {
+      displayExceptionMessageBox(ExceptionClass("Select another card", "The card "
+          "you have selected does not disprove " + CARD_VALUES[int(suspectToCard(
+          currentPlayerIter->getCharacter()))] + "'s suggestion.  "
+          "Please try again."));
     }
     else
     {
-      i++;
+      cardsEnabledFlag = false;
+      //Send revealed card to the other players
+/******************************************************************************/
+
+
+/******************************************************************************/
+      handleSuggestion(dummySuggestion);
     }
-  }
-
-  if(foundMatch == false)
-  {
-    displayExceptionMessageBox(ExceptionClass("Select another card", "The card "
-        "you have selected does not disprove " + CARD_VALUES[int(suspectToCard(
-        currentPlayerIter->getCharacter()))] + "'s suggestion.  "
-        "Please try again."));
-  }
-  else
-  {
-    //Send revealed card to the other players
-/******************************************************************************/
-
-
-/******************************************************************************/
-    handleSuggestion(dummySuggestion);
   }
 }
 

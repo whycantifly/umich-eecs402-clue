@@ -28,6 +28,7 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     PlayerClass *thisPlayerPtr;         //Pointer to the PlayerClass object for
                                         //the human player at this computer
     QMessageBox selectCardMessage;
+    bool cardsEnabledFlag;
 
   public:
     //Constructors
@@ -87,8 +88,8 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
 
     void takeAiAction(
         AiActionEnum action,
-        SuggestionClass &aiSuggestion,
-        std::queue<DirectionEnum> &aiMoves,
+        SuggestionClass aiSuggestion,
+        std::queue<DirectionEnum> aiMoves,
         int aiExitDoorNumber = 0
         );
 
@@ -103,6 +104,8 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     void displayDefaultOptions();
 
     void disableAllControls();
+
+    void enableAllControls();
 
     //Draws the pieces in the game on their starting tiles.
     void drawStartingPieces();

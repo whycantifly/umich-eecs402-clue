@@ -166,14 +166,14 @@ bool BoardLocationClass::checkPlayerBlocked(const QImage &currentBoard) const
     while(moveDir <= RIGHT && blockedFlag == true)
     {
       newLocation = *this;
-      newLocation.move(currentBoard, moveDir);
-
-      if(newLocation.getTileType(CLUE_BOARD_IMAGE) == ROOM_TILE ||
-          newLocation.getTileType(currentBoard) == UNOCCUPIED_TILE)
+      try
       {
+        newLocation.move(currentBoard, moveDir);
         blockedFlag = false;
       }
-
+      catch(ExceptionClass invalidDirection)
+      {
+      }
       moveDir = DirectionEnum(moveDir + 1);
     }
   }
@@ -305,21 +305,23 @@ queue<DirectionEnum> BoardLocationClass::getMovesToDoor(const QImage &currentBoa
   bool noStepsLeftFlag = false;
   bool noMoveFlag = false;
   int i;
+  int j;
 
 
-  while(i < movesLeft && noStepsLeftFlag == false)
+  i = 0;
+  while(i < movesLeft && noStepsLeftFlag == false && origin != target)
   {
     //Moved last turn
     if(noMoveFlag == false)
     {
-      for(int j = 0; i < NUMBER_OF_DIRECTIONS; i++)
+      for(int j = 0; j < NUMBER_OF_DIRECTIONS; j++)
       {
-        invalidDirectionsFlag[i] = false;
+        invalidDirectionsFlag[j] = false;
       }
     }
     else
     {
-      noMoveFlag == false;
+      noMoveFlag = false;
     }
 
     if(origin.xCoord < target.xCoord && invalidDirectionsFlag[RIGHT] == false)
@@ -335,8 +337,7 @@ queue<DirectionEnum> BoardLocationClass::getMovesToDoor(const QImage &currentBoa
         noMoveFlag = true;
       }
     }
-    else if(origin.xCoord > target.xCoord &&
-        invalidDirectionsFlag[LEFT] == false)
+    else if(origin.xCoord > target.xCoord && invalidDirectionsFlag[LEFT] == false)
     {
       try
       {
@@ -345,27 +346,13 @@ queue<DirectionEnum> BoardLocationClass::getMovesToDoor(const QImage &currentBoa
       }
       catch(ExceptionClass leftInvalid)
       {
-        invalidDirectionsFlag[LEFT] == true;
+        invalidDirectionsFlag[LEFT] = true;
         noMoveFlag = true;
       }
     }
     else
     {
-      if(origin.yCoord < target.yCoord && invalidDirectionsFlag[UP] == false)
-      {
-        try
-        {
-          origin.move(currentBoard, UP);
-          moveList.push(UP);
-        }
-        catch(ExceptionClass upInvalid)
-        {
-          invalidDirectionsFlag[UP] == true;
-          noMoveFlag = true;
-        }
-
-      }
-      else if(origin.yCoord > target.yCoord && invalidDirectionsFlag[DOWN] == false)
+      if(origin.yCoord < target.yCoord && invalidDirectionsFlag[DOWN] == false)
       {
         try
         {
@@ -374,46 +361,63 @@ queue<DirectionEnum> BoardLocationClass::getMovesToDoor(const QImage &currentBoa
         }
         catch(ExceptionClass downInvalid)
         {
-          invalidDirectionsFlag[DOWN] == true;
+          invalidDirectionsFlag[DOWN] = true;
+          noMoveFlag = true;
+        }
+
+      }
+      else if(origin.yCoord > target.yCoord && invalidDirectionsFlag[UP] == false)
+      {
+        try
+        {
+          origin.move(currentBoard, UP);
+          moveList.push(UP);
+        }
+        catch(ExceptionClass upInvalid)
+        {
+          invalidDirectionsFlag[UP] = true;
           noMoveFlag = true;
         }
       }
       else
       {
         //Move in any available direction
-        for(int j = 0; j < NUMBER_OF_DIRECTIONS; j++)
+        j = 0;
+        while(j < NUMBER_OF_DIRECTIONS && noMoveFlag == true)
         {
           if(invalidDirectionsFlag[j] == false)
           {
             try
             {
               origin.move(currentBoard, DirectionEnum(j));
-              noMoveFlag == false;
+              noMoveFlag = false;
             }
             catch(ExceptionClass invalidMove)
             {
-              invalidDirectionsFlag[DirectionEnum(j)] == true;
+              invalidDirectionsFlag[j] = true;
             }
+            j++;
           }
         }
 
         if(noMoveFlag == true)
         {
-          noStepsLeftFlag == true;
-          if(origin == *this)
-          {
-            moveList.push(DOOR_DIRECTIONS[doorIndex]);
-          }
+          noStepsLeftFlag = true;
         }
       }
     }
+
 
     if(noMoveFlag == false)
     {
       i++;
     }
-  }
 
+    if(i < movesLeft && origin == target)
+    {
+      moveList.push(DOOR_DIRECTIONS[doorIndex]);
+    }
+  }
   return moveList;
 }
 

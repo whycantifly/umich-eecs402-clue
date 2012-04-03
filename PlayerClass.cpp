@@ -116,7 +116,8 @@ AiActionEnum PlayerClass::handlePrerollAi(const QImage &currentBoard, Suggestion
 }
 
 AiActionEnum PlayerClass::handleAfterRollAi(const QImage &currentBoard,
-    SuggestionClass &aiSuggestion, queue<DirectionEnum> &aiMoves, int &aiExitDoorNumber)
+    SuggestionClass &aiSuggestion, queue<DirectionEnum> &aiMoves,
+    int &aiExitDoorNumber)
 {
   int targetDoorIndex;
   int startingDoorIndex = 0;
