@@ -21,9 +21,6 @@ class SuggestionDialogClass : public QDialog,
   public slots:
     void setSuggestion()
     {
-      int test1 = suspectCombo->currentIndex();
-      int test2 = weaponCombo->currentIndex();
-      int test3 = roomCombo->currentIndex();
       *playerSugPtr = SuggestionClass(suspectCombo->currentIndex(),
           weaponCombo->currentIndex(),
           roomCombo->currentIndex());

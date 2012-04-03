@@ -21,3 +21,8 @@ bool SuggestionClass::operator==(set<CardEnum> &playerHand) const
     return true;
   }
 }
+
+bool SuggestionClass::operator!=(set<CardEnum> &playerHand) const
+{
+  return !(*this == playerHand);
+}

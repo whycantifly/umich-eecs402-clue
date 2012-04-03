@@ -65,7 +65,7 @@ const BoardLocationClass DOOR_LOCATIONS[16] = {BoardLocationClass(11, 7),
 
 //Directions to move to get into the room
 const DirectionEnum DOOR_DIRECTIONS[16] = {UP, UP, UP, RIGHT, DOWN, DOWN, DOWN,
-    DOWN, RIGHT, LEFT, LEFT, LEFT, DOWN, UP, LEFT, UP};
+    DOWN, RIGHT, LEFT, LEFT, LEFT, DOWN, LEFT, UP, UP};
 
 //Piece starting locations
 const BoardLocationClass STARTING_LOCATIONS[6] = {BoardLocationClass(16, 0),
@@ -102,5 +102,7 @@ const int ROOM_STORAGE_WIDTH = 3;
 
 const int MIN_PLAYERS = 3;
 const int MAX_PLAYERS = 6;
+
+const int NUMBER_OF_DIRECTIONS = 4;
 
 #endif

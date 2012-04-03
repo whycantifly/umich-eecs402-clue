@@ -44,6 +44,8 @@ class SuggestionClass
 
     bool operator==(std::set<CardEnum> &playerHand) const;
 
+    bool operator!=(std::set<CardEnum> &playerHand) const;
+
     //Inline functions
     const SuspectEnum getSuspect() const
     {

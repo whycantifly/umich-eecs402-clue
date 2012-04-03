@@ -57,18 +57,36 @@ void PlayerClass::moveAi()
 CardEnum PlayerClass::handleSuggestionAi(SuggestionClass suggestion)
 {
   set<CardEnum> cardMatches;
-  set<CardEnum>::iterator cardMatchesIter = cardMatches.begin();
+  set<CardEnum>::iterator cardMatchesIter;
   int randomIndex;
 
-  cardMatches.insert(*hand.find(suspectToCard(suggestion.getSuspect())));
-  cardMatches.insert(*hand.find(weaponToCard(suggestion.getWeapon())));
-  cardMatches.insert(*hand.find(roomToCard(suggestion.getRoom())));
+  CardEnum cardToAdd;
+
+
+  if(hand.find(suspectToCard(suggestion.getSuspect())) != hand.end())
+  {
+    cardToAdd = *hand.find(suspectToCard(suggestion.getSuspect()));
+    cardMatches.insert(cardToAdd);
+  }
+  if(hand.find(weaponToCard(suggestion.getWeapon())) != hand.end())
+  {
+    cardToAdd = *hand.find(weaponToCard(suggestion.getWeapon()));
+    cardMatches.insert(cardToAdd);
+  }
+  if(hand.find(roomToCard(suggestion.getRoom())) != hand.end())
+  {
+    cardToAdd = *hand.find(roomToCard(suggestion.getRoom()));
+    cardMatches.insert(cardToAdd);
+  }
 
   randomIndex = rand() % cardMatches.size();
+
+  cardMatchesIter = cardMatches.begin();
   for(int i = 0; i < randomIndex; i++)
   {
     cardMatchesIter++;
   }
+
   return *cardMatchesIter;
 }
 
@@ -100,21 +118,31 @@ AiActionEnum PlayerClass::handlePrerollAi(const QImage &currentBoard, Suggestion
 AiActionEnum PlayerClass::handleAfterRollAi(const QImage &currentBoard,
     SuggestionClass &aiSuggestion, queue<DirectionEnum> &aiMoves, int &aiExitDoorNumber)
 {
-  BoardLocationClass targetLoc;
+  int targetDoorIndex;
+  int startingDoorIndex = 0;
 
   if(currentLocation.checkPlayerBlocked(currentBoard) == false)
   {
     if(currentLocation.getTileType(currentBoard) == ROOM_TILE)
     {
-      aiExitDoorNumber = rand() % NUMBER_OF_DOORS[currentLocation.getRoom()];
-      targetLoc = DOOR_LOCATIONS[rand() & (TOTAL_NUMBER_OF_DOORS - 1)];
-      aiMoves = targetLoc.getMovesTo(currentBoard, movesLeftThisTurn, targetLoc);
+      for(int i = 0; i < int(currentLocation.getRoom()); i++)
+      {
+        startingDoorIndex += NUMBER_OF_DOORS[i];
+      }
+
+      aiExitDoorNumber = rand() % NUMBER_OF_DOORS[currentLocation.getRoom()] +
+          startingDoorIndex;
+      targetDoorIndex = rand() % (TOTAL_NUMBER_OF_DOORS);
+      aiMoves = DOOR_LOCATIONS[aiExitDoorNumber].getMovesToDoor(currentBoard,
+          movesLeftThisTurn, targetDoorIndex);
       return MOVE;
     }
     else
     {
-      targetLoc = currentLocation.getClosestDoor();
-      aiMoves = targetLoc.getMovesTo(currentBoard, movesLeftThisTurn, targetLoc);
+      targetDoorIndex = currentLocation.getClosestDoorIndex();
+      aiMoves = currentLocation.getMovesToDoor(currentBoard, movesLeftThisTurn,
+          targetDoorIndex);
+      aiSuggestion = makeSuggestionAi();
       return MOVE;
     }
   }

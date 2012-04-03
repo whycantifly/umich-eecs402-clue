@@ -83,13 +83,10 @@ class BoardLocationClass
         const DirectionEnum &direction    //Direction to move
         );
 
-    BoardLocationClass getClosestDoor();
+    int getClosestDoorIndex();
 
-    std::queue<DirectionEnum> getMovesTo(
-        const QImage &currentBoard,
-        int movesLeft,
-        BoardLocationClass origin
-        ) const;
+    std::queue<DirectionEnum> getMovesToDoor(const QImage &currentBoard,
+        int movesLeft, int doorIndex) const;
 
 
     //If the tile is a door tile, gets the room that it belongs to.  If the tile

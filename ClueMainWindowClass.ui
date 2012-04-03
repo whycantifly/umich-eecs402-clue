@@ -257,7 +257,7 @@
     <string>It is x's turn.  x's turn is next.</string>
    </property>
   </widget>
-  <widget class="QLabel" name="cardInHand1">
+  <widget class="ClickableLabelClass" name="cardInHand1" native="true">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -266,11 +266,11 @@
      <height>120</height>
     </rect>
    </property>
-   <property name="text">
+   <property name="text" stdset="0">
     <string/>
    </property>
   </widget>
-  <widget class="QLabel" name="cardInHand2">
+  <widget class="ClickableLabelClass" name="cardInHand2" native="true">
    <property name="geometry">
     <rect>
      <x>100</x>
@@ -279,11 +279,11 @@
      <height>120</height>
     </rect>
    </property>
-   <property name="text">
+   <property name="text" stdset="0">
     <string/>
    </property>
   </widget>
-  <widget class="QLabel" name="cardInHand3">
+  <widget class="ClickableLabelClass" name="cardInHand3" native="true">
    <property name="geometry">
     <rect>
      <x>190</x>
@@ -292,11 +292,11 @@
      <height>120</height>
     </rect>
    </property>
-   <property name="text">
+   <property name="text" stdset="0">
     <string/>
    </property>
   </widget>
-  <widget class="QLabel" name="cardInHand4">
+  <widget class="ClickableLabelClass" name="cardInHand4" native="true">
    <property name="geometry">
     <rect>
      <x>280</x>
@@ -305,11 +305,11 @@
      <height>120</height>
     </rect>
    </property>
-   <property name="text">
+   <property name="text" stdset="0">
     <string/>
    </property>
   </widget>
-  <widget class="QLabel" name="cardInHand5">
+  <widget class="ClickableLabelClass" name="cardInHand5" native="true">
    <property name="geometry">
     <rect>
      <x>370</x>
@@ -318,11 +318,11 @@
      <height>120</height>
     </rect>
    </property>
-   <property name="text">
+   <property name="text" stdset="0">
     <string/>
    </property>
   </widget>
-  <widget class="QLabel" name="cardInHand6">
+  <widget class="ClickableLabelClass" name="cardInHand6" native="true">
    <property name="geometry">
     <rect>
      <x>460</x>
@@ -331,7 +331,7 @@
      <height>120</height>
     </rect>
    </property>
-   <property name="text">
+   <property name="text" stdset="0">
     <string/>
    </property>
   </widget>
@@ -1380,6 +1380,13 @@ p, li { white-space: pre-wrap; }
   <zorder>greenNameLabel</zorder>
   <zorder>youAreText</zorder>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ClickableLabelClass</class>
+   <extends>QWidget</extends>
+   <header>clickablelabelclass.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>networkedPlayOption</tabstop>
   <tabstop>gameHostCheck</tabstop>

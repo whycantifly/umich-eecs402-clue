@@ -1,10 +1,10 @@
 #ifndef _DECKCLASS_H_
 #define _DECKCLASS_H_
 
-#include <list>
+#include <set>
 #include "constants.h"
 
-class DeckClass : private std::list<CardEnum>
+class DeckClass : private std::set<CardEnum>
 {
   public:
     //Constructors

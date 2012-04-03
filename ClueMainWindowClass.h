@@ -27,6 +27,7 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     CaseFileClass caseFile;             //Case file of details of the crime
     PlayerClass *thisPlayerPtr;         //Pointer to the PlayerClass object for
                                         //the human player at this computer
+    QMessageBox selectCardMessage;
 
   public:
     //Constructors
@@ -58,7 +59,8 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     //inProgressBoardImage.
     void drawMove(
         const BoardLocationClass &oldLocation,   //Original location of the piece
-        const BoardLocationClass &newLocation    //New location of the piece
+        const BoardLocationClass &newLocation,    //New location of the piece
+        const std::list<PlayerClass>::iterator &playerIter
         );
 
     //Selects cards from the deck to make the case file.
@@ -83,6 +85,13 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
 
     void continuePlayerTurn();
 
+    void takeAiAction(
+        AiActionEnum action,
+        SuggestionClass &aiSuggestion,
+        std::queue<DirectionEnum> &aiMoves,
+        int aiExitDoorNumber = 0
+        );
+
     void updateRollInfoText();
 
     //Displays gameplay options from a corner room.
@@ -101,7 +110,7 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     //Displays an exception message box with an error message.
     void displayExceptionMessageBox(
         ExceptionClass exceptionText    //Exception
-        );
+        ) const;
 
     RoomEnum getCurrentPlayerRoom();
 
@@ -113,10 +122,12 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     //appropriate tile.
     void makePlayerSuggestion();
 
+    void moveSuggestedSuspect(SuspectEnum suggestedSuspect);
+
     //Moves the current player out of the room through a door; throws an
     //exception if the door number selected is not a valid door number for the
     //room.
-    void movePlayerOutDoor(
+    void moveCurrentPlayerOutDoor(
         int doorNumber        //Door number of the door
         );
 
@@ -124,10 +135,18 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
 
     //Moves the player one tile over; throws an exception if the move is
     //invalid.
-    void movePlayer(const DirectionEnum &direction);
+    void moveCurrentPlayer(const DirectionEnum &direction);
 
     //Moves the player through the secret passage.
-    void movePlayerToSecretPassage();
+    void moveCurrentPlayerToSecretPassage();
+
+    void displaySuggestionResults(CardEnum card);
+
+    void handleCardClicked(const QPixmap *cardClicked);
+
+    void handleSuggestion(
+        SuggestionClass &playerSuggestion
+        );
 
   public slots:
 
@@ -157,6 +176,36 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     void toggleLeaveRoomOpt(int dummyVar)
     {
       leaveRoomOption->setChecked(true);
+    }
+
+    void selectCard1()
+    {
+      handleCardClicked(cardInHand1->pixmap());
+    }
+
+    void selectCard2()
+    {
+      handleCardClicked(cardInHand2->pixmap());
+    }
+
+    void selectCard3()
+    {
+      handleCardClicked(cardInHand3->pixmap());
+    }
+
+    void selectCard4()
+    {
+      handleCardClicked(cardInHand4->pixmap());
+    }
+
+    void selectCard5()
+    {
+      handleCardClicked(cardInHand5->pixmap());
+    }
+
+    void selectCard6()
+    {
+      handleCardClicked(cardInHand6->pixmap());
     }
 };
 

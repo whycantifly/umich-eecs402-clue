@@ -228,7 +228,7 @@ void BoardLocationClass::move(const QImage &currentBoard,
     {
       if(*this == DOOR_LOCATIONS[i] && direction == DOOR_DIRECTIONS[i])
       {
-        enteredRoomFlag == true;
+        enteredRoomFlag = true;
         newLocation = newLocation.getEmptyRoomTile(currentBoard);
       }
       i++;
@@ -276,9 +276,10 @@ RoomEnum BoardLocationClass::getRoomDoor() const
   return room;
 }
 
-BoardLocationClass BoardLocationClass::getClosestDoor()
+int BoardLocationClass::getClosestDoorIndex()
 {
   BoardLocationClass closestDoor = DOOR_LOCATIONS[0];
+  int closestDoorIndex = 0;
 
   for(int i = 1; i < TOTAL_NUMBER_OF_DOORS; i++)
   {
@@ -287,41 +288,133 @@ BoardLocationClass BoardLocationClass::getClosestDoor()
         abs(closestDoor.xCoord - xCoord) + abs(closestDoor.yCoord - yCoord))
     {
       closestDoor = DOOR_LOCATIONS[i];
+      closestDoorIndex = i;
     }
   }
+
+  return closestDoorIndex;
 }
 
-queue<DirectionEnum> BoardLocationClass::getMovesTo(const QImage &currentBoard,
-    int movesLeft, BoardLocationClass origin) const
+queue<DirectionEnum> BoardLocationClass::getMovesToDoor(const QImage &currentBoard,
+    int movesLeft, int doorIndex) const
 {
   queue<DirectionEnum> moveList;
+  BoardLocationClass origin = *this;
+  BoardLocationClass target = DOOR_LOCATIONS[doorIndex];
+  bool invalidDirectionsFlag[NUMBER_OF_DIRECTIONS];
+  bool noStepsLeftFlag = false;
+  bool noMoveFlag = false;
+  int i;
 
-  for(int i = 0; i < movesLeft; i++)
+
+  while(i < movesLeft && noStepsLeftFlag == false)
   {
-    if(origin.xCoord < xCoord)
+    //Moved last turn
+    if(noMoveFlag == false)
     {
-
-    }
-    else if(origin.xCoord > xCoord)
-    {
-
+      for(int j = 0; i < NUMBER_OF_DIRECTIONS; i++)
+      {
+        invalidDirectionsFlag[i] = false;
+      }
     }
     else
     {
-      if(origin.yCoord < yCoord)
+      noMoveFlag == false;
+    }
+
+    if(origin.xCoord < target.xCoord && invalidDirectionsFlag[RIGHT] == false)
+    {
+      try
       {
+        origin.move(currentBoard, RIGHT);
+        moveList.push(RIGHT);
+      }
+      catch(ExceptionClass rightInvalid)
+      {
+        invalidDirectionsFlag[RIGHT] = true;
+        noMoveFlag = true;
+      }
+    }
+    else if(origin.xCoord > target.xCoord &&
+        invalidDirectionsFlag[LEFT] == false)
+    {
+      try
+      {
+        origin.move(currentBoard, LEFT);
+        moveList.push(LEFT);
+      }
+      catch(ExceptionClass leftInvalid)
+      {
+        invalidDirectionsFlag[LEFT] == true;
+        noMoveFlag = true;
+      }
+    }
+    else
+    {
+      if(origin.yCoord < target.yCoord && invalidDirectionsFlag[UP] == false)
+      {
+        try
+        {
+          origin.move(currentBoard, UP);
+          moveList.push(UP);
+        }
+        catch(ExceptionClass upInvalid)
+        {
+          invalidDirectionsFlag[UP] == true;
+          noMoveFlag = true;
+        }
 
       }
-      else if(origin.yCoord > yCoord)
+      else if(origin.yCoord > target.yCoord && invalidDirectionsFlag[DOWN] == false)
       {
-
+        try
+        {
+          origin.move(currentBoard, DOWN);
+          moveList.push(DOWN);
+        }
+        catch(ExceptionClass downInvalid)
+        {
+          invalidDirectionsFlag[DOWN] == true;
+          noMoveFlag = true;
+        }
       }
       else
       {
+        //Move in any available direction
+        for(int j = 0; j < NUMBER_OF_DIRECTIONS; j++)
+        {
+          if(invalidDirectionsFlag[j] == false)
+          {
+            try
+            {
+              origin.move(currentBoard, DirectionEnum(j));
+              noMoveFlag == false;
+            }
+            catch(ExceptionClass invalidMove)
+            {
+              invalidDirectionsFlag[DirectionEnum(j)] == true;
+            }
+          }
+        }
 
+        if(noMoveFlag == true)
+        {
+          noStepsLeftFlag == true;
+          if(origin == *this)
+          {
+            moveList.push(DOOR_DIRECTIONS[doorIndex]);
+          }
+        }
       }
     }
+
+    if(noMoveFlag == false)
+    {
+      i++;
+    }
   }
+
+  return moveList;
 }
 
 const BoardLocationClass BoardLocationClass::getEmptyRoomTile(
