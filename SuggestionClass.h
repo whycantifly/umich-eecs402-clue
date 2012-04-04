@@ -15,12 +15,6 @@ class SuggestionClass
 
   public:
     //Constructors
-    SuggestionClass(int suspectSug = 0, int weaponSug = 0, int roomSug = 0)
-    {
-      suspect = SuspectEnum(suspectSug);
-      weapon = WeaponEnum(weaponSug);
-      room = RoomEnum(roomSug);
-    }
 
     SuggestionClass(SuspectEnum suspectSug, WeaponEnum weaponSug,
         RoomEnum roomSug)
@@ -28,6 +22,13 @@ class SuggestionClass
       suspect = suspectSug;
       weapon = weaponSug;
       room = roomSug;
+    }
+
+    SuggestionClass(int suspectSug = 0, int weaponSug = 0, int roomSug = 0)
+    {
+      suspect = SuspectEnum(suspectSug);
+      weapon = WeaponEnum(weaponSug);
+      room = RoomEnum(roomSug);
     }
 
     //Overloaded operators
@@ -45,6 +46,10 @@ class SuggestionClass
     bool operator==(std::set<CardEnum> &playerHand) const;
 
     bool operator!=(std::set<CardEnum> &playerHand) const;
+
+    bool operator==(CardEnum card) const;
+
+    bool operator!=(CardEnum card) const;
 
     //Inline functions
     SuspectEnum getSuspect() const

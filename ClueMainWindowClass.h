@@ -51,8 +51,11 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
         const BoardLocationClass &tile
         );
 
+    void clearVisitedTiles();
+
     //Erases the piece on the tile indicated on inProgressBoardImage.
-    void eraseTileContents(
+    void clearPiece(
+        const SuspectEnum character,
         const BoardLocationClass &tile
         );
 
@@ -145,11 +148,21 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
 
     void displaySuggestionResults(CardEnum card);
 
-    void handleCardClicked(const QPixmap *cardClicked);
-
     void handleSuggestion(
         SuggestionClass &playerSuggestion
         );
+
+    //Inline Functions
+
+    std::set<CardEnum> getThisPlayerHand() const
+    {
+      return thisPlayerPtr->getHand();
+    }
+
+    SuspectEnum getCurrentPlayerChar() const
+    {
+      return currentPlayerIter->getCharacter();
+    }
 
   public slots:
 
@@ -179,36 +192,6 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     void toggleLeaveRoomOpt(int dummyVar)
     {
       leaveRoomOption->setChecked(true);
-    }
-
-    void selectCard1()
-    {
-      handleCardClicked(cardInHand1->pixmap());
-    }
-
-    void selectCard2()
-    {
-      handleCardClicked(cardInHand2->pixmap());
-    }
-
-    void selectCard3()
-    {
-      handleCardClicked(cardInHand3->pixmap());
-    }
-
-    void selectCard4()
-    {
-      handleCardClicked(cardInHand4->pixmap());
-    }
-
-    void selectCard5()
-    {
-      handleCardClicked(cardInHand5->pixmap());
-    }
-
-    void selectCard6()
-    {
-      handleCardClicked(cardInHand6->pixmap());
     }
 };
 

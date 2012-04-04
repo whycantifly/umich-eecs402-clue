@@ -1,5 +1,6 @@
 #include <cmath>
 #include <queue>
+#include <set>
 
 #include "BoardLocationClass.h"
 #include "constants.h"
@@ -184,25 +185,10 @@ bool BoardLocationClass::checkPlayerBlocked(const QImage &currentBoard) const
 void BoardLocationClass::move(const QImage &currentBoard,
     const DirectionEnum &direction)
 {
-  BoardLocationClass newLocation = *this;
+  BoardLocationClass newLocation = getTileInDir(direction);
   bool enteredRoomFlag = false;
   int i;
 
-  switch(direction)
-  {
-    case UP:
-      newLocation.yCoord -= 1;
-      break;
-    case DOWN:
-      newLocation.yCoord += 1;
-      break;
-    case LEFT:
-      newLocation.xCoord -= 1;
-      break;
-    case RIGHT:
-      newLocation.xCoord += 1;
-      break;
-  }
   if(checkBoardBounds() == false)
   {
     throw(ExceptionClass("Invalid Move", "That tile is not within the bounds "
@@ -301,123 +287,112 @@ queue<DirectionEnum> BoardLocationClass::getMovesToDoor(const QImage &currentBoa
   queue<DirectionEnum> moveList;
   BoardLocationClass origin = *this;
   BoardLocationClass target = DOOR_LOCATIONS[doorIndex];
-  bool invalidDirectionsFlag[NUMBER_OF_DIRECTIONS];
-  bool noStepsLeftFlag = false;
-  bool noMoveFlag = false;
-  int i;
-  int j;
+  OrientationEnum moveOrientation;
+  deque<DirectionEnum> moveDirection;
+  bool movedFromOriginFlag = false;
+  set<BoardLocationClass> alreadyVisited;
+  set<BoardLocationClass>::iterator alreadyVisitedIter;
+  DirectionEnum a;
+
+  alreadyVisited.insert(*this);
 
 
-  i = 0;
-  while(i < movesLeft && noStepsLeftFlag == false && origin != target)
+  while(movesLeft > 0)
   {
-    //Moved last turn
-    if(noMoveFlag == false)
+    //Reached the target door
+    if(origin == target)
     {
-      for(int j = 0; j < NUMBER_OF_DIRECTIONS; j++)
-      {
-        invalidDirectionsFlag[j] = false;
-      }
+      moveList.push(DOOR_DIRECTIONS[doorIndex]);
+      movesLeft = 0;
     }
+    //Blocked
+    else if(checkPlayerBlocked(currentBoard) == true)
+    {
+      movesLeft = 0;
+    }
+    //Can move
     else
     {
-      noMoveFlag = false;
-    }
-
-    if(origin.xCoord < target.xCoord && invalidDirectionsFlag[RIGHT] == false)
-    {
-      try
+      //Decide whether to make a horizontal or vertical move first
+      if(origin.xCoord == target.xCoord)
       {
-        origin.move(currentBoard, RIGHT);
-        moveList.push(RIGHT);
+        moveOrientation = VERTICAL;
       }
-      catch(ExceptionClass rightInvalid)
+      else if(origin.yCoord == target.yCoord)
       {
-        invalidDirectionsFlag[RIGHT] = true;
-        noMoveFlag = true;
-      }
-    }
-    else if(origin.xCoord > target.xCoord && invalidDirectionsFlag[LEFT] == false)
-    {
-      try
-      {
-        origin.move(currentBoard, LEFT);
-        moveList.push(LEFT);
-      }
-      catch(ExceptionClass leftInvalid)
-      {
-        invalidDirectionsFlag[LEFT] = true;
-        noMoveFlag = true;
-      }
-    }
-    else
-    {
-      if(origin.yCoord < target.yCoord && invalidDirectionsFlag[DOWN] == false)
-      {
-        try
-        {
-          origin.move(currentBoard, DOWN);
-          moveList.push(DOWN);
-        }
-        catch(ExceptionClass downInvalid)
-        {
-          invalidDirectionsFlag[DOWN] = true;
-          noMoveFlag = true;
-        }
-
-      }
-      else if(origin.yCoord > target.yCoord && invalidDirectionsFlag[UP] == false)
-      {
-        try
-        {
-          origin.move(currentBoard, UP);
-          moveList.push(UP);
-        }
-        catch(ExceptionClass upInvalid)
-        {
-          invalidDirectionsFlag[UP] = true;
-          noMoveFlag = true;
-        }
+        moveOrientation = HORIZONTAL;
       }
       else
       {
-        //Move in any available direction
-        j = 0;
-        while(j < NUMBER_OF_DIRECTIONS && noMoveFlag == true)
-        {
-          if(invalidDirectionsFlag[j] == false)
-          {
-            try
-            {
-              origin.move(currentBoard, DirectionEnum(j));
-              noMoveFlag = false;
-            }
-            catch(ExceptionClass invalidMove)
-            {
-              invalidDirectionsFlag[j] = true;
-            }
-            j++;
-          }
-        }
+        moveOrientation = OrientationEnum(rand() % 2);
+      }
 
-        if(noMoveFlag == true)
+      while(moveDirection.size() < NUMBER_OF_DIRECTIONS)
+      {
+        switch(moveOrientation)
         {
-          noStepsLeftFlag = true;
+          case HORIZONTAL:
+            if(origin.yCoord < target.yCoord)
+            {
+              moveDirection.push_front(DOWN);
+              moveDirection.push_back(UP);
+            }
+            else if(origin.yCoord > target.yCoord)
+            {
+              moveDirection.push_front(UP);
+              moveDirection.push_back(DOWN);
+            }
+            else
+            {
+              moveDirection.push_back(UP);
+              moveDirection.push_back(DOWN);
+            }
+            moveOrientation = VERTICAL;
+            break;
+
+          case VERTICAL:
+            if(origin.xCoord < target.xCoord)
+            {
+              moveDirection.push_front(RIGHT);
+              moveDirection.push_back(LEFT);
+            }
+            else if(origin.xCoord > target.xCoord)
+            {
+              moveDirection.push_front(LEFT);
+              moveDirection.push_back(RIGHT);
+            }
+            else
+            {
+              moveDirection.push_back(LEFT);
+              moveDirection.push_back(RIGHT);
+            }
+            moveOrientation = HORIZONTAL;
+            break;
         }
       }
-    }
 
+      while(moveDirection.size() > 0 && movedFromOriginFlag == false)
+      {
+        if((origin.getTileInDir(moveDirection.front()).getTileType(currentBoard)
+            == UNOCCUPIED_TILE) && alreadyVisited.find(origin.getTileInDir(
+            moveDirection.front())) == alreadyVisited.end())
+        {
+          a = moveDirection.front();
+          origin.move(currentBoard, moveDirection.front());
+          alreadyVisited.insert(origin);
+          moveList.push(moveDirection.front());
+          movesLeft--;
+          movedFromOriginFlag = true;
+        }
 
-    if(noMoveFlag == false)
-    {
-      i++;
-    }
+        moveDirection.pop_front();
+      }
 
-    if(i < movesLeft && origin == target)
-    {
-      moveList.push(DOOR_DIRECTIONS[doorIndex]);
+      moveDirection.clear();
+      movedFromOriginFlag = false;
     }
   }
+
   return moveList;
 }
 
@@ -449,4 +424,28 @@ const BoardLocationClass BoardLocationClass::getEmptyRoomTile(
   }
 
   return currentLocation;
+}
+
+BoardLocationClass BoardLocationClass::getTileInDir(DirectionEnum direction)
+    const
+{
+  BoardLocationClass newLocation = *this;
+
+  switch(direction)
+  {
+    case UP:
+      newLocation.yCoord -= 1;
+      break;
+    case DOWN:
+      newLocation.yCoord += 1;
+      break;
+    case LEFT:
+      newLocation.xCoord -= 1;
+      break;
+    case RIGHT:
+      newLocation.xCoord += 1;
+      break;
+  }
+
+  return newLocation;
 }

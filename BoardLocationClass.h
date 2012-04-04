@@ -34,7 +34,7 @@ class BoardLocationClass
     }
 
     //Overloaded functions
-    bool operator==(const BoardLocationClass &rhs)
+    bool operator==(const BoardLocationClass &rhs) const
     {
       if(xCoord == rhs.xCoord && yCoord == rhs.yCoord)
       {
@@ -46,9 +46,31 @@ class BoardLocationClass
       }
     }
 
-    bool operator !=(const BoardLocationClass &rhs)
+    bool operator!=(const BoardLocationClass &rhs) const
     {
       return !(*this == rhs);
+    }
+
+    bool operator<(const BoardLocationClass &rhs) const
+    {
+      return (xCoord < rhs.xCoord || (xCoord == rhs.xCoord && yCoord <
+          rhs.yCoord));
+    }
+
+    bool operator>(const BoardLocationClass &rhs) const
+    {
+      return (xCoord > rhs.xCoord || (xCoord == rhs.xCoord && yCoord >
+          rhs.yCoord));
+    }
+
+    bool operator<=(const BoardLocationClass &rhs) const
+    {
+      return !(*this > rhs);
+    }
+
+    bool operator>=(BoardLocationClass &rhs) const
+    {
+      return !(*this < rhs);
     }
 
     //Function Prototypes
@@ -101,6 +123,8 @@ class BoardLocationClass
     const BoardLocationClass getEmptyRoomTile(const QImage &currentBoard) const;
 
     //Inline functions
+
+    BoardLocationClass getTileInDir(DirectionEnum direction) const;
 
     //Gets the x-coordinate.
     int getXCoord() const

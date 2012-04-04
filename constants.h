@@ -3,6 +3,7 @@
 
 #include <QtGui>
 #include <string>
+#include "enums.h"
 
 #include "BoardLocationClass.h"
 
@@ -31,6 +32,11 @@ const QRgb ROOM_TILE_RGB[9] = {qRgb(153, 153, 153), qRgb(145, 111, 124),
 const QRgb CHAR_PIECE_RGB[6] = {qRgb(160, 44, 44), qRgb(200, 171, 55),
     qRgb(244, 227, 215), qRgb(68, 120, 33), qRgb(33, 68, 120),
     qRgb(68, 22, 80)};
+
+//RGB values for tiles visited for each character
+const QRgb VISITED_TILE_RGB[6] = {qRgb(234, 174, 174), qRgb(213, 191, 102),
+    qRgb(255, 254, 253), qRgb(139, 210, 91), qRgb(50, 103, 183),
+    qRgb(196, 117, 217)};
 
 //Clue board image
 const QImage CLUE_BOARD_IMAGE("images/board.png");

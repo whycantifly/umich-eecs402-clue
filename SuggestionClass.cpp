@@ -26,3 +26,28 @@ bool SuggestionClass::operator!=(set<CardEnum> &playerHand) const
 {
   return !(*this == playerHand);
 }
+
+bool SuggestionClass::operator==(CardEnum card) const
+{
+  try
+  {
+    if(card == suspectToCard(suspect) || card == weaponToCard(weapon) ||
+       card == roomToCard(room))
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+  catch(ExceptionClass exception)
+  {
+
+  }
+}
+
+bool SuggestionClass::operator!=(CardEnum card) const
+{
+  return !(*this == card);
+}

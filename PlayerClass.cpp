@@ -1,5 +1,6 @@
 #include <list>
 #include <queue>
+#include <set>
 
 #include "PlayerClass.h"
 #include "enums.h"
@@ -32,6 +33,35 @@ PlayerClass::PlayerClass(QString name, SuspectEnum suspect, bool aiValue,
   }
 }
 
+//Moves the player over one tile; throws an exception if the move is
+//outside the bounds of the board.
+void PlayerClass::move(const QImage &currentBoard, const DirectionEnum &direction)
+{
+  BoardLocationClass newLocation = currentLocation;
+  set<BoardLocationClass>::iterator visitedLocationIter;
+
+  newLocation.move(currentBoard, direction);
+
+//  if(locationsThisTurn.find(newLocation) != locationsThisTurn.end())
+//  {
+//    throw(ExceptionClass("You have already visited that tile this turn."));
+//  }
+
+  if(newLocation.getTileType(CLUE_BOARD_IMAGE) == ROOM_TILE)
+  {
+    for(visitedLocationIter = locationsThisTurn.begin(); visitedLocationIter !=
+        locationsThisTurn.end(); visitedLocationIter++)
+    {
+      if(visitedLocationIter->getTileType(CLUE_BOARD_IMAGE) == ROOM_TILE &&
+          visitedLocationIter->getRoom() == newLocation.getRoom())
+      {
+        throw(ExceptionClass("You have already visited that room this turn."));
+      }
+    }
+  }
+  currentLocation.move(currentBoard, direction);
+}
+
 void PlayerClass::addCardToHand(CardEnum cardToAdd)
 {
   hand.insert(cardToAdd);
@@ -40,6 +70,8 @@ void PlayerClass::addCardToHand(CardEnum cardToAdd)
 void PlayerClass::setStartingLocation()
 {
   setPlayerLocation(STARTING_LOCATIONS[int(character)]);
+
+  locationsThisTurn.insert(STARTING_LOCATIONS[character]);
 }
 
 void PlayerClass::addToDetectiveNotes(CardEnum card, SuspectEnum suspect)
@@ -49,10 +81,6 @@ void PlayerClass::addToDetectiveNotes(CardEnum card, SuspectEnum suspect)
 
 //DUMMY AI CODE/////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-void PlayerClass::moveAi()
-{
-
-}
 
 CardEnum PlayerClass::handleSuggestionAi(SuggestionClass suggestion)
 {
@@ -143,7 +171,6 @@ AiActionEnum PlayerClass::handleAfterRollAi(const QImage &currentBoard,
       targetDoorIndex = currentLocation.getClosestDoorIndex();
       aiMoves = currentLocation.getMovesToDoor(currentBoard, movesLeftThisTurn,
           targetDoorIndex);
-      aiSuggestion = makeSuggestionAi();
       return MOVE;
     }
   }
@@ -157,7 +184,7 @@ SuggestionClass PlayerClass::makeSuggestionAi()
 {
   SuspectEnum suspect = SuspectEnum(rand() % NUMBER_OF_SUSPECTS);
   WeaponEnum weapon = WeaponEnum(rand() % NUMBER_OF_WEAPONS);
-  RoomEnum room = RoomEnum(rand() & NUMBER_OF_ROOMS);
+  RoomEnum room = RoomEnum(rand() % NUMBER_OF_ROOMS);
 
   return SuggestionClass(suspect, weapon, room);
 }

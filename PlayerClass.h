@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QImage>
+#include <set>
 #include <stdlib.h>
 
 #include "constants.h"
@@ -23,12 +24,13 @@ class PlayerClass
                                         //False = not moved since last turn
     bool enteredRoomThisMoveFlag;       //True = just entered a room;
                                         //False = did not just enter a room
-    std::set<CardEnum> hand;           //Cards in the players hand; ordered in
+    std::set<CardEnum> hand;            //Cards in the players hand; ordered in
                                         //order of CardEnum
     int dieRollThisTurn;                //Value of the die roll this turn
     int movesLeftThisTurn;              //Moves left to make this turn
-    std::vector<BoardLocationClass> movesThisTurn;  //List of moves player has
-                                                    //made this turn
+    std::set<BoardLocationClass> locationsThisTurn;
+                                        //List of locations player has visited
+                                        //this turn
     std::pair<CardEnum, SuspectEnum> detectiveNotes[NUMBER_OF_CARDS];
 
   public:
@@ -49,6 +51,10 @@ class PlayerClass
 
     //Function Prototypes
 
+    //Moves the player over one tile; throws an exception if the move is
+    //outside the bounds of the board.
+    void move(const QImage &currentBoard, const DirectionEnum &direction);
+
     //Adds cardToAdd to the hand.
     void addCardToHand(
         CardEnum cardToAdd      //Card to add to the player's hand
@@ -57,7 +63,25 @@ class PlayerClass
     //Sets the piece's starting location based on CHAR_STARTING_LOCATION.
     void setStartingLocation();
 
+    void addToDetectiveNotes(CardEnum card, SuspectEnum suspect);
+
     //Inline Functions
+
+    void addToLocationsThisTurn(BoardLocationClass location)
+    {
+      locationsThisTurn.insert(location);
+    }
+
+    std::set<BoardLocationClass> getLocationsThisTurn() const
+    {
+      return locationsThisTurn;
+    }
+
+    void resetLocationsThisTurn()
+    {
+      locationsThisTurn.clear();
+      locationsThisTurn.insert(currentLocation);
+    }
 
     bool getMovedSinceLastTurnFlag() const
     {
@@ -147,14 +171,6 @@ class PlayerClass
       movesLeftThisTurn--;
     }
 
-
-    //Moves the player over one tile; throws an exception if the move is
-    //outside the bounds of the board.
-    void move(const QImage &currentBoard, const DirectionEnum &direction)
-    {
-      currentLocation.move(currentBoard, direction);
-    }
-
     //Sets currentLocation to newLocation.
     void setPlayerLocation(BoardLocationClass newLocation)
     {
@@ -165,8 +181,6 @@ class PlayerClass
     {
       return hand;
     }
-
-    void addToDetectiveNotes(CardEnum card, SuspectEnum suspect);
 
     SuspectEnum getDetectiveNotes(CardEnum card)
     {

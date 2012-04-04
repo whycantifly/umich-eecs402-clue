@@ -21,8 +21,8 @@ class AccusationDialogClass : public QDialog,
     void setAccusation()
     {
       *playerAccPtr = SuggestionClass(suspectCombo->currentIndex(),
-          weaponCombo->currentIndex() + NUMBER_OF_SUSPECTS,
-          roomCombo->currentIndex() + NUMBER_OF_SUSPECTS + NUMBER_OF_WEAPONS);
+          weaponCombo->currentIndex(),
+          roomCombo->currentIndex());
     }
 
 };

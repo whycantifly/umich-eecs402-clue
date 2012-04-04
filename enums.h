@@ -20,10 +20,12 @@ enum CardTypeEnum{SUSPECT_CARD, WEAPON_CARD, ROOM_CARD};
 
 //Tile types
 enum TileTypeEnum{UNOCCUPIED_TILE, ROOM_TILE, OCCUPIED_TILE,
-    OUT_OF_BOUNDS_TILE};
+    OUT_OF_BOUNDS_TILE, VISITED_TILE};
 
 //Directions
 enum DirectionEnum{UP, DOWN, LEFT, RIGHT};
+
+enum OrientationEnum{HORIZONTAL, VERTICAL};
 
 enum AiActionEnum{ROLL, USE_SECRET_PASSAGE, SUGGEST, ACCUSE, MOVE, END_TURN};
 
