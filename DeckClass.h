@@ -3,6 +3,7 @@
 
 #include <set>
 #include "constants.h"
+#include "SuggestionClass.h"
 
 class DeckClass : private std::set<CardEnum>
 {
@@ -27,6 +28,8 @@ class DeckClass : private std::set<CardEnum>
     //Resets the deck so that it includes all values of CardEnum.
     void resetDeck();
 
+    SuggestionClass createCaseFile();
+
     //Inline Functions
 
     //Returns the deck size
@@ -35,5 +38,7 @@ class DeckClass : private std::set<CardEnum>
       return size();
     }
 };
+
+
 
 #endif

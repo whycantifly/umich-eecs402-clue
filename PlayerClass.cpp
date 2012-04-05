@@ -12,11 +12,8 @@
 
 using namespace std;
 
-PlayerClass::PlayerClass(QString name, SuspectEnum suspect, bool aiValue,
-    bool gameHostValue)
+PlayerClass::PlayerClass(SuspectEnum suspect, bool aiValue, bool gameHostValue)
 {
-
-  playerName = name;
   character = suspect;
   aiFlag = aiValue;
   hostFlag = gameHostValue;

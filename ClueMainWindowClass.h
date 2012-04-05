@@ -9,10 +9,10 @@
 #include "ui_ClueMainWindowClass.h"
 #include "constants.h"
 #include "BoardLocationClass.h"
-#include "CaseFileClass.h"
 #include "DeckClass.h"
 #include "ExceptionClass.h"
 #include "PlayerClass.h"
+#include "SuggestionClass.h"
 
 class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
 {
@@ -23,8 +23,7 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
                                         //False = no one won yet
     std::list<PlayerClass> gameParticipants;  //Players in order of turn
     std::list<PlayerClass>::iterator currentPlayerIter; //Current player
-    DeckClass cardDeck;                 //Deck of cards
-    CaseFileClass caseFile;             //Case file of details of the crime
+    SuggestionClass caseFile;           //Case file of details of the crime
     PlayerClass *thisPlayerPtr;         //Pointer to the PlayerClass object for
                                         //the human player at this computer
     QMessageBox selectCardMessage;
@@ -67,11 +66,8 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
         const std::list<PlayerClass>::iterator &playerIter
         );
 
-    //Selects cards from the deck to make the case file.
-    void makeCaseFile();
-
     //Deals the cards to the players.
-    void dealCards();
+    void dealCards(DeckClass &cardDeck);
 
     //Sets the game up to play.
     void setupGame();

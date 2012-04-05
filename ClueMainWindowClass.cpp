@@ -9,7 +9,6 @@
 #include "AccusationDialogClass.h"
 #include "BoardLocationClass.h"
 #include "HandleSuggestionDialogClass.h"
-#include "CaseFileClass.h"
 #include "ExceptionClass.h"
 #include "SuggestionDialogClass.h"
 #include "SuggestionClass.h"
@@ -24,8 +23,8 @@ ClueMainWindowClass::ClueMainWindowClass(QWidget *parent)
   //Set up the GUI
   setupUi(this);
 
-  cardsEnabledFlag = false;
 
+  //Signals and slots
   connect(networkedPlayOption, SIGNAL(clicked()), this,
       SLOT(setNetworkOptVis()));
   connect(localPlayOption, SIGNAL(clicked()), this, SLOT(setLocalOptVis()));
@@ -35,15 +34,19 @@ ClueMainWindowClass::ClueMainWindowClass(QWidget *parent)
   connect(okayButton, SIGNAL(clicked()), this, SLOT(submitMove()));
   connect(startGameButton, SIGNAL(clicked()), this, SLOT(startGame()));
 
+  //Setup the board
   setupNewBoard();
 }
+
+//Initial board setup functions
 
 void ClueMainWindowClass::displayCardsInHand()
 {
   //Variable Declarations
-  set<CardEnum>hand = thisPlayerPtr->getHand();
+  set<CardEnum>hand = thisPlayerPtr->getHand();             //THIS player's hand
   set<CardEnum>::iterator currentCardIter = hand.begin();
-  QLabel *cardPtr;
+                            //Iterator used to progress through the hand
+  QLabel *cardPtr;          //Pointer to the QLabel on the form to show the card
 
   for(int i = 1; currentCardIter != hand.end(); i++, currentCardIter++)
   {
@@ -121,13 +124,15 @@ void ClueMainWindowClass::drawPieceToBoard(const list<PlayerClass>::iterator pla
     const BoardLocationClass &tile)
 {
   //Variable Declarations
-  QPoint boardLocTopLeft = tile.getTopLeftPixel();
+  QPoint boardLocTopLeft = tile.getTopLeftPixel();  //Top left pixel of the tile
+                                                    //to draw the piece on
 
   for(int i = 0; i < TILE_WIDTH; i++)
   {
     for(int j = 0; j < TILE_HEIGHT; j++)
     {
-      if(CHAR_PIECE_IMAGES[playerIter->getCharacter()].pixel(i, j) != TRANSPARENT_RGB)
+      if(CHAR_PIECE_IMAGES[playerIter->getCharacter()].pixel(i, j) != 
+          TRANSPARENT_RGB)
       {
         inProgressBoardImage.setPixel(boardLocTopLeft + QPoint(i, j),
             CHAR_PIECE_IMAGES[playerIter->getCharacter()].pixel(i, j));
@@ -139,13 +144,16 @@ void ClueMainWindowClass::drawPieceToBoard(const list<PlayerClass>::iterator pla
 void ClueMainWindowClass::clearVisitedTiles()
 {
   //Variable Declarations
-  set<BoardLocationClass> visitedLocations =
-      currentPlayerIter->getLocationsThisTurn();
-  set<BoardLocationClass>::iterator visitedLocationIter =
-      visitedLocations.begin();
-  QPoint tileTopLeftPixel;
+  set<BoardLocationClass> visitedLocations =                //Locations visited
+      currentPlayerIter->getLocationsThisTurn();            //this turn
+  set<BoardLocationClass>::iterator visitedLocationIter =   //Iterator to the
+      visitedLocations.begin();                             //locations visited
+  QPoint tileTopLeftPixel;  //Location of top left pixel of *visitedLocationIter
   BoardLocationClass currentPlayerLoc = currentPlayerIter->getPlayerLocation();
+                                                //Current location of the player
 
+  //Reset the tiles in the list of locations visited to the original color,
+  //with the exception of the player's current location
   while(visitedLocationIter != visitedLocations.end())
   {
     if(*visitedLocationIter != currentPlayerLoc)
@@ -161,10 +169,14 @@ void ClueMainWindowClass::clearVisitedTiles()
         }
       }
     }
-
     visitedLocationIter++;
   }
+
+  //Reset the list of locations visited to include only the player's current
+  //location
   currentPlayerIter->resetLocationsThisTurn();
+  
+  //Update the board shown on the gui
   gameBoard->setPixmap(QPixmap::fromImage(inProgressBoardImage));
 }
 
@@ -172,23 +184,28 @@ void ClueMainWindowClass::clearPiece(const list<PlayerClass>::iterator
     playerIter, const BoardLocationClass &tile)
 {
   //Variable Declarations
-  QPoint boardLocTopLeft = tile.getTopLeftPixel();
+  QPoint boardLocTopLeft = tile.getTopLeftPixel();    //Top left pixel of the 
+                                                      //tile the piece is on
   int drawOffset[NUMBER_OF_DIRECTIONS] = {1, 1, 1, 1};
-  TileTypeEnum tileType;
+                 //Pixel offset; 0 clears entire tile (including borders)
 
+  //If the tile to be cleared is a room tile and the tile in a direction is
+  //unoccupied, clear the tile including that border; otherwise, do not clear 
+  //the borner
   if(tile.getTileType(CLUE_BOARD_IMAGE) == ROOM_TILE)
   {
     for(DirectionEnum direction = UP; direction <= RIGHT; direction =
         DirectionEnum(int(direction) + 1))
     {
-      tileType = tile.getTileInDir(direction).getTileType(inProgressBoardImage);
-      if(tileType != OCCUPIED_TILE)
+      if(tile.getTileInDir(direction).getTileType(inProgressBoardImage) != 
+          OCCUPIED_TILE)
       {
         drawOffset[direction] = 0;
       }
     }
   }
 
+  //Clear the tile
   for(int i = drawOffset[LEFT]; i < TILE_WIDTH - drawOffset[RIGHT]; i++)
   {
     for(int j = drawOffset[UP]; j < TILE_HEIGHT - drawOffset[DOWN]; j++)
@@ -206,26 +223,29 @@ void ClueMainWindowClass::clearPiece(const list<PlayerClass>::iterator
       }
     }
   }
-
-  QColor a = inProgressBoardImage.pixel(tile.getMiddlePixel());
 }
 
 void ClueMainWindowClass::drawMove(const BoardLocationClass &oldLocation,
-    const BoardLocationClass &newLocation, const list<PlayerClass>::iterator &playerIter)
+    const BoardLocationClass &newLocation, const list<PlayerClass>::iterator 
+    &playerIter)
 {
+  //Clear the piece from its old location
   clearPiece(playerIter, oldLocation);
+  //Draw the piece to the new location
   drawPieceToBoard(playerIter, newLocation);
-
+  //Add the new location to the player's list of visited locations
   playerIter->addToLocationsThisTurn(newLocation);
-
+  //Update the board image on the gui
   gameBoard->setPixmap(QPixmap::fromImage(inProgressBoardImage));
 }
 
-void ClueMainWindowClass::dealCards()
+void ClueMainWindowClass::dealCards(DeckClass &cardDeck)
 {
   //Variable Declarations
   list<PlayerClass>::iterator playerBeingDealtTo = gameParticipants.begin();
+                            //Iterator pointing to the player to deal a card to
 
+  //Deal the cards to the players until there are no cards in the deck
   while(cardDeck.getDeckSize() > 0)
   {
     playerBeingDealtTo->addCardToHand(cardDeck.drawRandomCard());
@@ -245,11 +265,10 @@ void ClueMainWindowClass::setupGame()
   list<SuspectEnum>::iterator charIterator;
   list<PlayerClass>::iterator participantIterator;
   int randomCharacterNumber;
-  QString playerName;
-  int defaultNameCounter = 1;
+  DeckClass cardDeck;
 
   //Initialize availableCharacters
-  for(SuspectEnum i = SuspectEnum(0); i < NUMBER_OF_SUSPECTS;
+  for(SuspectEnum i = SCARLET; i < NUMBER_OF_SUSPECTS;
       i = SuspectEnum(int(i) + 1))
   {
     availableCharacters.push_front(i);
@@ -259,8 +278,8 @@ void ClueMainWindowClass::setupGame()
   if((humanPlayersSpin->value() + computerPlayersSpin->value()) < MIN_PLAYERS ||
       (humanPlayersSpin->value() + computerPlayersSpin->value() > MAX_PLAYERS))
   {
-//    throw(ExceptionClass("Error setting up game", "You must have a minimum of "
-//        "3 and a maximum of 6 players to start a game."));
+    throw(ExceptionClass("Error setting up game", "You must have a minimum of "
+        "3 and a maximum of 6 players to start a game."));
   }
 
   //Add players to gameParticipants
@@ -284,26 +303,11 @@ void ClueMainWindowClass::setupGame()
 
     //Add the player to gameParticipants.  Human participants (and the host) are
     //added first.
-    if(i == 0)
-    {
-      playerName = playerNameText->text();
-    }
-    else if(i < humanPlayersSpin->value())
-    {
-      //Networked player names
-    }
-    else
-    {
-      playerName.setNum(defaultNameCounter);
-      playerName.prepend("Player ");
-      defaultNameCounter++;
-    }
-
     charIterator = availableCharacters.end();
     charIterator--;
 
-    gameParticipants.insert(participantIterator, PlayerClass(playerName,
-        *charIterator, i >= humanPlayersSpin->value(), i == 0));
+    gameParticipants.insert(participantIterator, PlayerClass(*charIterator,
+        i >= humanPlayersSpin->value(), i == 0));
 
 
     //Erase the character in availableCharacters
@@ -322,9 +326,8 @@ void ClueMainWindowClass::setupGame()
   currentPlayerIter = gameParticipants.begin();
 
   //Make the case file and deal out the remaining cards
-  cardDeck.resetDeck();
-  caseFile.createCaseFile(cardDeck);
-  dealCards();
+  caseFile = cardDeck.createCaseFile();
+  dealCards(cardDeck);
 
   displayCardsInHand();
 
@@ -402,7 +405,7 @@ void ClueMainWindowClass::refreshDisplay()
     enableAllControls();
     currentTurnText->setText("It is your turn.  " +
         CARD_VALUES[int(suspectToCard(nextPlayerIter->getCharacter()))] +
-        "'s (" + nextPlayerIter->getName() + ") turn is next.");
+        "'s turn is next.");
   }
   else
   {
@@ -410,16 +413,14 @@ void ClueMainWindowClass::refreshDisplay()
     {
       currentTurnText->setText("It is " +
           CARD_VALUES[int(suspectToCard(currentPlayerIter->getCharacter()))]
-          + "'s (" + currentPlayerIter->getName() + ") turn.  "
-          "Your turn is next.");
+          + "'s turn.  Your turn is next.");
     }
     else
     {
       currentTurnText->setText("It is " +
           CARD_VALUES[int(suspectToCard(currentPlayerIter->getCharacter()))]
-          + "'s (" + currentPlayerIter->getName() + ") turn.  " +
-          CARD_VALUES[int(suspectToCard(nextPlayerIter->getCharacter()))] +
-          "'s (" + nextPlayerIter->getName() + ") turn is next.");
+          + "'s turn.  " + CARD_VALUES[int(suspectToCard(nextPlayerIter->
+          getCharacter()))] + "'s turn is next.");
     }
     disableAllControls();
   }

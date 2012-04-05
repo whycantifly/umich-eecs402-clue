@@ -4,7 +4,6 @@
 #include <set>
 
 #include "enums.h"
-#include "DeckClass.h"
 
 class SuggestionClass
 {

@@ -14,7 +14,6 @@
 class PlayerClass
 {
   private:
-    QString playerName;                 //Player name
     SuspectEnum character;              //Assigned character piece
     BoardLocationClass currentLocation; //Current location on the board
     bool hostFlag;                      //True = host (or local play);
@@ -43,7 +42,6 @@ class PlayerClass
     }
     //Constructor (QString, CardEnum, bool, bool)
     PlayerClass(
-        QString name,           //Player name
         SuspectEnum suspect,       //Character piece
         bool aiValue,           //AI or human
         bool gameHostValue      //Game host or not
@@ -120,11 +118,6 @@ class PlayerClass
     bool getHostFlag() const
     {
       return hostFlag;
-    }
-
-    QString getName() const
-    {
-      return playerName;
     }
 
     //Gets the current player location.

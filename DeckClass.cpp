@@ -2,6 +2,11 @@
 
 #include "DeckClass.h"
 #include "enums.h"
+#include "ExceptionClass.h"
+#include "SuggestionClass.h"
+#include "cardToSuspect.h"
+#include "cardToWeapon.h"
+#include "cardToRoom.h"
 
 DeckClass::DeckClass()
 {
@@ -39,9 +44,60 @@ void DeckClass::removeCard(CardEnum cardToRemove)
 void DeckClass::resetDeck()
 {
   clear();
-  for(int i = 0; i < NUMBER_OF_SUSPECTS + NUMBER_OF_WEAPONS + NUMBER_OF_ROOMS;
-      i++)
+  for(int i = 0; i < NUMBER_OF_CARDS; i++)
   {
     insert(CardEnum(i));
   }
+}
+
+SuggestionClass DeckClass::createCaseFile()
+{
+  //Variable Declarations
+  SuspectEnum suspect;
+  WeaponEnum weapon;
+  RoomEnum room;
+  bool haveSuspectFlag = false;
+  bool haveWeaponFlag = false;
+  bool haveRoomFlag = false;
+  CardEnum randomCard;
+
+  while(haveSuspectFlag == false || haveWeaponFlag == false || haveRoomFlag ==
+      false)
+  {
+    randomCard = getRandomCard();
+
+    try
+    {
+      cardToSuspect(randomCard);
+      if(haveSuspectFlag == false)
+      {
+        suspect = cardToSuspect(randomCard);
+        removeCard(randomCard);
+        haveSuspectFlag = true;
+      }
+    }
+    catch(ExceptionClass notASuspect)
+    {
+      try
+      {
+        cardToWeapon(randomCard);
+        if(haveWeaponFlag == false)
+        {
+          weapon = cardToWeapon(randomCard);
+          removeCard(randomCard);
+          haveWeaponFlag = true;
+        }
+      }
+      catch(ExceptionClass notAWeapon)
+      {
+        if(haveRoomFlag == false)
+        {
+          room = cardToRoom(randomCard);
+          removeCard(randomCard);
+          haveRoomFlag = true;
+        }
+      }
+    }
+  }
+  return SuggestionClass(suspect, weapon, room);
 }
