@@ -298,8 +298,16 @@ void ClueMainWindowClass::setupGame()
       playerName.prepend("Player ");
       defaultNameCounter++;
     }
+
+    charIterator = availableCharacters.end();
+    charIterator--;
+
     gameParticipants.insert(participantIterator, PlayerClass(playerName,
         *charIterator, i >= humanPlayersSpin->value(), i == 0));
+
+
+    //Erase the character in availableCharacters
+    availableCharacters.erase(charIterator);
 
     //Set thisPlayerChar
     if(i == 0)
@@ -309,9 +317,6 @@ void ClueMainWindowClass::setupGame()
       youAreText->setText("You are " + CARD_VALUES[int(suspectToCard(
           thisPlayerPtr->getCharacter()))] + ".");
     }
-
-    //Erase the character in availableCharacters
-    availableCharacters.erase(charIterator);
   }
 
   currentPlayerIter = gameParticipants.begin();
@@ -562,9 +567,8 @@ void ClueMainWindowClass::takeAiAction(AiActionEnum action,
     SuggestionClass &aiSuggestion, queue<DirectionEnum> &aiMoves,
     int aiExitDoorNumber)
 {
-  int j = currentPlayerIter->getDieRoll();
   BoardLocationClass lastLocation = currentPlayerIter->getPlayerLocation();
-  list<PlayerClass>::const_iterator aiPlayerIter= currentPlayerIter;
+  list<PlayerClass>::const_iterator aiPlayerIter = currentPlayerIter;
 
   switch(action)
   {
@@ -581,7 +585,8 @@ void ClueMainWindowClass::takeAiAction(AiActionEnum action,
         moveCurrentPlayerOutDoor(aiExitDoorNumber);
       }
 
-      while(aiMoves.size() > 0)
+      while(currentPlayerIter->getMovesLeft() > 0 &&
+          aiPlayerIter == currentPlayerIter)
       {
         QTest::qWait(AI_DELAY);
         moveCurrentPlayer(aiMoves.front());
@@ -595,7 +600,8 @@ void ClueMainWindowClass::takeAiAction(AiActionEnum action,
         finishMove();
       }
 
-      if(currentPlayerIter->getPlayerLocation().getTileType(CLUE_BOARD_IMAGE) == ROOM_TILE)
+      if(currentPlayerIter->getPlayerLocation().getTileType(CLUE_BOARD_IMAGE)
+          == ROOM_TILE)
       {
         currentPlayerIter->setEnteredRoomThisMoveFlag(false);
         currentPlayerIter->setMovesLeft(0);
@@ -1015,17 +1021,15 @@ void ClueMainWindowClass::moveSuggestedSuspect(SuspectEnum suggestedSuspect)
   {
     if(playerIter->getCharacter() == suggestedSuspect)
     {
-      if(playerIter->getPlayerLocation().getTileType(inProgressBoardImage) == ROOM_TILE)
+      if(playerIter->getPlayerLocation().getTileType(inProgressBoardImage) !=
+          ROOM_TILE || playerIter->getPlayerLocation().getRoom() !=
+          currentPlayerIter->getPlayerLocation().getRoom())
       {
-        if(playerIter->getPlayerLocation().getRoom() ==
-            currentPlayerIter->getPlayerLocation().getRoom())
-        {
-          newLocation = currentPlayerIter->getPlayerLocation().
-              getEmptyRoomTile(inProgressBoardImage);
-          drawMove(playerIter->getPlayerLocation(), newLocation, playerIter);
-          playerIter->setPlayerLocation(newLocation);
-          playerIter->setMovedSinceLastTurnFlag(true);
-        }
+        newLocation = currentPlayerIter->getPlayerLocation().
+            getEmptyRoomTile(inProgressBoardImage);
+        drawMove(playerIter->getPlayerLocation(), newLocation, playerIter);
+        playerIter->setPlayerLocation(newLocation);
+        playerIter->setMovedSinceLastTurnFlag(true);
       }
       playerIter = currentPlayerIter;
     }
@@ -1094,12 +1098,6 @@ void ClueMainWindowClass::moveCurrentPlayer(const DirectionEnum &direction)
 {
   //Variable Declarations
   BoardLocationClass oldLocation = currentPlayerIter->getPlayerLocation();
-
-  if(&*currentPlayerIter == &*thisPlayerPtr)
-  {
-    oldLocation = currentPlayerIter->getPlayerLocation();
-  }
-
 
   try
   {

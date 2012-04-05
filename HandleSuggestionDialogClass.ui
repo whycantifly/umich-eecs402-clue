@@ -10,17 +10,17 @@
     <x>0</x>
     <y>0</y>
     <width>300</width>
-    <height>224</height>
+    <height>178</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Select A Card</string>
   </property>
   <widget class="QComboBox" name="cardSelectionBox">
    <property name="geometry">
     <rect>
      <x>5</x>
-     <y>190</y>
+     <y>145</y>
      <width>156</width>
      <height>27</height>
     </rect>
@@ -32,11 +32,11 @@
      <x>10</x>
      <y>20</y>
      <width>281</width>
-     <height>106</height>
+     <height>66</height>
     </rect>
    </property>
    <property name="text">
-    <string>TextLabel</string>
+    <string/>
    </property>
    <property name="wordWrap">
     <bool>true</bool>
@@ -46,7 +46,7 @@
    <property name="geometry">
     <rect>
      <x>195</x>
-     <y>190</y>
+     <y>145</y>
      <width>97</width>
      <height>27</height>
     </rect>
@@ -62,7 +62,7 @@
    <property name="geometry">
     <rect>
      <x>5</x>
-     <y>145</y>
+     <y>100</y>
      <width>286</width>
      <height>41</height>
     </rect>
