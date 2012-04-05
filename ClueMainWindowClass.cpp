@@ -547,7 +547,6 @@ void ClueMainWindowClass::startPlayerTurn()
           aiAction = currentPlayerIter->handlePrerollAi(
               inProgressBoardImage, aiSuggestion);
           takeAiAction(aiAction, aiSuggestion, aiMoveList, aiExitDoor);
-          currentPlayerIter->setMovedSinceLastTurnFlag(false);
         }
 
         continuePlayerTurn();
@@ -596,20 +595,22 @@ void ClueMainWindowClass::takeAiAction(AiActionEnum action,
 
       if(aiPlayerIter == currentPlayerIter)
       {
-        currentPlayerIter->setMovesLeft(0);
-        finishMove();
-      }
-
-      if(currentPlayerIter->getPlayerLocation().getTileType(CLUE_BOARD_IMAGE)
-          == ROOM_TILE)
-      {
-        currentPlayerIter->setEnteredRoomThisMoveFlag(false);
-        currentPlayerIter->setMovesLeft(0);
-        takeAiAction(SUGGEST, aiSuggestion, aiMoves, aiExitDoorNumber);
+        if(currentPlayerIter->getPlayerLocation().getTileType(CLUE_BOARD_IMAGE)
+            == ROOM_TILE)
+        {
+          takeAiAction(SUGGEST, aiSuggestion, aiMoves, aiExitDoorNumber);
+        }
+        else
+        {
+          currentPlayerIter->setMovesLeft(0);
+          finishMove();
+        }
       }
       break;
     case SUGGEST:
       aiSuggestion = currentPlayerIter->makeSuggestionAi();
+      currentPlayerIter->setEnteredRoomThisMoveFlag(false);
+      currentPlayerIter->setMovesLeft(0);
       handleSuggestion(aiSuggestion);
       break;
     case ACCUSE:
@@ -856,7 +857,6 @@ void ClueMainWindowClass::makePlayerAccusation()
   }
 }
 
-
 //Only applies to THIS player
 void ClueMainWindowClass::makePlayerSuggestion()
 {
@@ -864,15 +864,13 @@ void ClueMainWindowClass::makePlayerSuggestion()
   SuggestionClass suggestion;
   SuggestionDialogClass suggestionDialog(&suggestion, this);
 
-  currentPlayerIter->setEnteredRoomThisMoveFlag(false);
-
-
+  disableAllControls();
   if(suggestionDialog.exec() == QDialog::Accepted)
   {
+    currentPlayerIter->setEnteredRoomThisMoveFlag(false);
     handleSuggestion(suggestion);
+    refreshDisplay();
   }
-
-  refreshDisplay();
 }
 
 //Handles all player's actions
@@ -884,8 +882,9 @@ void ClueMainWindowClass::handleSuggestion(SuggestionClass &playerSuggestion)
   CardEnum revealedCard;
   QMessageBox suggestionMessage(this);
   HandleSuggestionDialogClass playerSuggestionDialog(this);
-  PlayerClass a;
-  PlayerClass b;
+  SuspectEnum currentPlayer;
+
+  currentPlayer = currentPlayerIter->getCharacter();
 
   playerSuggestionDialog.setWindowFlags((playerSuggestionDialog.windowFlags()
       | Qt::CustomizeWindowHint) & ~Qt::WindowCloseButtonHint);
@@ -901,9 +900,6 @@ void ClueMainWindowClass::handleSuggestion(SuggestionClass &playerSuggestion)
 
     if(&*currentPlayerIter != &*thisPlayerPtr)
     {
-      a = *currentPlayerIter;
-      b = *thisPlayerPtr;
-
       suggestionMessage.setWindowTitle("Suggestion");
       suggestionMessage.setText(CARD_VALUES[int(suspectToCard(
           currentPlayerIter->getCharacter()))] + " suggests that the crime was "
@@ -1021,7 +1017,7 @@ void ClueMainWindowClass::moveSuggestedSuspect(SuspectEnum suggestedSuspect)
   {
     if(playerIter->getCharacter() == suggestedSuspect)
     {
-      if(playerIter->getPlayerLocation().getTileType(inProgressBoardImage) !=
+      if(playerIter->getPlayerLocation().getTileType(CLUE_BOARD_IMAGE) !=
           ROOM_TILE || playerIter->getPlayerLocation().getRoom() !=
           currentPlayerIter->getPlayerLocation().getRoom())
       {
