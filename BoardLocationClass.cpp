@@ -11,7 +11,7 @@ using namespace std;
 
 const QRgb BoardLocationClass::getTileColor(const QImage &currentBoard) const
 {
-  return currentBoard.pixel(getMiddlePixel().x(), getMiddlePixel().y());
+  return currentBoard.pixel(getMiddlePixel());
 }
 
 const TileTypeEnum BoardLocationClass::getTileType(const QImage &currentBoard)
@@ -25,13 +25,19 @@ const TileTypeEnum BoardLocationClass::getTileType(const QImage &currentBoard)
 
   tileColor = getTileColor(currentBoard);
 
-  i = 0;
-  while(i < NUMBER_OF_SUSPECTS + 1 && foundTile == false)
+  if(tileColor == EMPTY_TILE_RGB)
   {
-    if(tileColor == EMPTY_TILE_RGB[i])
+    foundTile = true;
+    tileType = UNOCCUPIED_TILE;
+  }
+
+  i = 0;
+  while(i < NUMBER_OF_SUSPECTS && foundTile == false)
+  {
+    if(tileColor == VISITED_TILE_RGB[i])
     {
       foundTile = true;
-      tileType = UNOCCUPIED_TILE;
+      tileType = VISITED_TILE;
     }
     i++;
   }
@@ -125,7 +131,7 @@ const RoomEnum BoardLocationClass::getRoom() const
 
 bool BoardLocationClass::checkBoardBounds() const
 {
-  if(xCoord < 0 || xCoord > BOARD_WIDTH || yCoord < 0 || yCoord > BOARD_HEIGHT)
+  if(xCoord < 0 || xCoord >= BOARD_WIDTH || yCoord < 0 || yCoord >= BOARD_HEIGHT)
   {
     return false;
   }
@@ -156,7 +162,7 @@ bool BoardLocationClass::checkPlayerBlocked(const QImage &currentBoard) const
       if(DOOR_LOCATIONS[doorStart + i].getTileType(currentBoard) !=
           OCCUPIED_TILE)
       {
-        blockedFlag == false;
+        blockedFlag = false;
       }
 
       i++;
@@ -186,10 +192,12 @@ void BoardLocationClass::move(const QImage &currentBoard,
     const DirectionEnum &direction)
 {
   BoardLocationClass newLocation = getTileInDir(direction);
-  bool enteredRoomFlag = false;
+  bool inRoomThisTurnFlag = false;
+  bool doorFlag = false;
+  int startingDoorIndex = 0;
   int i;
 
-  if(checkBoardBounds() == false)
+  if(newLocation.checkBoardBounds() == false)
   {
     throw(ExceptionClass("Invalid Move", "That tile is not within the bounds "
         "of the board.  Please try another move."));
@@ -207,20 +215,39 @@ void BoardLocationClass::move(const QImage &currentBoard,
         "Please try another move."));
   }
 
+  if(newLocation.getTileType(currentBoard) == VISITED_TILE)
+  {
+    throw(ExceptionClass("You have already visited that tile this turn."));
+  }
+
   if(newLocation.getTileType(currentBoard) == ROOM_TILE)
   {
     i = 0;
-    while(i < TOTAL_NUMBER_OF_DOORS && enteredRoomFlag == false)
+    while(i < TOTAL_NUMBER_OF_DOORS && doorFlag == false)
     {
       if(*this == DOOR_LOCATIONS[i] && direction == DOOR_DIRECTIONS[i])
       {
-        enteredRoomFlag = true;
+        for(int j = 0; j < int(newLocation.getRoom()); j++)
+        {
+          startingDoorIndex += NUMBER_OF_DOORS[j];
+        }
+
+        for(int j = 0; j < NUMBER_OF_DOORS[newLocation.getRoom()]; j++)
+        {
+          if(DOOR_LOCATIONS[startingDoorIndex + j].getTileType(currentBoard) ==
+              VISITED_TILE)
+          {
+            throw(ExceptionClass("You have already visited this room this "
+                "turn.  Please try another move."));
+          }
+        }
+        doorFlag = true;
         newLocation = newLocation.getEmptyRoomTile(currentBoard);
       }
       i++;
     }
 
-    if(enteredRoomFlag == false)
+    if(doorFlag == false)
     {
       throw(ExceptionClass("That tile is on the other side of a wall.  You "
           "must use a door to enter a room.  Please try another move."));
@@ -290,11 +317,56 @@ queue<DirectionEnum> BoardLocationClass::getMovesToDoor(const QImage &currentBoa
   OrientationEnum moveOrientation;
   deque<DirectionEnum> moveDirection;
   bool movedFromOriginFlag = false;
+  bool visitedRoomFlag = false;
+  int startingDoorIndex = 0;
+  int i;
+  RoomEnum roomVisited = HALL;
   set<BoardLocationClass> alreadyVisited;
   set<BoardLocationClass>::iterator alreadyVisitedIter;
-  DirectionEnum a;
+  DirectionEnum aaa;
 
   alreadyVisited.insert(*this);
+
+  //If move is starting on a door tile, add all doors to that room to the
+  //already visited list.
+  while(visitedRoomFlag == false && roomVisited <= STUDY)
+  {
+    i = 0;
+    while(i < NUMBER_OF_DOORS[roomVisited] && visitedRoomFlag == false)
+    {
+      if(DOOR_LOCATIONS[startingDoorIndex + i] == *this)
+      {
+        visitedRoomFlag = true;
+      }
+      i++;
+    }
+    if(visitedRoomFlag == false)
+    {
+      startingDoorIndex += NUMBER_OF_DOORS[roomVisited];
+      roomVisited = RoomEnum(int(roomVisited) + 1);
+    }
+    else
+    {
+      for(i = 0; i < NUMBER_OF_DOORS[roomVisited]; i++)
+      {
+        alreadyVisited.insert(DOOR_LOCATIONS[startingDoorIndex + i]);
+      }
+    }
+  }
+
+  //Decide whether to make a horizontal or vertical move first
+  if(origin.xCoord == target.xCoord)
+  {
+    moveOrientation = VERTICAL;
+  }
+  else if(origin.yCoord == target.yCoord)
+  {
+    moveOrientation = HORIZONTAL;
+  }
+  else
+  {
+    moveOrientation = OrientationEnum(rand() % 2);
+  }
 
 
   while(movesLeft > 0)
@@ -313,20 +385,6 @@ queue<DirectionEnum> BoardLocationClass::getMovesToDoor(const QImage &currentBoa
     //Can move
     else
     {
-      //Decide whether to make a horizontal or vertical move first
-      if(origin.xCoord == target.xCoord)
-      {
-        moveOrientation = VERTICAL;
-      }
-      else if(origin.yCoord == target.yCoord)
-      {
-        moveOrientation = HORIZONTAL;
-      }
-      else
-      {
-        moveOrientation = OrientationEnum(rand() % 2);
-      }
-
       while(moveDirection.size() < NUMBER_OF_DIRECTIONS)
       {
         switch(moveOrientation)
@@ -377,7 +435,15 @@ queue<DirectionEnum> BoardLocationClass::getMovesToDoor(const QImage &currentBoa
             == UNOCCUPIED_TILE) && alreadyVisited.find(origin.getTileInDir(
             moveDirection.front())) == alreadyVisited.end())
         {
-          a = moveDirection.front();
+          aaa = moveDirection.front();
+          if(moveDirection.front() == UP || moveDirection.front() == DOWN)
+          {
+            moveOrientation = VERTICAL;
+          }
+          else
+          {
+            moveOrientation = HORIZONTAL;
+          }
           origin.move(currentBoard, moveDirection.front());
           alreadyVisited.insert(origin);
           moveList.push(moveDirection.front());
@@ -386,6 +452,11 @@ queue<DirectionEnum> BoardLocationClass::getMovesToDoor(const QImage &currentBoa
         }
 
         moveDirection.pop_front();
+      }
+
+      if(movedFromOriginFlag == false && moveDirection.size() == 0)
+      {
+        movesLeft = 0;
       }
 
       moveDirection.clear();

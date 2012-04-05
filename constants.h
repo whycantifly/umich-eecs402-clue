@@ -18,9 +18,7 @@ const QString CARD_VALUES[21] = {"Miss Scarlet", "Col. Mustard", "Mrs. White",
 const QRgb TRANSPARENT_RGB = qRgb(255, 255, 255);
 
 //RGB values for empty tiles
-const QRgb EMPTY_TILE_RGB[7] = {qRgb(255, 238, 170), qRgb(50, 103, 183),
-    qRgb(139, 210, 91), qRgb(196, 117, 217), qRgb(213, 191, 102),
-    qRgb(255, 254, 253), qRgb(234, 174, 174)};
+const QRgb EMPTY_TILE_RGB = qRgb(255, 238, 170);
 
 //RGB values for rooms
 const QRgb ROOM_TILE_RGB[9] = {qRgb(153, 153, 153), qRgb(145, 111, 124),

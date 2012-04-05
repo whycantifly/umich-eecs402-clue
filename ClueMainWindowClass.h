@@ -47,7 +47,7 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     //Draws the character piece indicated to the tile indicated on
     //inProgressBoardImage.
     void drawPieceToBoard(
-        const SuspectEnum &character,
+        std::list<PlayerClass>::iterator playerIter,
         const BoardLocationClass &tile
         );
 
@@ -55,7 +55,7 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
 
     //Erases the piece on the tile indicated on inProgressBoardImage.
     void clearPiece(
-        const SuspectEnum character,
+        std::list<PlayerClass>::iterator playerIter,
         const BoardLocationClass &tile
         );
 
@@ -91,8 +91,8 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
 
     void takeAiAction(
         AiActionEnum action,
-        SuggestionClass aiSuggestion,
-        std::queue<DirectionEnum> aiMoves,
+        SuggestionClass &aiSuggestion,
+        std::queue<DirectionEnum> &aiMoves,
         int aiExitDoorNumber = 0
         );
 

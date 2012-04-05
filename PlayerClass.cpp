@@ -42,11 +42,6 @@ void PlayerClass::move(const QImage &currentBoard, const DirectionEnum &directio
 
   newLocation.move(currentBoard, direction);
 
-//  if(locationsThisTurn.find(newLocation) != locationsThisTurn.end())
-//  {
-//    throw(ExceptionClass("You have already visited that tile this turn."));
-//  }
-
   if(newLocation.getTileType(CLUE_BOARD_IMAGE) == ROOM_TILE)
   {
     for(visitedLocationIter = locationsThisTurn.begin(); visitedLocationIter !=
@@ -149,26 +144,33 @@ AiActionEnum PlayerClass::handleAfterRollAi(const QImage &currentBoard,
 {
   int targetDoorIndex;
   int startingDoorIndex = 0;
+  int randNumber = rand() % 10;
 
   if(currentLocation.checkPlayerBlocked(currentBoard) == false)
   {
-    if(currentLocation.getTileType(currentBoard) == ROOM_TILE)
+    if(currentLocation.getTileType(CLUE_BOARD_IMAGE) == ROOM_TILE)
     {
-      for(int i = 0; i < int(currentLocation.getRoom()); i++)
+      for(int i = 0; i < currentLocation.getRoom(); i++)
       {
         startingDoorIndex += NUMBER_OF_DOORS[i];
       }
-
-      aiExitDoorNumber = rand() % NUMBER_OF_DOORS[currentLocation.getRoom()] +
-          startingDoorIndex;
+      aiExitDoorNumber = rand() % NUMBER_OF_DOORS[currentLocation.getRoom()]
+          + 1;
       targetDoorIndex = rand() % (TOTAL_NUMBER_OF_DOORS);
-      aiMoves = DOOR_LOCATIONS[aiExitDoorNumber].getMovesToDoor(currentBoard,
-          movesLeftThisTurn, targetDoorIndex);
+      aiMoves = DOOR_LOCATIONS[aiExitDoorNumber + startingDoorIndex - 1].
+          getMovesToDoor(currentBoard, movesLeftThisTurn, targetDoorIndex);
       return MOVE;
     }
     else
     {
-      targetDoorIndex = currentLocation.getClosestDoorIndex();
+      if(randNumber < 6)
+      {
+        targetDoorIndex = currentLocation.getClosestDoorIndex();
+      }
+      else
+      {
+        targetDoorIndex = rand() % TOTAL_NUMBER_OF_DOORS;
+      }
       aiMoves = currentLocation.getMovesToDoor(currentBoard, movesLeftThisTurn,
           targetDoorIndex);
       return MOVE;
@@ -184,7 +186,7 @@ SuggestionClass PlayerClass::makeSuggestionAi()
 {
   SuspectEnum suspect = SuspectEnum(rand() % NUMBER_OF_SUSPECTS);
   WeaponEnum weapon = WeaponEnum(rand() % NUMBER_OF_WEAPONS);
-  RoomEnum room = RoomEnum(rand() % NUMBER_OF_ROOMS);
+  RoomEnum room = currentLocation.getRoom();
 
   return SuggestionClass(suspect, weapon, room);
 }
