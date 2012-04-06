@@ -41,7 +41,7 @@ bool SuggestionClass::operator==(CardEnum card) const
       return false;
     }
   }
-  catch(ExceptionClass exception)
+  catch(ExceptionClass newException)
   {
 
   }

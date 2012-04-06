@@ -1152,10 +1152,10 @@ void ClueMainWindowClass::moveCurrentPlayer(const DirectionEnum &direction)
     }
     finishMove();
   }
-  catch(ExceptionClass exception)
+  catch(ExceptionClass newException)
   {
     errorMessageLabel->setText("<span style=' font-weight:600; color:#ff0000;'>"
-        + exception.getErrorMessage() + "</span>");
+        + newException.getErrorMessage() + "</span>");
   }
 }
 
@@ -1253,10 +1253,10 @@ void ClueMainWindowClass::submitMove()
       finishMove();
     }
   }
-  catch(ExceptionClass exception)
+  catch(ExceptionClass newException)
   {
     errorMessageLabel->setText("<span style=' font-weight:600; color:#ff0000;'>"
-        + exception.getErrorMessage() + "</span>");
+        + newException.getErrorMessage() + "</span>");
   }
 }
 
@@ -1283,9 +1283,9 @@ void ClueMainWindowClass::startGame()
       //Code
     }
   }
-  catch(ExceptionClass exception)
+  catch(ExceptionClass newException)
   {
-    displayExceptionMessageBox(exception);
+    displayExceptionMessageBox(newException);
   }
 }
 
