@@ -83,10 +83,7 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     void continuePlayerTurn();
 
     void takeAiAction(
-        const AiActionEnum action,
-        SuggestionClass aiSuggestion = EMPTY_SUGGESTION,
-        std::queue<DirectionEnum> aiMoves = EMPTY_MOVE_LIST,
-        const int aiExitDoorNumber = 0
+        const AiActionEnum action
         );
 
     void updateRollInfoText();
@@ -123,6 +120,8 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
 
     void moveSuggestedSuspect(SuspectEnum suggestedSuspect);
 
+    void moveCurrentPlayerOutDoor(BoardLocationClass doorLoc);
+
     //Moves the current player out of the room through a door; throws an
     //exception if the door number selected is not a valid door number for the
     //room.
@@ -131,6 +130,8 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
         );
 
     void finishMove();
+
+    void endTurn();
 
     //Moves the player one tile over; throws an exception if the move is
     //invalid.

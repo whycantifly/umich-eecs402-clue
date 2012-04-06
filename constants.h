@@ -117,4 +117,6 @@ const int MAX_PLAYERS = 6;
 
 const int NUMBER_OF_DIRECTIONS = 4;
 
+const int AI_EASY_TARGET_RAND_MAX = 2;
+
 #endif

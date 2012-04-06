@@ -3,7 +3,7 @@
 
 #include <QImage>
 #include <QPoint>
-#include <queue>
+#include <map>
 
 #include "enums.h"
 
@@ -100,8 +100,6 @@ class BoardLocationClass
     //otherwise.
     bool checkBoardBounds() const;
 
-    bool checkPlayerBlocked(const QImage &currentBoard) const;
-
     //Moves this location over one tile; throws an exception if this exceeds
     //the bounds of the board.
     void move(
@@ -110,6 +108,9 @@ class BoardLocationClass
         );
 
     int getClosestDoorIndex() const;
+
+    std::multimap<int, BoardLocationClass> getTargetDoors()
+        const;
 
     RoomEnum getRoomForDoor(BoardLocationClass doorLocation) const;
 
@@ -124,6 +125,8 @@ class BoardLocationClass
     RoomEnum getRoomDoor() const;
 
     const BoardLocationClass getEmptyRoomTile(const QImage &currentBoard) const;
+
+    int getDoorIndex();
 
     //Inline functions
 

@@ -16,6 +16,7 @@
 #include "roomToCard.h"
 #include "suspectToCard.h"
 #include "weaponToCard.h"
+#include "getStartingDoorIndex.h"
 
 using namespace std;
 
@@ -363,21 +364,24 @@ void ClueMainWindowClass::refreshDisplay()
   map<SuspectEnum, PlayerClass>::iterator nextPlayerIter;
   PlayerClass thisPlayer = gameParticipants.find(thisSuspect)->second;
 
-  if(thisPlayer.getPlayerLocation().getTileType(CLUE_BOARD_IMAGE) == ROOM_TILE)
+  if(currentPlayerIter->first == thisSuspect)
   {
-    //Player is in a corner room
-    if(thisPlayer.getPlayerLocation().checkCornerRoom() == true)
+    if(thisPlayer.getPlayerLocation().getTileType(CLUE_BOARD_IMAGE) == ROOM_TILE)
     {
-      displayCornerRoomOptions();
+      //Player is in a corner room
+      if(thisPlayer.getPlayerLocation().checkCornerRoom() == true)
+      {
+        displayCornerRoomOptions();
+      }
+      else
+      {
+        displayRoomOptions();
+      }
     }
     else
     {
-      displayRoomOptions();
+      displayDefaultOptions();
     }
-  }
-  else
-  {
-    displayDefaultOptions();
   }
 
   if(thisPlayer.getMovedSinceLastTurnFlag() == true ||
@@ -504,13 +508,6 @@ void ClueMainWindowClass::updateDetectiveNotes(CardEnum updatedCard)
 //Handles all player events
 void ClueMainWindowClass::startPlayerTurn()
 {
-  SuggestionClass aiSuggestion;
-  AiActionEnum aiAction;
-  queue<DirectionEnum> aiMoveList;
-  int aiExitDoor;
-
-  currentPlayerIter->second.setEnteredRoomThisMoveFlag(false);
-
   refreshDisplay();
 
   if(gameOver == true)
@@ -547,9 +544,8 @@ void ClueMainWindowClass::startPlayerTurn()
             true || currentPlayerIter->second.getMovedSinceLastTurnFlag() ==
             true))
         {
-          aiAction = currentPlayerIter->second.handlePrerollAi(
-              inProgressBoardImage, aiSuggestion);
-          takeAiAction(aiAction, aiSuggestion);
+          takeAiAction(currentPlayerIter->second.handlePrerollAi(
+              inProgressBoardImage));
         }
         else
         {
@@ -565,15 +561,14 @@ void ClueMainWindowClass::startPlayerTurn()
 /*****************************************************************************/
     }
   }
+  currentPlayerIter->second.setMovedSinceLastTurnFlag(false);
 }
 
-void ClueMainWindowClass::takeAiAction(const AiActionEnum action,
-    SuggestionClass aiSuggestion, queue<DirectionEnum> aiMoves,
-    const int aiExitDoorNumber)
+void ClueMainWindowClass::takeAiAction(const AiActionEnum action)
 {
   map<SuspectEnum, PlayerClass>::const_iterator aiPlayerIter =
       currentPlayerIter;
-  DirectionEnum a;
+  BoardLocationClass targetDoorLocation;
 
   switch(action)
   {
@@ -582,56 +577,68 @@ void ClueMainWindowClass::takeAiAction(const AiActionEnum action,
       break;
     case USE_SECRET_PASSAGE:
       moveCurrentPlayerToSecretPassage();
-      takeAiAction(SUGGEST, aiSuggestion, aiMoves, aiExitDoorNumber);
+      QTest::qWait(AI_DELAY);
+      takeAiAction(SUGGEST);
       break;
     case MOVE:
+      //Get the target door location
+      targetDoorLocation = currentPlayerIter->second.getAiTargetDoor();
+
+      //Player is in a room
       if(currentPlayerIter->second.getPlayerLocation().getTileType(
           CLUE_BOARD_IMAGE) == ROOM_TILE)
       {
-        moveCurrentPlayerOutDoor(aiExitDoorNumber);
+        moveCurrentPlayerOutDoor(currentPlayerIter->second.getAiExitDoor(
+            inProgressBoardImage));
       }
 
+      //Move while there are moves left and the player hasn't reached the room
       while(currentPlayerIter->second.getMovesLeft() > 0 &&
-          aiPlayerIter == currentPlayerIter)
+          aiPlayerIter == currentPlayerIter && currentPlayerIter->second.
+          getPlayerLocation().getTileType(CLUE_BOARD_IMAGE) == UNOCCUPIED_TILE)
       {
         QTest::qWait(AI_DELAY);
         try
         {
-          moveCurrentPlayer(aiMoves.front());
+          moveCurrentPlayer(currentPlayerIter->second.getAiMove(
+              inProgressBoardImage, targetDoorLocation));
         }
-        catch(...)
-        {
-          a = aiMoves.front();
-          currentPlayerIter->second.setMovesLeft(0);
-        }
-        aiMoves.pop();
-      }
-
-      if(aiPlayerIter == currentPlayerIter)
-      {
-        if(currentPlayerIter->second.getPlayerLocation().getTileType(
-            CLUE_BOARD_IMAGE)
-            == ROOM_TILE)
-        {
-          takeAiAction(SUGGEST, aiSuggestion, aiMoves, aiExitDoorNumber);
-        }
-        else
+        catch(ExceptionClass noValidMovesLeft)
         {
           currentPlayerIter->second.setMovesLeft(0);
           finishMove();
         }
       }
+
+      //Make a suggestion if the player is in a room
+      if(aiPlayerIter == currentPlayerIter && currentPlayerIter->second.
+          getPlayerLocation().getTileType(CLUE_BOARD_IMAGE) == ROOM_TILE)
+      {
+        takeAiAction(SUGGEST);
+      }
+      else
+      {
+        takeAiAction(ACCUSE);
+      }
       break;
     case SUGGEST:
-      aiSuggestion = currentPlayerIter->second.makeSuggestionAi();
       currentPlayerIter->second.setMovedSinceLastTurnFlag(false);
-      currentPlayerIter->second.setEnteredRoomThisMoveFlag(false);
       currentPlayerIter->second.setMovesLeft(0);
-      handleSuggestion(aiSuggestion);
+      handleSuggestion(currentPlayerIter->second.makeAiSuggestion());
+      takeAiAction(ACCUSE);
       break;
     case ACCUSE:
+      try
+      {
+        currentPlayerIter->second.makeAiAccusation();
+      }
+      catch(ExceptionClass notReadyToAccuse)
+      {
+        takeAiAction(END_TURN);
+      }
       break;
     case END_TURN:
+      endTurn();
       break;
   }
 }
@@ -639,11 +646,6 @@ void ClueMainWindowClass::takeAiAction(const AiActionEnum action,
 //Only applies to THIS player and Ai's if THIS player is the host
 void ClueMainWindowClass::continuePlayerTurn()
 {
-  SuggestionClass aiSuggestion;
-  AiActionEnum aiAction;
-  queue<DirectionEnum> aiMoveList;
-  int aiExitDoor;
-
   //Roll die and display die roll
   if(currentPlayerIter->second.getDieRoll() == 0)
   {
@@ -659,9 +661,7 @@ void ClueMainWindowClass::continuePlayerTurn()
   //Ai's
   else
   {
-    aiAction = currentPlayerIter->second.handleAfterRollAi(inProgressBoardImage,
-        aiMoveList, aiExitDoor);
-    takeAiAction(aiAction, EMPTY_SUGGESTION, aiMoveList, aiExitDoor);
+    takeAiAction(currentPlayerIter->second.handleAfterRollAi());
   }
 }
 
@@ -1009,6 +1009,7 @@ void ClueMainWindowClass::handleSuggestion(const SuggestionClass
     }
     else
     {
+      suggestionMessage.setText("No Card Shown");
       //THIS player
       if(playerIter->first == thisSuspect)
       {
@@ -1072,11 +1073,19 @@ void ClueMainWindowClass::moveSuggestedSuspect(SuspectEnum suggestedSuspect)
   }
 }
 
+void ClueMainWindowClass::moveCurrentPlayerOutDoor(BoardLocationClass doorLoc)
+{
+  drawMove(currentPlayerIter->first, currentPlayerIter->second.
+      getPlayerLocation(), doorLoc);
+  currentPlayerIter->second.setPlayerLocation(doorLoc);
+
+  currentPlayerIter->second.setEnteredRoomThisMoveFlag(false);
+  finishMove();
+  refreshDisplay();
+}
+
 void ClueMainWindowClass::moveCurrentPlayerOutDoor(int doorNumber)
 {
-  //Variable Declarations
-  int firstDoor = 0;
-
   //Check if the door number exists for the room
   if(doorNumber >
       NUMBER_OF_DOORS[currentPlayerIter->second.getPlayerLocation().getRoom()])
@@ -1085,20 +1094,8 @@ void ClueMainWindowClass::moveCurrentPlayerOutDoor(int doorNumber)
         "room you are in.  Please select another door and try again."));
   }
 
-  for(int i = 0; i < int(currentPlayerIter->second.getPlayerLocation().
-      getRoom()); i++)
-  {
-    firstDoor += NUMBER_OF_DOORS[i];
-  }
-
-  drawMove(currentPlayerIter->first, currentPlayerIter->second.
-      getPlayerLocation(), DOOR_LOCATIONS[firstDoor + doorNumber - 1]);
-  currentPlayerIter->second.setPlayerLocation(DOOR_LOCATIONS
-      [firstDoor + doorNumber - 1]);
-
-  currentPlayerIter->second.setEnteredRoomThisMoveFlag(false);
-  finishMove();
-  refreshDisplay();
+  moveCurrentPlayerOutDoor(DOOR_LOCATIONS[getStartingDoorIndex(currentPlayerIter
+      ->second.getPlayerLocation().getRoom()) + doorNumber - 1]);
 }
 
 void ClueMainWindowClass::finishMove()
@@ -1106,7 +1103,7 @@ void ClueMainWindowClass::finishMove()
   currentPlayerIter->second.decrementMovesLeft();
   if(currentPlayerIter->second.getMovesLeft() <= 0)
   {
-    if(currentPlayerIter->second.getEnteredRoomThisMoveFlag() == false)
+    if(currentPlayerIter->second.getEndTurnFlag() == true)
     {
       currentPlayerIter->second.setDieRoll(0);
       clearVisitedTiles();
@@ -1116,11 +1113,22 @@ void ClueMainWindowClass::finishMove()
       {
         currentPlayerIter = gameParticipants.begin();
       }
+      currentPlayerIter->second.setEndTurnFlag(false);
+      currentPlayerIter->second.setEnteredRoomThisMoveFlag(false);
+
       startPlayerTurn();
     }
     refreshDisplay();
   }
   updateRollInfoText();
+}
+
+void ClueMainWindowClass::endTurn()
+{
+  currentPlayerIter->second.setMovesLeft(0);
+  currentPlayerIter->second.setEnteredRoomThisMoveFlag(false);
+  currentPlayerIter->second.setEndTurnFlag(true);
+  finishMove();
 }
 
 void ClueMainWindowClass::moveCurrentPlayer(const DirectionEnum &direction)
@@ -1246,9 +1254,7 @@ void ClueMainWindowClass::submitMove()
     }
     else if(endTurnOption->isChecked() == true)
     {
-      currentPlayerIter->second.setMovesLeft(0);
-      currentPlayerIter->second.setEnteredRoomThisMoveFlag(false);
-      finishMove();
+      endTurn();
     }
   }
   catch(ExceptionClass newException)
@@ -1271,6 +1277,7 @@ void ClueMainWindowClass::startGame()
 
       //Display gameplay interface
       displayGameInterface();
+      displayDefaultOptions();
 
       //Start the first turn
       startPlayerTurn();

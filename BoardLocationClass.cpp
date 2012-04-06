@@ -142,53 +142,6 @@ bool BoardLocationClass::checkBoardBounds() const
   }
 }
 
-bool BoardLocationClass::checkPlayerBlocked(const QImage &currentBoard) const
-{
-  bool blockedFlag = true;
-  BoardLocationClass newLocation;
-  DirectionEnum moveDir = UP;
-  int doorStart = 0;
-  int i;
-
-  if(getTileType(CLUE_BOARD_IMAGE) == ROOM_TILE)
-  {
-    for(i = 0; i < int(getRoom()); i++)
-    {
-      doorStart += NUMBER_OF_DOORS[i];
-    }
-
-    i = 0;
-    while(i < NUMBER_OF_DOORS[int(getRoom())] && blockedFlag == true)
-    {
-      if(DOOR_LOCATIONS[doorStart + i].getTileType(currentBoard) !=
-          OCCUPIED_TILE)
-      {
-        blockedFlag = false;
-      }
-
-      i++;
-    }
-  }
-  else
-  {
-    while(moveDir <= RIGHT && blockedFlag == true)
-    {
-      newLocation = *this;
-      try
-      {
-        newLocation.move(currentBoard, moveDir);
-        blockedFlag = false;
-      }
-      catch(ExceptionClass invalidDirection)
-      {
-      }
-      moveDir = DirectionEnum(moveDir + 1);
-    }
-  }
-
-  return blockedFlag;
-}
-
 void BoardLocationClass::move(const QImage &currentBoard,
     const DirectionEnum &direction)
 {
@@ -289,23 +242,28 @@ RoomEnum BoardLocationClass::getRoomDoor() const
   return room;
 }
 
-int BoardLocationClass::getClosestDoorIndex() const
+multimap<int, BoardLocationClass> BoardLocationClass::getTargetDoors() const
 {
-  BoardLocationClass closestDoor = DOOR_LOCATIONS[0];
-  int closestDoorIndex = 0;
+  //Variable Declarations
+  multimap<int, BoardLocationClass> targetDoors;
+  set<BoardLocationClass> invalidDoors;
 
-  for(int i = 1; i < TOTAL_NUMBER_OF_DOORS; i++)
+  if(getTileType(CLUE_BOARD_IMAGE) == ROOM_TILE)
   {
-    if(abs(DOOR_LOCATIONS[i].xCoord - xCoord) +
-        abs(DOOR_LOCATIONS[i].yCoord - yCoord) <
-        abs(closestDoor.xCoord - xCoord) + abs(closestDoor.yCoord - yCoord))
+    invalidDoors = getDoorsForRoom(getRoom());
+  }
+
+  for(int i = 0; i < TOTAL_NUMBER_OF_DOORS; i++)
+  {
+    if(invalidDoors.find(DOOR_LOCATIONS[i]) == invalidDoors.end())
     {
-      closestDoor = DOOR_LOCATIONS[i];
-      closestDoorIndex = i;
+      targetDoors.insert(pair<int, BoardLocationClass>(abs(DOOR_LOCATIONS[i].
+          getXCoord() - xCoord) + abs(DOOR_LOCATIONS[i].getYCoord() - yCoord),
+          DOOR_LOCATIONS[i]));
     }
   }
 
-  return closestDoorIndex;
+  return targetDoors;
 }
 
 RoomEnum BoardLocationClass::getRoomForDoor(BoardLocationClass doorLocation)
@@ -340,118 +298,6 @@ const
 RoomEnum BoardLocationClass::getRoomForDoor(int doorIndex) const
 {
   return(getRoomForDoor(DOOR_LOCATIONS[doorIndex]));
-}
-
-queue<DirectionEnum> BoardLocationClass::getMovesToDoor(
-    const QImage &currentBoard, int movesLeft, int doorIndex) const
-{
-  queue<DirectionEnum> moveList;
-  BoardLocationClass origin = *this;
-  BoardLocationClass target = DOOR_LOCATIONS[doorIndex];
-  OrientationEnum moveOrientation;
-  deque<DirectionEnum> moveDirection;
-  bool movedFromOriginFlag = false;
-  set<BoardLocationClass> alreadyVisited;
-  set<BoardLocationClass>::iterator alreadyVisitedIter;
-  DirectionEnum a;
-
-  alreadyVisited.insert(*this);
-
-  moveOrientation = OrientationEnum(rand() % 2);
-
-  while(movesLeft > 0)
-  {
-    //Reached the target door
-    if(origin == target)
-    {
-      moveList.push(DOOR_DIRECTIONS[doorIndex]);
-      movesLeft = 0;
-    }
-    //Blocked
-    else if(checkPlayerBlocked(currentBoard) == true)
-    {
-      movesLeft = 0;
-    }
-    //Can move
-    else
-    {
-      for(int j = 0; j < NUMBER_OF_DIRECTIONS / 2; j++)
-      {
-        switch(moveOrientation)
-        {
-          case VERTICAL:
-            if(origin.yCoord < target.yCoord)
-            {
-              moveDirection.push_back(DOWN);
-            }
-            else if(origin.yCoord > target.yCoord)
-            {
-              moveDirection.push_back(UP);
-            }
-            moveOrientation = HORIZONTAL;
-            break;
-
-          case HORIZONTAL:
-            if(origin.xCoord < target.xCoord)
-            {
-              moveDirection.push_back(RIGHT);
-            }
-            else if(origin.xCoord > target.xCoord)
-            {
-              moveDirection.push_back(LEFT);
-            }
-            moveOrientation = VERTICAL;
-            break;
-        }
-      }
-
-      for(int j = 0; j < NUMBER_OF_DIRECTIONS; j++)
-      {
-        moveDirection.push_back(DirectionEnum(j));
-      }
-
-      while(moveDirection.size() > 0 && movedFromOriginFlag == false)
-      {
-        if(alreadyVisited.find(origin.getTileInDir(moveDirection.front())) ==
-            alreadyVisited.end())
-        {
-          try
-          {
-            origin.move(currentBoard, moveDirection.front());
-            a = moveDirection.front();
-            if(moveDirection.front() == UP || moveDirection.front() == DOWN)
-            {
-              moveOrientation = VERTICAL;
-            }
-            else
-            {
-              moveOrientation = HORIZONTAL;
-            }
-            alreadyVisited.insert(origin);
-            moveList.push(moveDirection.front());
-            movesLeft--;
-            movedFromOriginFlag = true;
-          }
-          catch(ExceptionClass invalidMove)
-          {
-
-          }
-        }
-
-        moveDirection.pop_front();
-      }
-
-      if(movedFromOriginFlag == false && moveDirection.size() == 0)
-      {
-        movesLeft = 0;
-      }
-
-      moveDirection.clear();
-      movedFromOriginFlag = false;
-    }
-  }
-
-  return moveList;
 }
 
 const BoardLocationClass BoardLocationClass::getEmptyRoomTile(
@@ -506,4 +352,30 @@ BoardLocationClass BoardLocationClass::getTileInDir(DirectionEnum direction)
   }
 
   return newLocation;
+}
+
+int BoardLocationClass::getDoorIndex()
+{
+  //Variable Declarations
+  int i = 0;
+  bool doorFoundFlag = false;
+
+  while(i < TOTAL_NUMBER_OF_DOORS && doorFoundFlag == false)
+  {
+    if(*this == DOOR_LOCATIONS[i])
+    {
+      doorFoundFlag = true;
+    }
+    else
+    {
+      i++;
+    }
+  }
+
+  if(doorFoundFlag == false)
+  {
+    throw(ExceptionClass("This location is not a door."));
+  }
+
+  return i;
 }

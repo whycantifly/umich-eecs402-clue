@@ -13,6 +13,9 @@ int main(int argc, char *argv[])
 
   srand(time(0));
 
+  clueGame->setWindowTitle("Clue");
+  clueGame->setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint);
+
   clueGame->show();
 
   return app.exec();

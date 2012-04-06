@@ -30,6 +30,8 @@ class PlayerClass
                                         //List of locations player has visited
                                         //this turn
     std::pair<CardEnum, SuspectEnum> detectiveNotes[NUMBER_OF_CARDS];
+    DifficultyEnum aiDifficulty;
+    bool endTurnFlag;
 
   public:
     //Constructors
@@ -44,7 +46,7 @@ class PlayerClass
         const bool aiValue,                         //AI or human
         const bool gameHostValue,                   //Game host or not
         const BoardLocationClass &startingLocation, //Starting location
-        const DifficultyEnum aiDifficulty = EASY    //AI difficulty
+        const DifficultyEnum aiDiff = EASY          //AI difficulty
         );
 
     //Function Prototypes
@@ -64,6 +66,16 @@ class PlayerClass
     void addToDetectiveNotes(CardEnum card, SuspectEnum suspect);
 
     //Inline Functions
+
+    void setEndTurnFlag(bool value)
+    {
+      endTurnFlag = value;
+    }
+
+    bool getEndTurnFlag() const
+    {
+      return endTurnFlag;
+    }
 
     void addToLocationsThisTurn(BoardLocationClass location)
     {
@@ -174,18 +186,30 @@ class PlayerClass
       return detectiveNotes[int(card)].second;
     }
 
+    std::set<BoardLocationClass> getValidExitDoors(const QImage &currentBoard);
+
+    std::set<DirectionEnum> getValidMoveDirections(const QImage &currentBoard);
+
 //DUMMY AI CODE/////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
+    AiActionEnum makeCornerRoomDecision();
+
+    BoardLocationClass getAiTargetDoor();
+
+    BoardLocationClass getAiExitDoor(QImage &currentBoard);
+
+    DirectionEnum getAiMove(QImage &currentBoard, BoardLocationClass &target);
 
     //Handles suggestions passed to the AI.
     CardEnum handleSuggestionAi(SuggestionClass suggestion);
 
-    AiActionEnum handlePrerollAi(const QImage &currentBoard, SuggestionClass &aiSuggestion);
+    AiActionEnum handlePrerollAi(const QImage &currentBoard);
 
-    AiActionEnum handleAfterRollAi(const QImage &currentBoard,
-        std::queue<DirectionEnum> &aiMoves, int &aiExitDoorNumber);
+    AiActionEnum handleAfterRollAi();
 
-    SuggestionClass makeSuggestionAi() const;
+    SuggestionClass makeAiSuggestion() const;
+
+    SuggestionClass makeAiAccusation() const;
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
