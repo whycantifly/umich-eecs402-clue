@@ -5,6 +5,7 @@
 #include "BoardLocationClass.h"
 #include "constants.h"
 #include "enums.h"
+#include "getDoorsForRoom.h"
 #include "ExceptionClass.h"
 
 using namespace std;
@@ -307,8 +308,42 @@ int BoardLocationClass::getClosestDoorIndex() const
   return closestDoorIndex;
 }
 
-queue<DirectionEnum> BoardLocationClass::getMovesToDoor(const QImage &currentBoard,
-    int movesLeft, int doorIndex) const
+RoomEnum BoardLocationClass::getRoomForDoor(BoardLocationClass doorLocation)
+const
+{
+  int roomIndex = 0;
+  bool foundRoomFlag = false;
+  set<BoardLocationClass> doors;
+
+  while(roomIndex < NUMBER_OF_ROOMS && foundRoomFlag == false)
+  {
+    doors = getDoorsForRoom(RoomEnum(roomIndex));
+
+    if(doors.find(doorLocation) != doors.end())
+    {
+      foundRoomFlag = true;
+    }
+    else
+    {
+      roomIndex++;
+    }
+  }
+
+  if(foundRoomFlag == false)
+  {
+    throw(ExceptionClass("That tile is not a door tile."));
+  }
+
+  return RoomEnum(roomIndex);
+}
+
+RoomEnum BoardLocationClass::getRoomForDoor(int doorIndex) const
+{
+  return(getRoomForDoor(DOOR_LOCATIONS[doorIndex]));
+}
+
+queue<DirectionEnum> BoardLocationClass::getMovesToDoor(
+    const QImage &currentBoard, int movesLeft, int doorIndex) const
 {
   queue<DirectionEnum> moveList;
   BoardLocationClass origin = *this;
@@ -316,60 +351,13 @@ queue<DirectionEnum> BoardLocationClass::getMovesToDoor(const QImage &currentBoa
   OrientationEnum moveOrientation;
   deque<DirectionEnum> moveDirection;
   bool movedFromOriginFlag = false;
-  bool visitedRoomFlag = false;
-  int startingDoorIndex = 0;
-  int i;
-  RoomEnum roomVisited = HALL;
   set<BoardLocationClass> alreadyVisited;
   set<BoardLocationClass>::iterator alreadyVisitedIter;
-  set<DirectionEnum> opposingDirections;
-  set<DirectionEnum>::iterator opposingIter;
-  DirectionEnum frontDirection;
-  DirectionEnum backDirection;
+  DirectionEnum a;
 
   alreadyVisited.insert(*this);
 
-  //If move is starting on a door tile, add all doors to that room to the
-  //already visited list.
-  while(visitedRoomFlag == false && roomVisited <= STUDY)
-  {
-    i = 0;
-    while(i < NUMBER_OF_DOORS[roomVisited] && visitedRoomFlag == false)
-    {
-      if(DOOR_LOCATIONS[startingDoorIndex + i] == *this)
-      {
-        visitedRoomFlag = true;
-      }
-      i++;
-    }
-    if(visitedRoomFlag == false)
-    {
-      startingDoorIndex += NUMBER_OF_DOORS[roomVisited];
-      roomVisited = RoomEnum(int(roomVisited) + 1);
-    }
-    else
-    {
-      for(i = 0; i < NUMBER_OF_DOORS[roomVisited]; i++)
-      {
-        alreadyVisited.insert(DOOR_LOCATIONS[startingDoorIndex + i]);
-      }
-    }
-  }
-
-  //Decide whether to make a horizontal or vertical move first
-  if(origin.xCoord == target.xCoord)
-  {
-    moveOrientation = VERTICAL;
-  }
-  else if(origin.yCoord == target.yCoord)
-  {
-    moveOrientation = HORIZONTAL;
-  }
-  else
-  {
-    moveOrientation = OrientationEnum(rand() % 2);
-  }
-
+  moveOrientation = OrientationEnum(rand() % 2);
 
   while(movesLeft > 0)
   {
@@ -387,119 +375,67 @@ queue<DirectionEnum> BoardLocationClass::getMovesToDoor(const QImage &currentBoa
     //Can move
     else
     {
-      while(moveDirection.size() < NUMBER_OF_DIRECTIONS)
+      for(int j = 0; j < NUMBER_OF_DIRECTIONS / 2; j++)
       {
         switch(moveOrientation)
         {
-          case HORIZONTAL:
+          case VERTICAL:
             if(origin.yCoord < target.yCoord)
             {
-              frontDirection = DOWN;
-              backDirection = UP;
+              moveDirection.push_back(DOWN);
             }
             else if(origin.yCoord > target.yCoord)
             {
-              frontDirection = UP;
-              backDirection = DOWN;
-            }
-            else
-            {
-              if(origin.yCoord >= BOARD_HEIGHT / 2)
-              {
-                frontDirection = UP;
-                backDirection = DOWN;
-              }
-              else
-              {
-                frontDirection = DOWN;
-                backDirection = UP;
-              }
-            }
-            moveOrientation = VERTICAL;
-            break;
-
-          case VERTICAL:
-            if(origin.xCoord < target.xCoord)
-            {
-              frontDirection = RIGHT;
-              backDirection = LEFT;
-            }
-            else if(origin.xCoord > target.xCoord)
-            {
-              frontDirection = LEFT;
-              backDirection = RIGHT;
-            }
-            else
-            {
-              if(origin.xCoord >= BOARD_WIDTH / 2)
-              {
-                frontDirection = LEFT;
-                backDirection = RIGHT;
-              }
-              else
-              {
-                frontDirection = RIGHT;
-                backDirection = LEFT;
-              }
-
+              moveDirection.push_back(UP);
             }
             moveOrientation = HORIZONTAL;
             break;
-        }
-        if(opposingDirections.find(frontDirection) == opposingDirections.end())
-        {
-          moveDirection.push_front(frontDirection);
-        }
 
-        if(opposingDirections.find(backDirection) == opposingDirections.end())
-        {
-          moveDirection.push_back(backDirection);
+          case HORIZONTAL:
+            if(origin.xCoord < target.xCoord)
+            {
+              moveDirection.push_back(RIGHT);
+            }
+            else if(origin.xCoord > target.xCoord)
+            {
+              moveDirection.push_back(LEFT);
+            }
+            moveOrientation = VERTICAL;
+            break;
         }
       }
 
-      opposingIter = opposingDirections.begin();
-      while(opposingIter != opposingDirections.end())
+      for(int j = 0; j < NUMBER_OF_DIRECTIONS; j++)
       {
-        moveDirection.push_back(*opposingIter);
-        opposingIter++;
+        moveDirection.push_back(DirectionEnum(j));
       }
 
       while(moveDirection.size() > 0 && movedFromOriginFlag == false)
       {
-        if((origin.getTileInDir(moveDirection.front()).getTileType(currentBoard)
-            == UNOCCUPIED_TILE) && alreadyVisited.find(origin.getTileInDir(
-            moveDirection.front())) == alreadyVisited.end())
+        if(alreadyVisited.find(origin.getTileInDir(moveDirection.front())) ==
+            alreadyVisited.end())
         {
-          if(moveDirection.front() == UP || moveDirection.front() == DOWN)
+          try
           {
-            moveOrientation = VERTICAL;
-            if(moveDirection.front() == UP)
+            origin.move(currentBoard, moveDirection.front());
+            a = moveDirection.front();
+            if(moveDirection.front() == UP || moveDirection.front() == DOWN)
             {
-              opposingDirections.insert(DOWN);
+              moveOrientation = VERTICAL;
             }
             else
             {
-              opposingDirections.insert(UP);
+              moveOrientation = HORIZONTAL;
             }
+            alreadyVisited.insert(origin);
+            moveList.push(moveDirection.front());
+            movesLeft--;
+            movedFromOriginFlag = true;
           }
-          else
+          catch(ExceptionClass invalidMove)
           {
-            moveOrientation = HORIZONTAL;
-            if(moveDirection.front() == LEFT)
-            {
-              opposingDirections.insert(RIGHT);
-            }
-            else
-            {
-              opposingDirections.insert(LEFT);
-            }
-          }
 
-          origin.move(currentBoard, moveDirection.front());
-          alreadyVisited.insert(origin);
-          moveList.push(moveDirection.front());
-          movesLeft--;
-          movedFromOriginFlag = true;
+          }
         }
 
         moveDirection.pop_front();

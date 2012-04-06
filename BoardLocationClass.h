@@ -111,6 +111,10 @@ class BoardLocationClass
 
     int getClosestDoorIndex() const;
 
+    RoomEnum getRoomForDoor(BoardLocationClass doorLocation) const;
+
+    RoomEnum getRoomForDoor(int doorIndex) const;
+
     std::queue<DirectionEnum> getMovesToDoor(const QImage &currentBoard,
         int movesLeft, const int doorIndex) const;
 

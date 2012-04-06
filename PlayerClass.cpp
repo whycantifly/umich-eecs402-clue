@@ -9,6 +9,7 @@
 #include "roomToCard.h"
 #include "suspectToCard.h"
 #include "weaponToCard.h"
+#include "getStartingDoorIndex.h"
 
 using namespace std;
 
@@ -148,7 +149,13 @@ AiActionEnum PlayerClass::handleAfterRollAi(const QImage &currentBoard,
       }
       aiExitDoorNumber = rand() % NUMBER_OF_DOORS[currentLocation.getRoom()]
           + 1;
-      targetDoorIndex = rand() % (TOTAL_NUMBER_OF_DOORS);
+      do
+      {
+        targetDoorIndex = rand() % (TOTAL_NUMBER_OF_DOORS);
+      }
+      while(targetDoorIndex >= getStartingDoorIndex(currentLocation.getRoom())
+          && targetDoorIndex < getStartingDoorIndex(currentLocation.getRoom()) +
+          NUMBER_OF_DOORS[getStartingDoorIndex(currentLocation.getRoom())]);
       aiMoves = DOOR_LOCATIONS[aiExitDoorNumber + startingDoorIndex - 1].
           getMovesToDoor(currentBoard, movesLeftThisTurn, targetDoorIndex);
       return MOVE;

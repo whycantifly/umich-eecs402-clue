@@ -79,8 +79,6 @@ void ClueMainWindowClass::displayCardsInHand()
 
     cardPtr->setPixmap(QPixmap::fromImage(CARD_IMAGES[*currentCardIter]));
 
-    gameParticipants.find(thisSuspect)->second.addToDetectiveNotes(
-        *currentCardIter, thisSuspect);
     updateDetectiveNotes(*currentCardIter);
   }
 }
@@ -251,11 +249,15 @@ void ClueMainWindowClass::dealCards(DeckClass &cardDeck)
   //Variable Declarations
   map<SuspectEnum, PlayerClass>::iterator playerBeingDealtTo =
       gameParticipants.begin();  //Iterator for the player to deal a card to
+  CardEnum randomCard;
 
   //Deal the cards to the players until there are no cards in the deck
   while(cardDeck.getDeckSize() > 0)
   {
-    playerBeingDealtTo->second.addCardToHand(cardDeck.drawRandomCard());
+    randomCard = cardDeck.drawRandomCard();
+    playerBeingDealtTo->second.addCardToHand(randomCard);
+    playerBeingDealtTo->second.addToDetectiveNotes(randomCard,
+        playerBeingDealtTo->first);
 
     playerBeingDealtTo++;
     if(playerBeingDealtTo == gameParticipants.end())
@@ -300,14 +302,6 @@ void ClueMainWindowClass::setupGame()
 
       if(availableCharacters.find(randomCharacter) != availableCharacters.end())
       {
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-        if(i == 1)
-        {
-          randomCharacter = PLUM;
-        }
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
         gameParticipants.insert(pair<SuspectEnum, PlayerClass>(randomCharacter,
             PlayerClass(i >= humanPlayersSpin->value(), i == 0,
             STARTING_LOCATIONS[randomCharacter], DifficultyEnum(
@@ -503,8 +497,8 @@ void ClueMainWindowClass::updateDetectiveNotes(CardEnum updatedCard)
       break;
   }
   textToUpdatePtr->setText("<span style='color:#ff0000;'>" +
-      CARD_VALUES[int(suspectToCard(currentPlayerIter->second.getDetectiveNotes(
-      updatedCard)))] + "</span>");
+      CARD_VALUES[suspectToCard(gameParticipants.find(thisSuspect)->second.
+      getDetectiveNotes(updatedCard))] + "</span>");
 }
 
 //Handles all player events
@@ -577,10 +571,9 @@ void ClueMainWindowClass::takeAiAction(const AiActionEnum action,
     SuggestionClass aiSuggestion, queue<DirectionEnum> aiMoves,
     const int aiExitDoorNumber)
 {
-  BoardLocationClass lastLocation =
-      currentPlayerIter->second.getPlayerLocation();
   map<SuspectEnum, PlayerClass>::const_iterator aiPlayerIter =
       currentPlayerIter;
+  DirectionEnum a;
 
   switch(action)
   {
@@ -602,8 +595,15 @@ void ClueMainWindowClass::takeAiAction(const AiActionEnum action,
           aiPlayerIter == currentPlayerIter)
       {
         QTest::qWait(AI_DELAY);
-        moveCurrentPlayer(aiMoves.front());
-        lastLocation = currentPlayerIter->second.getPlayerLocation();
+        try
+        {
+          moveCurrentPlayer(aiMoves.front());
+        }
+        catch(...)
+        {
+          a = aiMoves.front();
+          currentPlayerIter->second.setMovesLeft(0);
+        }
         aiMoves.pop();
       }
 
@@ -909,18 +909,6 @@ void ClueMainWindowClass::handleSuggestion(const SuggestionClass
   HandleSuggestionDialogClass playerSuggestionDialog(this);
   QString revealer;
   QString suggester = CARD_VALUES[suspectToCard(currentPlayerIter->first)];
-  QString revealTense = "s";
-
-  if(playerIter->first == thisSuspect)
-  {
-    revealer = "You";
-    revealTense = "";
-  }
-
-  if(currentPlayerIter->first == thisSuspect)
-  {
-    suggester = "you";
-  }
 
   playerSuggestionDialog.setWindowFlags((playerSuggestionDialog.windowFlags()
       | Qt::CustomizeWindowHint) & ~Qt::WindowCloseButtonHint);
@@ -991,8 +979,17 @@ void ClueMainWindowClass::handleSuggestion(const SuggestionClass
         }
 
         suggestionMessage.setWindowTitle("Card Revealed");
-        suggestionMessage.setText(revealer + " reveal" + revealTense + " the "
-            + CARD_VALUES[revealedCard] + " card to " + suggester + ".");
+
+        if(currentPlayerIter->first != thisSuspect)
+        {
+          suggestionMessage.setText(revealer + " reveals a card to " +
+              suggester + ".");
+        }
+        else
+        {
+          suggestionMessage.setText(revealer + " reveals the " +
+              CARD_VALUES[revealedCard] + " card to you.");
+        }
         suggestionMessage.exec();
         if(currentPlayerIter->first == thisSuspect || (gameParticipants.find(
             thisSuspect)->second.getHostFlag() == true && currentPlayerIter->
@@ -1144,6 +1141,7 @@ void ClueMainWindowClass::moveCurrentPlayer(const DirectionEnum &direction)
     {
       currentPlayerIter->second.setEnteredRoomThisMoveFlag(true);
       currentPlayerIter->second.setMovesLeft(0);
+      clearVisitedTiles();
       refreshDisplay();
     }
     else
