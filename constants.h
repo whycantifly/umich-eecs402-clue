@@ -3,11 +3,17 @@
 
 #include <QtGui>
 #include <string>
+#include <queue>
 #include "enums.h"
+#include "SuggestionClass.h"
 
 #include "BoardLocationClass.h"
 
 const int AI_DELAY = 500;
+
+const SuggestionClass EMPTY_SUGGESTION;
+
+const std::queue<DirectionEnum> EMPTY_MOVE_LIST;
 
 const QString CARD_VALUES[21] = {"Miss Scarlet", "Col. Mustard", "Mrs. White",
     "Mr. Green", "Mrs. Peacock", "Prof. Plum", "Knife", "Candlestick",

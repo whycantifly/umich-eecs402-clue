@@ -82,8 +82,7 @@ class BoardLocationClass
 
     //Gets the tile type of the tile at this location on gameBoard.
     const TileTypeEnum getTileType(
-        const QImage &gameBoard
-                                              //Board to get the tile type from
+        const QImage &gameBoard           //Board to get the tile type from
         ) const;
 
     //Gets the room of the tile at this location based on ROOM_TILE_RGB.
@@ -110,10 +109,10 @@ class BoardLocationClass
         const DirectionEnum &direction    //Direction to move
         );
 
-    int getClosestDoorIndex();
+    int getClosestDoorIndex() const;
 
     std::queue<DirectionEnum> getMovesToDoor(const QImage &currentBoard,
-        int movesLeft, int doorIndex) const;
+        int movesLeft, const int doorIndex) const;
 
 
     //If the tile is a door tile, gets the room that it belongs to.  If the tile
@@ -124,7 +123,7 @@ class BoardLocationClass
 
     //Inline functions
 
-    BoardLocationClass getTileInDir(DirectionEnum direction) const;
+    BoardLocationClass getTileInDir(const DirectionEnum direction) const;
 
     //Gets the x-coordinate.
     int getXCoord() const

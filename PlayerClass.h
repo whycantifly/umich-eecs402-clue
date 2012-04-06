@@ -14,7 +14,6 @@
 class PlayerClass
 {
   private:
-    SuspectEnum character;              //Assigned character piece
     BoardLocationClass currentLocation; //Current location on the board
     bool hostFlag;                      //True = host (or local play);
                                         //False = not host
@@ -40,11 +39,12 @@ class PlayerClass
     {
 
     }
-    //Constructor (QString, CardEnum, bool, bool)
+    //Constructor (bool, bool)
     PlayerClass(
-        SuspectEnum suspect,       //Character piece
-        bool aiValue,           //AI or human
-        bool gameHostValue      //Game host or not
+        const bool aiValue,                         //AI or human
+        const bool gameHostValue,                   //Game host or not
+        const BoardLocationClass &startingLocation, //Starting location
+        const DifficultyEnum aiDifficulty = EASY    //AI difficulty
         );
 
     //Function Prototypes
@@ -126,12 +126,6 @@ class PlayerClass
       return currentLocation;
     }
 
-    //Gets the player's character piece.
-    const SuspectEnum getCharacter() const
-    {
-      return character;
-    }
-
     //Sets dieRollThisTurn and movesLeftThisTurn to a die roll.
     void rollDie()
     {
@@ -170,7 +164,7 @@ class PlayerClass
       currentLocation = newLocation;
     }
 
-    std::set<CardEnum> getHand()
+    std::set<CardEnum> getHand() const
     {
       return hand;
     }
@@ -182,18 +176,16 @@ class PlayerClass
 
 //DUMMY AI CODE/////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-    //Moves the AI.
-    void moveAi();
 
     //Handles suggestions passed to the AI.
     CardEnum handleSuggestionAi(SuggestionClass suggestion);
 
     AiActionEnum handlePrerollAi(const QImage &currentBoard, SuggestionClass &aiSuggestion);
 
-    AiActionEnum handleAfterRollAi(const QImage &currentBoard, SuggestionClass &aiSuggestion,
+    AiActionEnum handleAfterRollAi(const QImage &currentBoard,
         std::queue<DirectionEnum> &aiMoves, int &aiExitDoorNumber);
 
-    SuggestionClass makeSuggestionAi();
+    SuggestionClass makeSuggestionAi() const;
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 

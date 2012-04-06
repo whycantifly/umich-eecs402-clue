@@ -2,7 +2,7 @@
 #include "AccusationDialogClass.h"
 
 AccusationDialogClass::AccusationDialogClass(SuggestionClass *accusationPtr,
-    QWidget *parent, Qt::WindowFlags f)
+    QWidget *parent, Qt::WindowFlags f) : QDialog(parent, f)
 {
     setupUi(this);
 

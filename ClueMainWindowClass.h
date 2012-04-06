@@ -2,10 +2,8 @@
 #define _CLUEMAINWINDOWCLASS_H_
 
 #include <QtGui>
-#include <list>
-#include <queue>
+#include <map>
 #include <set>
-#include <vector>
 #include "ui_ClueMainWindowClass.h"
 #include "constants.h"
 #include "BoardLocationClass.h"
@@ -21,19 +19,18 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     QImage inProgressBoardImage;        //Board at current state of gameplay
     bool gameOver;                      //True = someone won;
                                         //False = no one won yet
-    std::list<PlayerClass> gameParticipants;  //Players in order of turn
-    std::list<PlayerClass>::iterator currentPlayerIter; //Current player
+    std::map<SuspectEnum, PlayerClass> gameParticipants;
+                                        //Players in order of turn
+    std::map<SuspectEnum, PlayerClass>::iterator currentPlayerIter;
+                                        //Current player
     SuggestionClass caseFile;           //Case file of details of the crime
-    PlayerClass *thisPlayerPtr;         //Pointer to the PlayerClass object for
-                                        //the human player at this computer
-    QMessageBox selectCardMessage;
-    bool cardsEnabledFlag;
+    SuspectEnum thisSuspect;            //Suspect that THIS player controls
 
   public:
     //Constructors
 
     //Constructor; shows the GUI and sets up game for play.
-    ClueMainWindowClass(QWidget *parent = 0);
+    ClueMainWindowClass();
 
     //Function Prototypes
 
@@ -46,7 +43,7 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     //Draws the character piece indicated to the tile indicated on
     //inProgressBoardImage.
     void drawPieceToBoard(
-        std::list<PlayerClass>::iterator playerIter,
+        SuspectEnum suspect,
         const BoardLocationClass &tile
         );
 
@@ -54,16 +51,16 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
 
     //Erases the piece on the tile indicated on inProgressBoardImage.
     void clearPiece(
-        std::list<PlayerClass>::iterator playerIter,
+        SuspectEnum suspect,
         const BoardLocationClass &tile
         );
 
     //Draws the movement from oldLocation to newLocation onto
     //inProgressBoardImage.
     void drawMove(
+        SuspectEnum suspect,
         const BoardLocationClass &oldLocation,   //Original location of the piece
-        const BoardLocationClass &newLocation,    //New location of the piece
-        const std::list<PlayerClass>::iterator &playerIter
+        const BoardLocationClass &newLocation    //New location of the piece
         );
 
     //Deals the cards to the players.
@@ -86,10 +83,10 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     void continuePlayerTurn();
 
     void takeAiAction(
-        AiActionEnum action,
-        SuggestionClass &aiSuggestion,
-        std::queue<DirectionEnum> &aiMoves,
-        int aiExitDoorNumber = 0
+        const AiActionEnum action,
+        SuggestionClass aiSuggestion = EMPTY_SUGGESTION,
+        std::queue<DirectionEnum> aiMoves = EMPTY_MOVE_LIST,
+        const int aiExitDoorNumber = 0
         );
 
     void updateRollInfoText();
@@ -145,19 +142,19 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     void displaySuggestionResults(CardEnum card);
 
     void handleSuggestion(
-        SuggestionClass &playerSuggestion
+        const SuggestionClass &playerSuggestion
         );
 
-    //Inline Functions
+    //Inline functions
+
+    SuspectEnum getCurrentPlayerSuspect() const
+    {
+      return currentPlayerIter->first;
+    }
 
     std::set<CardEnum> getThisPlayerHand() const
     {
-      return thisPlayerPtr->getHand();
-    }
-
-    SuspectEnum getCurrentPlayerChar() const
-    {
-      return currentPlayerIter->getCharacter();
+      return gameParticipants.find(thisSuspect)->second.getHand();
     }
 
   public slots:
@@ -184,8 +181,10 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     //play.
     void setLocalOptVis();
 
+    void updateDifficultyText(int sliderPosition);
+
     //Toggles the option to leave the room.
-    void toggleLeaveRoomOpt(int dummyVar)
+    void toggleLeaveRoomOpt()
     {
       leaveRoomOption->setChecked(true);
     }

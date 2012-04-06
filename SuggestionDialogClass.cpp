@@ -3,7 +3,7 @@
 #include "SuggestionDialogClass.h"
 
 SuggestionDialogClass::SuggestionDialogClass(SuggestionClass *suggestionPtr,
-    ClueMainWindowClass *parent, Qt::WindowFlags f)
+    ClueMainWindowClass *parent, Qt::WindowFlags f) : QDialog(parent, f)
 {
   setupUi(this);
 

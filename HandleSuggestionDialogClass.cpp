@@ -12,9 +12,9 @@
 using namespace std;
 
 HandleSuggestionDialogClass::HandleSuggestionDialogClass(
-    ClueMainWindowClass *parent, Qt::WindowFlags f)
+    ClueMainWindowClass *parent, Qt::WindowFlags f) : QDialog(parent, f)
 {
-  currentPlayerChar = parent->getCurrentPlayerChar();
+  currentPlayerChar = parent->getCurrentPlayerSuspect();
   hand = parent->getThisPlayerHand();
 
 
@@ -40,33 +40,18 @@ void HandleSuggestionDialogClass::setupDialogBox(SuggestionClass *suggestionPtr,
 
   for(handIter = hand.begin(); handIter != hand.end(); handIter++)
   {
-    cardSelectionBox->insertItem(hand.size(), CARD_VALUES[*handIter]);
+    if(*suggestionPtr == *handIter)
+    {
+      cardChoices.insert(pair<int, CardEnum>(cardSelectionBox->count(), *
+          handIter));
+      cardSelectionBox->insertItem(hand.size(), CARD_VALUES[*handIter]);
+    }
   }
 }
 
 void HandleSuggestionDialogClass::showCard()
 {
-  set<CardEnum>::iterator handIter = hand.begin();
-  QMessageBox errorBox;
-  CardEnum a;
-  SuggestionClass b;
+  *cardToRevealPtr = cardChoices.find(cardSelectionBox->currentIndex())->second;
 
-  for(int i = 0; i < cardSelectionBox->currentIndex(); i++)
-  {
-    handIter++;
-  }
-
-  a = *handIter;
-  b = *suggPtr;
-  if(*suggPtr == *handIter)
-  {
-    accept();
-  }
-  else
-  {
-    errorBox.setWindowTitle("Error");
-    errorBox.setText("You must select a card that disproves the suggestion.  "
-        "Please select another card and try again.");
-    errorBox.exec();
-  }
+  accept();
 }

@@ -1039,7 +1039,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>270</x>
-      <y>70</y>
+      <y>45</y>
       <width>51</width>
       <height>21</height>
      </rect>
@@ -1055,7 +1055,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>50</y>
+      <y>25</y>
       <width>116</width>
       <height>22</height>
      </rect>
@@ -1068,7 +1068,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>70</y>
+      <y>45</y>
       <width>211</width>
       <height>17</height>
      </rect>
@@ -1081,7 +1081,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>30</y>
+      <y>5</y>
       <width>141</width>
       <height>22</height>
      </rect>
@@ -1094,7 +1094,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>90</y>
+      <y>65</y>
       <width>232</width>
       <height>17</height>
      </rect>
@@ -1107,7 +1107,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>160</x>
-      <y>30</y>
+      <y>5</y>
       <width>97</width>
       <height>22</height>
      </rect>
@@ -1120,7 +1120,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>270</x>
-      <y>90</y>
+      <y>65</y>
       <width>51</width>
       <height>21</height>
      </rect>
@@ -1129,34 +1129,11 @@ p, li { white-space: pre-wrap; }
      <number>5</number>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>15</x>
-      <y>5</y>
-      <width>126</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Enter your name:</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="playerNameText">
-    <property name="geometry">
-     <rect>
-      <x>135</x>
-      <y>5</y>
-      <width>236</width>
-      <height>21</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QLabel" name="hostIPLabel">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>75</y>
+      <y>50</y>
       <width>161</width>
       <height>17</height>
      </rect>
@@ -1169,7 +1146,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>75</y>
+      <y>50</y>
       <width>111</width>
       <height>21</height>
      </rect>
@@ -1181,12 +1158,54 @@ p, li { white-space: pre-wrap; }
      <string>...</string>
     </property>
    </widget>
+   <widget class="QLabel" name="aiDifficultyLabel">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>90</y>
+      <width>91</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>AI Difficulty:</string>
+    </property>
+   </widget>
+   <widget class="QSlider" name="difficultySlider">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>90</y>
+      <width>186</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>3</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="aiDifficultyText">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>90</y>
+      <width>71</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Easy</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QPushButton" name="startGameButton">
    <property name="geometry">
     <rect>
      <x>890</x>
-     <y>230</y>
+     <y>210</y>
      <width>95</width>
      <height>27</height>
     </rect>
@@ -1350,12 +1369,12 @@ p, li { white-space: pre-wrap; }
     <string>You are x.</string>
    </property>
   </widget>
+  <zorder>actionOptionsFrame</zorder>
   <zorder>gameBoard</zorder>
   <zorder>startGameButton</zorder>
   <zorder>gameWelcomeLabel</zorder>
   <zorder>currentTurnText</zorder>
   <zorder>gameSetupFrame</zorder>
-  <zorder>actionOptionsFrame</zorder>
   <zorder>errorMessageLabel</zorder>
   <zorder>okayButton</zorder>
   <zorder>rollInfoText</zorder>

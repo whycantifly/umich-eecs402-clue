@@ -12,16 +12,18 @@
 
 using namespace std;
 
-PlayerClass::PlayerClass(SuspectEnum suspect, bool aiValue, bool gameHostValue)
+PlayerClass::PlayerClass(const bool aiValue, const bool gameHostValue,
+    const BoardLocationClass &startingLocation, const DifficultyEnum
+    aiDifficulty)
 {
-  character = suspect;
   aiFlag = aiValue;
   hostFlag = gameHostValue;
   movedSinceLastTurnFlag = false;
   dieRollThisTurn = 0;
   movesLeftThisTurn = 0;
   enteredRoomThisMoveFlag = false;
-  setStartingLocation();
+  currentLocation = startingLocation;
+  resetLocationsThisTurn();
 
   for(int i = 0; i < NUMBER_OF_CARDS; i++)
   {
@@ -57,13 +59,6 @@ void PlayerClass::move(const QImage &currentBoard, const DirectionEnum &directio
 void PlayerClass::addCardToHand(CardEnum cardToAdd)
 {
   hand.insert(cardToAdd);
-}
-
-void PlayerClass::setStartingLocation()
-{
-  setPlayerLocation(STARTING_LOCATIONS[int(character)]);
-
-  locationsThisTurn.insert(STARTING_LOCATIONS[character]);
 }
 
 void PlayerClass::addToDetectiveNotes(CardEnum card, SuspectEnum suspect)
@@ -110,7 +105,8 @@ CardEnum PlayerClass::handleSuggestionAi(SuggestionClass suggestion)
   return *cardMatchesIter;
 }
 
-AiActionEnum PlayerClass::handlePrerollAi(const QImage &currentBoard, SuggestionClass &aiSuggestion)
+AiActionEnum PlayerClass::handlePrerollAi(const QImage &currentBoard,
+    SuggestionClass &aiSuggestion)
 {
   //Make a suggestion if possible
   if(movedSinceLastTurnFlag == true)
@@ -136,8 +132,7 @@ AiActionEnum PlayerClass::handlePrerollAi(const QImage &currentBoard, Suggestion
 }
 
 AiActionEnum PlayerClass::handleAfterRollAi(const QImage &currentBoard,
-    SuggestionClass &aiSuggestion, queue<DirectionEnum> &aiMoves,
-    int &aiExitDoorNumber)
+    queue<DirectionEnum> &aiMoves, int &aiExitDoorNumber)
 {
   int targetDoorIndex;
   int startingDoorIndex = 0;
@@ -179,7 +174,7 @@ AiActionEnum PlayerClass::handleAfterRollAi(const QImage &currentBoard,
   }
 }
 
-SuggestionClass PlayerClass::makeSuggestionAi()
+SuggestionClass PlayerClass::makeSuggestionAi() const
 {
   SuspectEnum suspect = SuspectEnum(rand() % NUMBER_OF_SUSPECTS);
   WeaponEnum weapon = WeaponEnum(rand() % NUMBER_OF_WEAPONS);

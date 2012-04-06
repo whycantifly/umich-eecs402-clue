@@ -2,6 +2,7 @@
 #define _HANDLESUGGESTIONDIALOGCLASS_H_
 
 #include <QtGui>
+#include <map>
 #include "ui_HandleSuggestionDialogClass.h"
 #include "SuggestionClass.h"
 #include "ClueMainWindowClass.h"
@@ -13,7 +14,8 @@ class HandleSuggestionDialogClass : public QDialog,
   Q_OBJECT
 
   public:
-    HandleSuggestionDialogClass(ClueMainWindowClass *parent = 0, Qt::WindowFlags f = 0);
+    HandleSuggestionDialogClass(ClueMainWindowClass *parent = 0,
+        Qt::WindowFlags f = 0);
 
     void setupDialogBox(SuggestionClass *suggestionPtr,
         CardEnum *cardPtr);
@@ -22,6 +24,7 @@ class HandleSuggestionDialogClass : public QDialog,
     SuggestionClass *suggPtr;
     CardEnum *cardToRevealPtr;
     SuspectEnum currentPlayerChar;
+    std::map<int, CardEnum> cardChoices;
     std::set<CardEnum> hand;
 
   public slots:
