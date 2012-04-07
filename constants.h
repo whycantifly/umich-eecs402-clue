@@ -9,7 +9,8 @@
 
 #include "BoardLocationClass.h"
 
-const int AI_DELAY = 500;
+////const int AI_DELAY = 500;
+const int AI_DELAY = 200;
 
 const SuggestionClass EMPTY_SUGGESTION;
 

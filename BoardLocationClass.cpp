@@ -175,32 +175,12 @@ void BoardLocationClass::move(const QImage &currentBoard,
 
   if(newLocation.getTileType(currentBoard) == ROOM_TILE)
   {
-    i = 0;
-    while(i < TOTAL_NUMBER_OF_DOORS && doorFlag == false)
+    try
     {
-      if(*this == DOOR_LOCATIONS[i] && direction == DOOR_DIRECTIONS[i])
-      {
-        for(int j = 0; j < int(newLocation.getRoom()); j++)
-        {
-          startingDoorIndex += NUMBER_OF_DOORS[j];
-        }
-
-        for(int j = 0; j < NUMBER_OF_DOORS[newLocation.getRoom()]; j++)
-        {
-          if(DOOR_LOCATIONS[startingDoorIndex + j].getTileType(currentBoard) ==
-              VISITED_TILE)
-          {
-            throw(ExceptionClass("You have already visited this room this "
-                "turn.  Please try another move."));
-          }
-        }
-        doorFlag = true;
-        newLocation = newLocation.getEmptyRoomTile(currentBoard);
-      }
-      i++;
+      getDoorIndex();
+      newLocation = newLocation.getEmptyRoomTile(currentBoard);
     }
-
-    if(doorFlag == false)
+    catch(ExceptionClass notADoor)
     {
       throw(ExceptionClass("That tile is on the other side of a wall.  You "
           "must use a door to enter a room.  Please try another move."));

@@ -560,6 +560,14 @@ void ClueMainWindowClass::startPlayerTurn()
   }
   else
   {
+
+    ////Test code
+//    if(currentPlayerIter->first == thisSuspect)
+//    {
+//      endTurn();
+//    }
+    ////
+
     currentPlayerIter->second.resetLocationsThisTurn();
     currentPlayerIter->second.setMovedThisTurnFlag(false);
     refreshDisplay();
@@ -613,44 +621,44 @@ void ClueMainWindowClass::takeAiAction(const ActionEnum action)
       takeAiAction(SUGGEST);
       break;
     case MOVE:
-      //Get the target door location
-      targetDoorLocation = currentPlayerIter->second.getAiTargetDoor();
-
-      //Player is in a room
-      if(currentPlayerIter->second.getPlayerLocation().getTileType(
-          CLUE_BOARD_IMAGE) == ROOM_TILE)
+      try
       {
-        moveCurrentPlayerOutDoor(currentPlayerIter->second.getAiExitDoor(
-            inProgressBoardImage));
-      }
+        //Get the target door location
+        targetDoorLocation = currentPlayerIter->second.getAiTargetDoor();
 
-      //Move while there are moves left and the player hasn't reached the room
-      while(currentPlayerIter->second.getMovesLeft() > 0 &&
-          aiPlayerIter == currentPlayerIter && currentPlayerIter->second.
-          getPlayerLocation().getTileType(CLUE_BOARD_IMAGE) == UNOCCUPIED_TILE)
-      {
-        QTest::qWait(AI_DELAY);
-        try
+        //Player is in a room
+        if(currentPlayerIter->second.getPlayerLocation().getTileType(
+            CLUE_BOARD_IMAGE) == ROOM_TILE)
         {
+          moveCurrentPlayerOutDoor(currentPlayerIter->second.getAiExitDoor(
+              inProgressBoardImage));
+        }
+
+        //Move while there are moves left and the player hasn't reached the room
+        while(currentPlayerIter->second.getMovesLeft() > 0 &&
+            aiPlayerIter == currentPlayerIter && currentPlayerIter->second.
+            getPlayerLocation().getTileType(CLUE_BOARD_IMAGE) == UNOCCUPIED_TILE)
+        {
+          QTest::qWait(AI_DELAY);
           moveCurrentPlayer(currentPlayerIter->second.getAiMove(
               inProgressBoardImage, targetDoorLocation));
         }
-        catch(ExceptionClass noValidMovesLeft)
+
+        //Make a suggestion if the player is in a room
+        if(aiPlayerIter == currentPlayerIter && currentPlayerIter->second.
+            getPlayerLocation().getTileType(CLUE_BOARD_IMAGE) == ROOM_TILE)
         {
-          currentPlayerIter->second.setMovesLeft(0);
-          finishMove();
+          takeAiAction(SUGGEST);
+        }
+        else
+        {
+          takeAiAction(ACCUSE);
         }
       }
-
-      //Make a suggestion if the player is in a room
-      if(aiPlayerIter == currentPlayerIter && currentPlayerIter->second.
-          getPlayerLocation().getTileType(CLUE_BOARD_IMAGE) == ROOM_TILE)
+      catch(ExceptionClass aiBlocked)
       {
-        takeAiAction(SUGGEST);
-      }
-      else
-      {
-        takeAiAction(ACCUSE);
+        currentPlayerIter->second.setMovesLeft(0);
+        takeAiAction(END_TURN);
       }
       break;
     case SUGGEST:
@@ -811,9 +819,6 @@ void ClueMainWindowClass::disableMovementControls()
   useSecretPassageOption->setEnabled(false);
   leaveRoomOption->setEnabled(false);
   doorNumberSpin->setEnabled(false);
-
-//  endTurnOption->toggle();
-//  endTurnOption->setFocus();
 }
 
 void ClueMainWindowClass::enableMovementControls()
@@ -960,7 +965,7 @@ void ClueMainWindowClass::handleSuggestion(const SuggestionClass
           "committed in the " + CARD_VALUES[roomToCard(suggestion.getRoom())]
           + " by " + CARD_VALUES[suspectToCard(suggestion.getSuspect())] +
           " with the " + CARD_VALUES[weaponToCard(suggestion.getWeapon())]);
-      suggestionMessage.exec();
+      ////suggestionMessage.exec();
     }
     moveSuggestedSuspect(suggestion.getSuspect());
   }
@@ -1104,12 +1109,20 @@ void ClueMainWindowClass::moveSuggestedSuspect(SuspectEnum suggestedSuspect)
 
 void ClueMainWindowClass::moveCurrentPlayerOutDoor(BoardLocationClass doorLoc)
 {
-  drawMove(currentPlayerIter->first, currentPlayerIter->second.
-      getPlayerLocation(), doorLoc);
-  currentPlayerIter->second.setPlayerLocation(doorLoc);
+  if(doorLoc.getTileType(inProgressBoardImage) == UNOCCUPIED_TILE)
+  {
+    drawMove(currentPlayerIter->first, currentPlayerIter->second.
+        getPlayerLocation(), doorLoc);
+    currentPlayerIter->second.setPlayerLocation(doorLoc);
 
-  finishMove();
+    finishMove();
   refreshDisplay();
+  }
+  else
+  {
+    throw(ExceptionClass("This door is blocked.  Please select another door "
+        "and try agan."));
+  }
 }
 
 void ClueMainWindowClass::moveCurrentPlayerOutDoor(int doorNumber)

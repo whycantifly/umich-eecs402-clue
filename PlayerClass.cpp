@@ -56,7 +56,8 @@ void PlayerClass::move(const QImage &currentBoard, const DirectionEnum
       if(visitedLocationIter->getTileType(CLUE_BOARD_IMAGE) == ROOM_TILE &&
           visitedLocationIter->getRoom() == newLocation.getRoom())
       {
-        throw(ExceptionClass("You have already visited that room this turn."));
+        throw(ExceptionClass("You have already visited that room this turn.  "
+            "Please select another move and try again."));
       }
     }
   }
@@ -79,30 +80,20 @@ set<BoardLocationClass> PlayerClass::getValidExitDoors(const QImage
   //Variable Declarations
   set<BoardLocationClass> doors = getDoorsForRoom(currentLocation.getRoom());
   set<BoardLocationClass>::iterator doorIter = doors.begin();
+  set<BoardLocationClass> validDoors;
   DirectionEnum direction;
   bool validDoorFlag;
 
   while(doorIter != doors.end())
   {
-    validDoorFlag = false;
-    direction = UP;
-    while(direction < NUMBER_OF_DIRECTIONS && validDoorFlag == false)
+    if(doorIter->getTileType(currentBoard) == UNOCCUPIED_TILE)
     {
-      if(doorIter->getTileInDir(direction).getTileType(currentBoard) ==
-          UNOCCUPIED_TILE)
-      {
-        validDoorFlag = true;
-      }
-      direction = DirectionEnum(int(direction) + 1);
-    }
-    if(validDoorFlag == false)
-    {
-      doors.erase(doorIter);
+      validDoors.insert(*doorIter);
     }
     doorIter++;
   }
 
-  return doors;
+  return validDoors;
 }
 
 set<DirectionEnum> PlayerClass::getValidMoveDirections(const QImage
@@ -231,7 +222,7 @@ BoardLocationClass PlayerClass::getAiTargetDoor()
       currentLocation.getTargetDoors();
   multimap<int, BoardLocationClass>::iterator doorIter = targetDoorList.begin();
   bool gotTargetFlag = false;
-  int randomNumber;
+  int randomNumber = targetDoorList.size();
   BoardLocationClass target;
 
   switch(aiDifficulty)
@@ -240,7 +231,7 @@ BoardLocationClass PlayerClass::getAiTargetDoor()
       do
       {
         randomNumber = rand() % AI_EASY_TARGET_RAND_MAX;
-        if(randomNumber == 0)
+        if(randomNumber == AI_EASY_TARGET_RAND_MAX - 1)
         {
           gotTargetFlag = true;
         }
@@ -254,6 +245,7 @@ BoardLocationClass PlayerClass::getAiTargetDoor()
         }
       }
       while(gotTargetFlag == false);
+
       target = doorIter->second;
       break;
 //Insert AI code - set target based on targetDoorList.
@@ -287,6 +279,11 @@ BoardLocationClass PlayerClass::getAiExitDoor(QImage &currentBoard)
   set<BoardLocationClass>::iterator doorIter = doors.begin();
   BoardLocationClass doorLocation;
   int doorPosition;
+
+  if(doors.empty() == true)
+  {
+    throw(ExceptionClass("All doorways blocked"));
+  }
 
   switch(aiDifficulty)
   {
