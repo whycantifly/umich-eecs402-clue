@@ -163,7 +163,7 @@ void ClueMainWindowClass::clearVisitedTiles()
   //with the exception of the player's current location
   while(visitedLocationIter != visitedLocations.end())
   {
-    if(*visitedLocationIter != currentPlayerLoc)
+    if(visitedLocationIter->getTileType(inProgressBoardImage) != OCCUPIED_TILE)
     {
       tileTopLeftPixel = visitedLocationIter->getTopLeftPixel();
 
@@ -178,7 +178,6 @@ void ClueMainWindowClass::clearVisitedTiles()
     }
     visitedLocationIter++;
   }
-  
   //Update the board shown on the gui
   gameBoard->setPixmap(QPixmap::fromImage(inProgressBoardImage));
 }
@@ -819,6 +818,9 @@ void ClueMainWindowClass::disableMovementControls()
   useSecretPassageOption->setEnabled(false);
   leaveRoomOption->setEnabled(false);
   doorNumberSpin->setEnabled(false);
+
+//  endTurnOption->toggle();
+//  endTurnOption->setFocus();
 }
 
 void ClueMainWindowClass::enableMovementControls()
@@ -965,7 +967,8 @@ void ClueMainWindowClass::handleSuggestion(const SuggestionClass
           "committed in the " + CARD_VALUES[roomToCard(suggestion.getRoom())]
           + " by " + CARD_VALUES[suspectToCard(suggestion.getSuspect())] +
           " with the " + CARD_VALUES[weaponToCard(suggestion.getWeapon())]);
-      ////suggestionMessage.exec();
+      //Comment to test Ai
+      suggestionMessage.exec();
     }
     moveSuggestedSuspect(suggestion.getSuspect());
   }
@@ -989,6 +992,7 @@ void ClueMainWindowClass::handleSuggestion(const SuggestionClass
       if(playerIter->first == thisSuspect)
       {
         playerSuggestionDialog.setupDialogBox(&suggestion, &revealedCard);
+        //Comment to test Ai
         playerSuggestionDialog.exec();
       }
       else
@@ -1025,6 +1029,7 @@ void ClueMainWindowClass::handleSuggestion(const SuggestionClass
           suggestionMessage.setText(revealer + " reveals the " +
               CARD_VALUES[revealedCard] + " card to you.");
         }
+        //Comment to test Ai
         suggestionMessage.exec();
         if(currentPlayerIter->first == thisSuspect || (gameParticipants.find(
             thisSuspect)->second.getHostFlag() == true && currentPlayerIter->
@@ -1056,6 +1061,7 @@ void ClueMainWindowClass::handleSuggestion(const SuggestionClass
         suggestionMessage.setText(CARD_VALUES[int(suspectToCard(
             playerIter->first))] + " cannot disprove the suggestion.");
       }
+      //Comment to test Ai
       suggestionMessage.exec();
 
 

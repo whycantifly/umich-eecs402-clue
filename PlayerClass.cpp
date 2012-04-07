@@ -583,7 +583,7 @@ SuggestionClass PlayerClass::makeAiAccusation() const
   WeaponEnum weapon;
   RoomEnum room;
   int missingEntries = 0;
-  int i;
+  int i = 0;
 
   switch(aiDifficulty)
   {
