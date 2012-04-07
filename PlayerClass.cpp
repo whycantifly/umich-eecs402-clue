@@ -6,11 +6,15 @@
 #include "enums.h"
 #include "BoardLocationClass.h"
 #include "ExceptionClass.h"
+#include "cardToSuspect.h"
+#include "cardToWeapon.h"
+#include "cardToRoom.h"
 #include "roomToCard.h"
 #include "suspectToCard.h"
 #include "weaponToCard.h"
 #include "getStartingDoorIndex.h"
 #include "getDoorsForRoom.h"
+#include "getCardType.h"
 
 using namespace std;
 
@@ -20,25 +24,24 @@ PlayerClass::PlayerClass(const bool aiValue, const bool gameHostValue,
 {
   aiFlag = aiValue;
   hostFlag = gameHostValue;
-  movedSinceLastTurnFlag = false;
   dieRollThisTurn = 0;
   movesLeftThisTurn = 0;
-  enteredRoomThisMoveFlag = false;
   currentLocation = startingLocation;
   aiDifficulty = aiDiff;
-  endTurnFlag = false;
+  lastAction = END_TURN;
+  movedThisTurnFlag = false;
   resetLocationsThisTurn();
 
   for(int i = 0; i < NUMBER_OF_CARDS; i++)
   {
-//    if(hand.find())
     detectiveNotes[i] = make_pair(CardEnum(i), UNKNOWN);
   }
 }
 
 //Moves the player over one tile; throws an exception if the move is
 //outside the bounds of the board.
-void PlayerClass::move(const QImage &currentBoard, const DirectionEnum &direction)
+void PlayerClass::move(const QImage &currentBoard, const DirectionEnum
+    &direction)
 {
   BoardLocationClass newLocation = currentLocation;
   set<BoardLocationClass>::iterator visitedLocationIter;
@@ -153,8 +156,75 @@ set<DirectionEnum> PlayerClass::getValidMoveDirections(const QImage
   return validDirections;
 }
 
-//DUMMY AI CODE/////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
+
+set<ActionEnum> PlayerClass::getValidPrerollMoves()
+{
+  //Variable Declarations
+  set<ActionEnum> validMoves;
+
+  validMoves.insert(ROLL);
+  validMoves.insert(ACCUSE);
+
+  if(lastAction == MOVE)
+  {
+    validMoves.insert(SUGGEST);
+  }
+
+  if(currentLocation.checkCornerRoom() == true)
+  {
+    validMoves.insert(USE_SECRET_PASSAGE);
+  }
+
+  return validMoves;
+}
+
+ActionEnum PlayerClass::handleAfterRollAi()
+{
+  try
+  {
+    makeAiAccusation();
+    return ACCUSE;
+  }
+  catch(ExceptionClass notReadToAccuse)
+  {
+    return MOVE;
+  }
+}
+
+set<CardEnum> PlayerClass::getSuggestionMatches(SuggestionClass suggestion)
+{
+  //Variable Declarations
+  set<CardEnum> cardMatches;
+  CardEnum cardToAdd;
+
+  if(hand.find(suspectToCard(suggestion.getSuspect())) != hand.end())
+  {
+    cardToAdd = *hand.find(suspectToCard(suggestion.getSuspect()));
+    cardMatches.insert(cardToAdd);
+  }
+  if(hand.find(weaponToCard(suggestion.getWeapon())) != hand.end())
+  {
+    cardToAdd = *hand.find(weaponToCard(suggestion.getWeapon()));
+    cardMatches.insert(cardToAdd);
+  }
+  if(hand.find(roomToCard(suggestion.getRoom())) != hand.end())
+  {
+    cardToAdd = *hand.find(roomToCard(suggestion.getRoom()));
+    cardMatches.insert(cardToAdd);
+  }
+
+  return cardMatches;
+}
+
+
+
+
+
+
+//AI CODE STARTS HERE
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
 BoardLocationClass PlayerClass::getAiTargetDoor()
 {
   multimap<int, BoardLocationClass> targetDoorList =
@@ -166,7 +236,7 @@ BoardLocationClass PlayerClass::getAiTargetDoor()
 
   switch(aiDifficulty)
   {
-    case EASY:
+    case VERY_EASY:
       do
       {
         randomNumber = rand() % AI_EASY_TARGET_RAND_MAX;
@@ -186,12 +256,26 @@ BoardLocationClass PlayerClass::getAiTargetDoor()
       while(gotTargetFlag == false);
       target = doorIter->second;
       break;
-
-    case MEDIUM:
-      break;
-
-    default:
-      break;
+//Insert AI code - set target based on targetDoorList.
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//    case EASY:
+//
+//      break;
+//
+//    case MEDIUM:
+//
+//      break;
+//
+//    case HARD:
+//
+//      break;
+//
+//    case EXPERT:
+//
+//      break;
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
   }
   return target;
 }
@@ -201,14 +285,43 @@ BoardLocationClass PlayerClass::getAiExitDoor(QImage &currentBoard)
   //Variable Declarations
   set<BoardLocationClass> doors = getValidExitDoors(currentBoard);
   set<BoardLocationClass>::iterator doorIter = doors.begin();
-  int doorPosition = rand() % doors.size();
+  BoardLocationClass doorLocation;
+  int doorPosition;
 
-  for(int i = 0; i < doorPosition; i++)
+  switch(aiDifficulty)
   {
-    doorIter++;
+    case VERY_EASY:
+      doorPosition = rand() % doors.size();
+      for(int i = 0; i < doorPosition; i++)
+      {
+        doorIter++;
+      }
+      doorLocation = *doorIter;
+      break;
+
+//Insert AI code - set doorLocation based on doors.
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//    case EASY:
+//
+//      break;
+//
+//    case MEDIUM:
+//
+//      break;
+//
+//    case HARD:
+//
+//      break;
+//
+//    case EXPERT:
+//
+//      break;
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
   }
 
-  return *doorIter;
+  return doorLocation;
 }
 
 DirectionEnum PlayerClass::getAiMove(QImage &currentBoard, BoardLocationClass
@@ -219,199 +332,212 @@ DirectionEnum PlayerClass::getAiMove(QImage &currentBoard, BoardLocationClass
   bool validMoveFlag = false;
   queue<DirectionEnum> moveDirection;
   set<DirectionEnum> validDirections = getValidMoveDirections(currentBoard);
+  DirectionEnum direction;
 
   if(validDirections.empty() == true)
   {
     throw(ExceptionClass("No valid move directions"));
   }
 
-  if(target == currentLocation && validDirections.find(
-      DOOR_DIRECTIONS[target.getDoorIndex()]) != validDirections.end())
+  switch(aiDifficulty)
   {
-    moveDirection.push(DOOR_DIRECTIONS[target.getDoorIndex()]);
-  }
-  else
-  {
-    if(target.getXCoord() == currentLocation.getXCoord())
-    {
-      moveOrientation = VERTICAL;
-    }
-    else if(target.getYCoord() == currentLocation.getYCoord())
-    {
-      moveOrientation = HORIZONTAL;
-    }
-    else
-    {
-      moveOrientation = OrientationEnum(rand() % 2);
-    }
-
-    while(moveDirection.size() < NUMBER_OF_DIRECTIONS / 2)
-    {
-      switch(moveOrientation)
+    case VERY_EASY:
+      if(target == currentLocation && validDirections.find(
+          DOOR_DIRECTIONS[target.getDoorIndex()]) != validDirections.end())
       {
-        case HORIZONTAL:
-          if(target.getXCoord() < currentLocation.getXCoord() || (target.
-              getXCoord() == currentLocation.getXCoord() && currentLocation.
-              getXCoord() >= BOARD_WIDTH / 2))
-          {
-            moveDirection.push(LEFT);
-          }
-          else
-          {
-            moveDirection.push(RIGHT);
-          }
-          moveOrientation = VERTICAL;
-          break;
-        case VERTICAL:
-          if(target.getYCoord() < currentLocation.getYCoord() || (target.
-              getYCoord() == currentLocation.getYCoord() && currentLocation.
-              getYCoord() >= BOARD_WIDTH / 2))
-          {
-            moveDirection.push(UP);
-          }
-          else
-          {
-            moveDirection.push(DOWN);
-          }
-          moveOrientation = HORIZONTAL;
-          break;
-      }
-    }
-
-    while(moveDirection.size() < NUMBER_OF_DIRECTIONS * 3 / 2)
-    {
-      switch(moveOrientation)
-      {
-        case HORIZONTAL:
-          moveDirection.push(LEFT);
-          moveDirection.push(RIGHT);
-          moveOrientation = VERTICAL;
-          break;
-        case VERTICAL:
-          moveDirection.push(UP);
-          moveDirection.push(DOWN);
-          moveOrientation = HORIZONTAL;
-          break;
-      }
-    }
-
-    while(validMoveFlag == false)
-    {
-      if(validDirections.find(moveDirection.front()) != validDirections.end())
-      {
-        validMoveFlag = true;
+        moveDirection.push(DOOR_DIRECTIONS[target.getDoorIndex()]);
       }
       else
       {
-        moveDirection.pop();
+        if(target.getXCoord() == currentLocation.getXCoord())
+        {
+          moveOrientation = VERTICAL;
+        }
+        else if(target.getYCoord() == currentLocation.getYCoord())
+        {
+          moveOrientation = HORIZONTAL;
+        }
+        else
+        {
+          moveOrientation = OrientationEnum(rand() % 2);
+        }
+
+        while(moveDirection.size() < NUMBER_OF_DIRECTIONS / 2)
+        {
+          switch(moveOrientation)
+          {
+            case HORIZONTAL:
+              if(target.getXCoord() < currentLocation.getXCoord() || (target.
+                  getXCoord() == currentLocation.getXCoord() && currentLocation.
+                  getXCoord() >= BOARD_WIDTH / 2))
+              {
+                moveDirection.push(LEFT);
+              }
+              else
+              {
+                moveDirection.push(RIGHT);
+              }
+              moveOrientation = VERTICAL;
+              break;
+            case VERTICAL:
+              if(target.getYCoord() < currentLocation.getYCoord() || (target.
+                  getYCoord() == currentLocation.getYCoord() && currentLocation.
+                  getYCoord() >= BOARD_WIDTH / 2))
+              {
+                moveDirection.push(UP);
+              }
+              else
+              {
+                moveDirection.push(DOWN);
+              }
+              moveOrientation = HORIZONTAL;
+              break;
+          }
+        }
+
+        while(moveDirection.size() < NUMBER_OF_DIRECTIONS * 3 / 2)
+        {
+          switch(moveOrientation)
+          {
+            case HORIZONTAL:
+              moveDirection.push(LEFT);
+              moveDirection.push(RIGHT);
+              moveOrientation = VERTICAL;
+              break;
+            case VERTICAL:
+              moveDirection.push(UP);
+              moveDirection.push(DOWN);
+              moveOrientation = HORIZONTAL;
+              break;
+          }
+        }
+
+        while(validMoveFlag == false)
+        {
+          if(validDirections.find(moveDirection.front()) != validDirections.end())
+          {
+            validMoveFlag = true;
+          }
+          else
+          {
+            moveDirection.pop();
+          }
+        }
       }
-    }
+
+      direction = moveDirection.front();
+      break;
+//Insert AI code - set direction based on validDirections.
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//    case EASY:
+//
+//      break;
+//
+//    case MEDIUM:
+//
+//      break;
+//
+//    case HARD:
+//
+//      break;
+//
+//    case EXPERT:
+//
+//      break;
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
   }
 
-  return moveDirection.front();
+  return direction;
 }
 
 CardEnum PlayerClass::handleSuggestionAi(SuggestionClass suggestion)
 {
-  set<CardEnum> cardMatches;
+  //Variable Declarations
+  set<CardEnum> cardMatches = getSuggestionMatches(suggestion);
   set<CardEnum>::iterator cardMatchesIter;
   int randomIndex;
+  CardEnum cardToReveal;
 
-  CardEnum cardToAdd;
 
-
-  if(hand.find(suspectToCard(suggestion.getSuspect())) != hand.end())
+  switch(aiDifficulty)
   {
-    cardToAdd = *hand.find(suspectToCard(suggestion.getSuspect()));
-    cardMatches.insert(cardToAdd);
+    case VERY_EASY:
+      randomIndex = rand() % cardMatches.size();
+      cardMatchesIter = cardMatches.begin();
+      for(int i = 0; i < randomIndex; i++)
+      {
+        cardMatchesIter++;
+      }
+      cardToReveal = *cardMatchesIter;
+      break;
+//Insert AI code - set cardToReveal based on cardMatches.
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//    case EASY:
+//
+//      break;
+//
+//    case MEDIUM:
+//
+//      break;
+//
+//    case HARD:
+//
+//      break;
+//
+//    case EXPERT:
+//
+//      break;
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
   }
-  if(hand.find(weaponToCard(suggestion.getWeapon())) != hand.end())
-  {
-    cardToAdd = *hand.find(weaponToCard(suggestion.getWeapon()));
-    cardMatches.insert(cardToAdd);
-  }
-  if(hand.find(roomToCard(suggestion.getRoom())) != hand.end())
-  {
-    cardToAdd = *hand.find(roomToCard(suggestion.getRoom()));
-    cardMatches.insert(cardToAdd);
-  }
-
-  randomIndex = rand() % cardMatches.size();
-
-  cardMatchesIter = cardMatches.begin();
-  for(int i = 0; i < randomIndex; i++)
-  {
-    cardMatchesIter++;
-  }
-
-  return *cardMatchesIter;
+  return cardToReveal;
 }
 
-AiActionEnum PlayerClass::makeCornerRoomDecision()
+ActionEnum PlayerClass::handlePrerollAi(const QImage &currentBoard)
 {
-  int randomNumber = rand() % 10;
+  //Variable Declarations
+  set<ActionEnum> validMoves = getValidPrerollMoves();
+  set<ActionEnum>::iterator moveIter = validMoves.begin();
+  int randomNumber;
+  ActionEnum aiAction;
 
-  if(randomNumber < 3)
+  switch(aiDifficulty)
   {
-    return USE_SECRET_PASSAGE;
-  }
-  else
-  {
-    return ROLL;
+    case VERY_EASY:
+      randomNumber = rand() % validMoves.size();
+      for(int i = 0; i < randomNumber; i++)
+      {
+        moveIter++;
+      }
+      aiAction = *moveIter;
+      break;
+
+//Insert AI code - set aiAction based on the moves in validMoves.
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//    case EASY:
+//
+//      break;
+//
+//    case MEDIUM:
+//
+//      break;
+//
+//    case HARD:
+//
+//      break;
+//
+//    case EXPERT:
+//
+//      break;
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
   }
 
-}
-
-AiActionEnum PlayerClass::handlePrerollAi(const QImage &currentBoard)
-{
-  //Make a suggestion if possible
-  if(movedSinceLastTurnFlag == true)
-  {
-    return SUGGEST;
-  }
-  try
-  {
-    makeAiAccusation();
-    return ACCUSE;
-  }
-  catch(ExceptionClass notReadyToAccuse)
-  {
-    //Roll if player is not in a room and there are valid moves
-    if(currentLocation.getTileType(CLUE_BOARD_IMAGE) == UNOCCUPIED_TILE &&
-        getValidMoveDirections(currentBoard).empty() == false)
-    {
-      return ROLL;
-    }
-    //Use secret passage in corner room otherwise
-    else if(currentLocation.checkCornerRoom() == true)
-    {
-      return makeCornerRoomDecision();
-    }
-    //Roll if player is in a room and there are valid doors
-    else if(currentLocation.getTileType(CLUE_BOARD_IMAGE) == ROOM_TILE &&
-        getValidExitDoors(currentBoard).empty() == false)
-    {
-      return ROLL;
-    }
-    //Otherwise end turn
-    else
-    {
-      return END_TURN;
-    }
-  }
-}
-
-AiActionEnum PlayerClass::handleAfterRollAi()
-{
-  try
-  {
-    makeAiAccusation();
-    return ACCUSE;
-  }
-  catch(ExceptionClass notReadToAccuse)
-  {
-    return MOVE;
-  }
+  return aiAction;
 }
 
 SuggestionClass PlayerClass::makeAiSuggestion() const
@@ -422,16 +548,33 @@ SuggestionClass PlayerClass::makeAiSuggestion() const
 
   switch(aiDifficulty)
   {
-    case EASY:
+    case VERY_EASY:
       suspect = SuspectEnum(rand() % NUMBER_OF_SUSPECTS);
       weapon = WeaponEnum(rand() % NUMBER_OF_WEAPONS);
       break;
-    default:
-      break;
+//Insert AI code - set suspect and weapon.
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//    case EASY:
+//
+//      break;
+//
+//    case MEDIUM:
+//
+//      break;
+//
+//    case HARD:
+//
+//      break;
+//
+//    case EXPERT:
+//
+//      break;
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
   }
 
   room = currentLocation.getRoom();
-
   return SuggestionClass(suspect, weapon, room);
 }
 
@@ -439,13 +582,66 @@ SuggestionClass PlayerClass::makeAiAccusation() const
 {
   bool readyToAccuseFlag = false;
   SuggestionClass accusation;
+  SuspectEnum suspect;
+  WeaponEnum weapon;
+  RoomEnum room;
+  int missingEntries = 0;
+  int i;
 
   switch(aiDifficulty)
   {
-    case EASY:
-      break;
-  }
+    case VERY_EASY:
+      while(i < NUMBER_OF_CARDS && missingEntries <= NUMBER_OF_CARD_TYPES)
+      {
+        if(detectiveNotes[i].second != UNKNOWN)
+        {
+          switch(getCardType(detectiveNotes[i].first))
+          {
+            case SUSPECT_CARD:
+              suspect = cardToSuspect(detectiveNotes[i].first);
+              break;
+            case WEAPON_CARD:
+              weapon = cardToWeapon(detectiveNotes[i].first);
+              break;
+            case ROOM_CARD:
+              room = cardToRoom(detectiveNotes[i].first);
+              break;
+          }
+        }
+        else
+        {
+          missingEntries++;
+        }
+        i++;
+      }
 
+      if(missingEntries == NUMBER_OF_CARD_TYPES)
+      {
+        readyToAccuseFlag = true;
+        accusation = SuggestionClass(suspect, weapon, room);
+      }
+      break;
+//Insert AI code - set accusation or set readyToAccuseFlag to true.
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//    case EASY:
+//
+//      break;
+//
+//    case MEDIUM:
+//
+//      break;
+//
+//    case HARD:
+//
+//      break;
+//
+//    case EXPERT:
+//
+//      break;
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+  }
   if(readyToAccuseFlag == false)
   {
     throw(ExceptionClass("Ai not ready to accuse"));
@@ -453,5 +649,3 @@ SuggestionClass PlayerClass::makeAiAccusation() const
 
   return accusation;
 }
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////

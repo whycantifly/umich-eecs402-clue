@@ -18,10 +18,8 @@ class PlayerClass
     bool hostFlag;                      //True = host (or local play);
                                         //False = not host
     bool aiFlag;                        //True = AI; false = human player
-    bool movedSinceLastTurnFlag;        //True = moved since last turn;
-                                        //False = not moved since last turn
-    bool enteredRoomThisMoveFlag;       //True = just entered a room;
-                                        //False = did not just enter a room
+    bool movedThisTurnFlag;             //True = moved this turn; false = not
+    ActionEnum lastAction;              //Last action taken by the player
     std::set<CardEnum> hand;            //Cards in the players hand; ordered in
                                         //order of CardEnum
     int dieRollThisTurn;                //Value of the die roll this turn
@@ -31,7 +29,6 @@ class PlayerClass
                                         //this turn
     std::pair<CardEnum, SuspectEnum> detectiveNotes[NUMBER_OF_CARDS];
     DifficultyEnum aiDifficulty;
-    bool endTurnFlag;
 
   public:
     //Constructors
@@ -67,16 +64,6 @@ class PlayerClass
 
     //Inline Functions
 
-    void setEndTurnFlag(bool value)
-    {
-      endTurnFlag = value;
-    }
-
-    bool getEndTurnFlag() const
-    {
-      return endTurnFlag;
-    }
-
     void addToLocationsThisTurn(BoardLocationClass location)
     {
       locationsThisTurn.insert(location);
@@ -93,27 +80,26 @@ class PlayerClass
       locationsThisTurn.insert(currentLocation);
     }
 
-    bool getMovedSinceLastTurnFlag() const
+    void setLastAction(ActionEnum action)
     {
-      return movedSinceLastTurnFlag;
+      lastAction = action;
     }
 
-    void setMovedSinceLastTurnFlag(bool newValue)
+    ActionEnum getLastAction() const
     {
-      movedSinceLastTurnFlag = newValue;
+      return lastAction;
     }
 
-
-
-    bool getEnteredRoomThisMoveFlag() const
+    void setMovedThisTurnFlag(bool value)
     {
-      return enteredRoomThisMoveFlag;
+      movedThisTurnFlag = value;
     }
 
-    void setEnteredRoomThisMoveFlag(bool newValue)
+    bool getMovedThisTurnFlag() const
     {
-      enteredRoomThisMoveFlag = newValue;
+      return movedThisTurnFlag;
     }
+
     //Sets the AI flag.
     void setAiFlag(bool aiValue)
     {
@@ -160,7 +146,7 @@ class PlayerClass
       movesLeftThisTurn = movesLeft;
     }
 
-    int getMovesLeft()
+    int getMovesLeft() const
     {
       return movesLeftThisTurn;
     }
@@ -186,13 +172,16 @@ class PlayerClass
       return detectiveNotes[int(card)].second;
     }
 
+    std::set<ActionEnum> getValidPrerollMoves();
+
+    std::set<CardEnum> getSuggestionMatches(SuggestionClass
+        suggestion);
+
     std::set<BoardLocationClass> getValidExitDoors(const QImage &currentBoard);
 
     std::set<DirectionEnum> getValidMoveDirections(const QImage &currentBoard);
 
-//DUMMY AI CODE/////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-    AiActionEnum makeCornerRoomDecision();
+    ActionEnum makeCornerRoomDecision();
 
     BoardLocationClass getAiTargetDoor();
 
@@ -203,9 +192,9 @@ class PlayerClass
     //Handles suggestions passed to the AI.
     CardEnum handleSuggestionAi(SuggestionClass suggestion);
 
-    AiActionEnum handlePrerollAi(const QImage &currentBoard);
+    ActionEnum handlePrerollAi(const QImage &currentBoard);
 
-    AiActionEnum handleAfterRollAi();
+    ActionEnum handleAfterRollAi();
 
     SuggestionClass makeAiSuggestion() const;
 

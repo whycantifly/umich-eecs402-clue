@@ -83,7 +83,7 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     void continuePlayerTurn();
 
     void takeAiAction(
-        const AiActionEnum action
+        const ActionEnum action
         );
 
     void updateRollInfoText();
@@ -97,6 +97,10 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     void displayDefaultOptions();
 
     void disableAllControls();
+
+    void disableMovementControls();
+
+    void enableMovementControls();
 
     void enableAllControls();
 
