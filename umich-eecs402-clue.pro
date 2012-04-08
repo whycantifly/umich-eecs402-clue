@@ -9,6 +9,7 @@ INCLUDEPATH += .
 QT += testlib
 
 # Input
+CONFIG += debug
 HEADERS += AccusationDialogClass.h \
            BoardLocationClass.h \
            cardToRoom.h \

@@ -18,11 +18,6 @@
 #include "PlayerClass.h"
 #include "SuggestionClass.h"
 
-<<<<<<< .mine
-//For ClueMainWindowClass, all references to THIS player refer to the player
-//controlling this particular instance of the game.
-
-=======
 // Network stuff
 #include "ServerSocket.h"
 #include "PackageClass.h"
@@ -30,7 +25,9 @@
 #include "SocketException.h"
 #include <iostream>
 
->>>>>>> .r41
+//For ClueMainWindowClass, all references to THIS player refer to the player
+//controlling this particular instance of the game.
+
 class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
 {
   Q_OBJECT
@@ -147,9 +144,14 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     //Continues the current player's turn after the roll.
     void continuePlayerTurn();
 
-    //Handles the suggestion.
+    //Handles any suggestion made.
     void handleSuggestion(
         const SuggestionClass &playerSuggestion   //Suggestion posed
+        );
+
+    //Handles any accusation made.
+    void handleAccusation(
+        const SuggestionClass playerAccusation   //Accusation posed
         );
 
     //Moves the current player one tile over; throws an exception if the move is
@@ -187,6 +189,30 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     void takeAiAction(
         const ActionEnum action         //Action to take
         );
+
+    //NETWORK FUNCTIONS
+
+    //Sends turn information to remote players.
+    void sendRemoteTurnInfo(
+        ActionEnum playerAction,                //Remote player action
+        int dieRoll,                            //Remote player die roll
+        BoardLocationClass locationAfterMove,   //Location after this move
+        SuggestionClass suggestionMade
+        );
+
+    //Receives turn information from any remote players.
+    void receiveRemoteTurnInfo();
+
+    //Sends card information for the card revealed.
+    void sendRevealedCard(CardEnum revealedCard);
+
+    //Receives card information for the card revealed to the player when a
+    //suggestion is made.
+    CardEnum receiveRevealedCard();
+
+    //Checks to make sure all players have acknowledged the suggestion or
+    //response to the suggestion before continuing.
+    void checkSuggestionAcknowledged();
 
     //GUI SUPPORT FUNCTIONS
 

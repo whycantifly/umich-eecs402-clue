@@ -30,6 +30,7 @@ PlayerClass::PlayerClass(const bool aiValue, const bool gameHostValue,
   aiDifficulty = aiDiff;
   lastAction = END_TURN;
   movedThisTurnFlag = false;
+  gameOverFlag = false;
   resetLocationsThisTurn();
 
   for(int i = 0; i < NUMBER_OF_CARDS; i++)
@@ -151,7 +152,7 @@ void PlayerClass::addCardToHand(CardEnum cardToAdd)
 
 void PlayerClass::addToDetectiveNotes(CardEnum card, SuspectEnum suspect)
 {
-  detectiveNotes[int(card)].second = suspect;
+  detectiveNotes[card].second = suspect;
 }
 
 set<BoardLocationClass> PlayerClass::getValidExitDoors(const QImage
@@ -200,26 +201,29 @@ set<DirectionEnum> PlayerClass::getValidMoveDirections(const QImage
   //Check each direction to see if its a feasible direction
   for(DirectionEnum i = UP; i <= RIGHT; i = DirectionEnum(int(i) + 1))
   {
-    if(currentLocation.getTileInDir(i).getTileType(currentBoard) ==
-        UNOCCUPIED_TILE)
+    if(currentLocation.getTileInDir(i).checkBoardBounds() == true)
     {
-      validDirections.insert(i);
-    }
-    else if(currentLocation.getTileInDir(i).getTileType(currentBoard) ==
-        ROOM_TILE)
-    {
-      try
+      if(currentLocation.getTileInDir(i).getTileType(currentBoard) ==
+          UNOCCUPIED_TILE)
       {
-        currentLocation.getDoorIndex();
-        if((visitedRoomFlag == false || currentLocation.getTileInDir(i).
-            getRoom() != visitedRoom))
-        {
-          validDirections.insert(i);
-        }
+        validDirections.insert(i);
       }
-      catch(ExceptionClass notADoor)
+      else if(currentLocation.getTileInDir(i).getTileType(currentBoard) ==
+          ROOM_TILE)
       {
-        //Tile is not a door
+        try
+        {
+          currentLocation.getDoorIndex();
+          if((visitedRoomFlag == false || currentLocation.getTileInDir(i).
+              getRoom() != visitedRoom))
+          {
+            validDirections.insert(i);
+          }
+        }
+        catch(ExceptionClass notADoor)
+        {
+          //Tile is not a door
+        }
       }
     }
   }
@@ -670,7 +674,7 @@ SuggestionClass PlayerClass::makeAiAccusation() const
     case VERY_EASY:
       while(i < NUMBER_OF_CARDS && missingEntries <= NUMBER_OF_CARD_TYPES)
       {
-        if(detectiveNotes[i].second != UNKNOWN)
+        if(detectiveNotes[i].second == UNKNOWN)
         {
           switch(getCardType(detectiveNotes[i].first))
           {
@@ -684,9 +688,6 @@ SuggestionClass PlayerClass::makeAiAccusation() const
               room = cardToRoom(detectiveNotes[i].first);
               break;
           }
-        }
-        else
-        {
           missingEntries++;
         }
         i++;

@@ -126,7 +126,7 @@ class BoardLocationClass
 
     const BoardLocationClass getEmptyRoomTile(const QImage &currentBoard) const;
 
-    int getDoorIndex();
+    int getDoorIndex() const;
 
     //Inline functions
 

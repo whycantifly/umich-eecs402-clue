@@ -24,6 +24,8 @@ class PlayerClass
     bool hostFlag;                      //True = host (or local play);
                                         //False = not host
     bool aiFlag;                        //True = AI; false = human player
+    bool gameOverFlag;                  //True = hasn't lost the game
+                                        //False = has lost the game
     bool movedThisTurnFlag;             //True = moved this turn; false = not
     ActionEnum lastAction;              //Last action taken by the player
     std::set<CardEnum> hand;            //Cards in the players hand; ordered in
@@ -121,10 +123,28 @@ class PlayerClass
       return aiFlag;
     }
 
+    //Sets the host flag.
+    void setHostFlag(bool value)
+    {
+      hostFlag = value;
+    }
+
     //Gets the host flag.
     bool getHostFlag() const
     {
       return hostFlag;
+    }
+
+    //Sets the the game over flag.
+    void setGameOverFlag(bool value)
+    {
+      gameOverFlag = value;
+    }
+
+    //Gets the game over flag.
+    bool getGameOverFlag()
+    {
+      return gameOverFlag;
     }
 
     //Gets the current player location.

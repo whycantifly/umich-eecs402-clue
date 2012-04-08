@@ -9,7 +9,9 @@
 
 #include "BoardLocationClass.h"
 
-const int AI_DELAY = 300;
+const int HOST_AI_DELAY = 300;
+
+const int REMOTE_PLAYER_DELAY = 350;
 
 const SuggestionClass EMPTY_SUGGESTION;
 

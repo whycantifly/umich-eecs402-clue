@@ -103,7 +103,7 @@ const RoomEnum BoardLocationClass::getRoom() const
 {
   //Variable Declarations
   QRgb tileColor;
-  RoomEnum room;
+  RoomEnum room = HALL;
   bool foundRoom = false;
   int i;
 
@@ -146,9 +146,6 @@ void BoardLocationClass::move(const QImage &currentBoard,
     const DirectionEnum &direction)
 {
   BoardLocationClass newLocation = getTileInDir(direction);
-  bool doorFlag = false;
-  int startingDoorIndex = 0;
-  int i;
 
   if(newLocation.checkBoardBounds() == false)
   {
@@ -195,7 +192,7 @@ RoomEnum BoardLocationClass::getRoomDoor() const
   int j;
   bool isDoorTile = false;
   int runningNumberOfDoors = 0;
-  RoomEnum room;
+  RoomEnum room = HALL;
 
   i = 0;
   while(i < TOTAL_NUMBER_OF_DOORS && isDoorTile == false)
@@ -334,7 +331,7 @@ BoardLocationClass BoardLocationClass::getTileInDir(DirectionEnum direction)
   return newLocation;
 }
 
-int BoardLocationClass::getDoorIndex()
+int BoardLocationClass::getDoorIndex() const
 {
   //Variable Declarations
   int i = 0;
