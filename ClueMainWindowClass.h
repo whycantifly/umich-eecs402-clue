@@ -12,6 +12,13 @@
 #include "PlayerClass.h"
 #include "SuggestionClass.h"
 
+// Network stuff
+#include "ServerSocket.h"
+#include "PackageClass.h"
+#include "ClientSocket.h"
+#include "SocketException.h"
+#include <iostream>
+
 class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
 {
   Q_OBJECT

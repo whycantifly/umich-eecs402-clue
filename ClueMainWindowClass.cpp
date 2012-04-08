@@ -1328,6 +1328,32 @@ void ClueMainWindowClass::startGame()
         //
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
+        
+        // Open server socket
+        ServerSocket server(30000);
+        ServerSocket serverSock;
+  
+        string message;
+        PackageClass package;
+        int unwrap = 0;
+        string packageString;
+        
+        // Wrap up package to pass to other networked game(s)
+        package.wrapSetupPkg(gameParticipants, caseFile, thisSuspect);
+
+        // Hold for client to connect
+        cout << "Waiting for client to connect......." << endl;
+        server.accept(serverSock);
+        cout << "The client connected!" << endl;
+      
+        // Test stuff
+        cout << "Waiting for message from client" << endl;
+        serverSock >> message;
+        
+        unwrap = package.unwrapPackage(message);
+        cout << "Received message: " << unwrap << endl;
+        
+        serverSock << "Sending this data to the client";        
       }
     }
     else
@@ -1342,8 +1368,32 @@ void ClueMainWindowClass::startGame()
       //
       //////////////////////////////////////////////////////////////////////////
       //////////////////////////////////////////////////////////////////////////
+      
+      // Fun things to create
+      PackageClass package;
+      string packageString;
+      string reply;
+      
+      // Trying to connect to server
+      cout << "Attempting to connect to server" << endl;
+      // Right now on localhost, replace with IP
+      ClientSocket cliSock("localhost", 30000);
+      
+      packageString = package.wrapPackage();
+      
+      // Send "I'm here message to server!"
+      cout << "Sending message to server: " << endl;
+      cliSock << packageString;
+      cout << "Waiting for server response" << endl;
+      // Get server response!
+      cliSock >> reply;
+      cout << reply << endl;
+      
+      // SetupGame to stop segfaulting for the time being
+      setupGame();
+      
+      //currentPlayerIter = gameParticipants.begin();
 
-      currentPlayerIter = gameParticipants.begin();
     }
 
     //Display gameplay interface
@@ -1360,6 +1410,7 @@ void ClueMainWindowClass::startGame()
     displayExceptionMessageBox(newException);
   }
 }
+
 
 void ClueMainWindowClass::setNetworkOptVis()
 {
