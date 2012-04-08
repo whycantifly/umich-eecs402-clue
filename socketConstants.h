@@ -1,0 +1,6 @@
+#ifndef _SOCKETCONSTANTS_H_
+#define _SOCKETCONSTANTS_H_
+
+const int SUBMSG_SIZE = 1024;
+
+#endif // _SOCKETCONSTANTS_H_
