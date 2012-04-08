@@ -1,9 +1,15 @@
+//Name:       Elaine Pang, Taylor Tappe, Colin Zarzycki
+//Date:       04/13/2012
+//Assignment: EECS402 Project 5
+//Purpose:    ClueMainWindowClass class definition
+
 #ifndef _CLUEMAINWINDOWCLASS_H_
 #define _CLUEMAINWINDOWCLASS_H_
 
 #include <QtGui>
 #include <map>
 #include <set>
+
 #include "ui_ClueMainWindowClass.h"
 #include "constants.h"
 #include "BoardLocationClass.h"
@@ -12,6 +18,11 @@
 #include "PlayerClass.h"
 #include "SuggestionClass.h"
 
+<<<<<<< .mine
+//For ClueMainWindowClass, all references to THIS player refer to the player
+//controlling this particular instance of the game.
+
+=======
 // Network stuff
 #include "ServerSocket.h"
 #include "PackageClass.h"
@@ -19,151 +30,179 @@
 #include "SocketException.h"
 #include <iostream>
 
+>>>>>>> .r41
 class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
 {
   Q_OBJECT
   private:
-    QImage inProgressBoardImage;        //Board at current state of gameplay
-    bool gameOver;                      //True = someone won;
-                                        //False = no one won yet
+    QImage inProgressBoardImage;  //Board image at the current state of gameplay
     std::map<SuspectEnum, PlayerClass> gameParticipants;
-                                        //Players in order of turn
+                                  //List of game participants: first = suspect,
+                                  //second = player
     std::map<SuspectEnum, PlayerClass>::iterator currentPlayerIter;
-                                        //Current player
-    SuggestionClass caseFile;           //Case file of details of the crime
-    SuspectEnum thisSuspect;            //Suspect that THIS player controls
+                                  //Iterator pointing to the current player
+    SuggestionClass caseFile;     //Case file include details of the crime
+    SuspectEnum thisSuspect;      //Suspect controlled by THIS player
 
   public:
-    //Constructors
+    //CONSTRUCTORS
 
     //Constructor; shows the GUI and sets up game for play.
     ClueMainWindowClass();
 
-    //Function Prototypes
-
-    //Displays the cards in the player's hand
-    void displayCardsInHand();
+    //GUI DISPLAY FUNCTIONS
 
     //Sets up the board for play.
     void setupNewBoard();
 
-    //Draws the character piece indicated to the tile indicated on
-    //inProgressBoardImage.
-    void drawPieceToBoard(
-        SuspectEnum suspect,
-        const BoardLocationClass &tile
-        );
+    //Displays the cards in THIS player's hand on the game interface.
+    void displayCardsInHand();
 
-    void clearVisitedTiles();
-
-    //Erases the piece on the tile indicated on inProgressBoardImage.
-    void clearPiece(
-        SuspectEnum suspect,
-        const BoardLocationClass &tile
-        );
-
-    //Draws the movement from oldLocation to newLocation onto
-    //inProgressBoardImage.
+    //Draws the movement of the suspect from the old location to the new
+    //location.
     void drawMove(
-        SuspectEnum suspect,
-        const BoardLocationClass &oldLocation,   //Original location of the piece
-        const BoardLocationClass &newLocation    //New location of the piece
+        SuspectEnum suspect,                    //Suspect to move
+        const BoardLocationClass &oldLocation,  //Original location of the piece
+        const BoardLocationClass &newLocation   //New location of the piece
         );
-
-    //Deals the cards to the players.
-    void dealCards(DeckClass &cardDeck);
-
-    //Sets the game up to play.
-    void setupGame();
-
-    //Displays the gameplay interface.
-    void displayGameInterface();
-
-    //Refreshes the display with available options
-    void refreshDisplay();
-
-    void updateDetectiveNotes(CardEnum card);
-
-    //Starts the current player's turn.
-    void startPlayerTurn();
-
-    void continuePlayerTurn();
-
-    void takeAiAction(
-        const ActionEnum action
-        );
-
-    void updateRollInfoText();
-
-    //Displays gameplay options from a corner room.
-    void displayCornerRoomOptions();
-
-    void displayRoomOptions();
-
-    //Displays default gameplay options.
-    void displayDefaultOptions();
-
-    void disableAllControls();
-
-    void disableMovementControls();
-
-    void enableMovementControls();
-
-    void enableAllControls();
 
     //Draws the pieces in the game on their starting tiles.
     void drawStartingPieces();
 
-    //Displays an exception message box with an error message.
-    void displayExceptionMessageBox(
-        ExceptionClass exceptionText    //Exception
-        ) const;
-
-    RoomEnum getCurrentPlayerRoom();
-
-    //Displays the accusation window and either eliminates the player from the
-    //game or ends the game with the player as the winner.
-    void makePlayerAccusation();
-
-    //Displays the suggestion window and moves the appropriate piece to the
-    //appropriate tile.
-    void makePlayerSuggestion();
-
-    void moveSuggestedSuspect(SuspectEnum suggestedSuspect);
-
-    void moveCurrentPlayerOutDoor(BoardLocationClass doorLoc);
-
-    //Moves the current player out of the room through a door; throws an
-    //exception if the door number selected is not a valid door number for the
-    //room.
-    void moveCurrentPlayerOutDoor(
-        int doorNumber        //Door number of the door
+    //Draws the character piece indicated to the tile indicated on
+    //inProgressBoardImage.
+    void drawPieceToBoard(
+        SuspectEnum suspect,            //Suspect piece to draw
+        const BoardLocationClass &tile  //Location to draw the piece to
         );
 
-    void finishMove();
+    //Erases the piece belonging to the suspect from the tile indicated.
+    void clearPiece(
+        SuspectEnum suspect,            //Suspect to be cleared
+        const BoardLocationClass &tile  //Tile to clear the suspect from
+        );
 
-    void endTurn();
+    //Clears the travel trail of the current player.
+    void clearVisitedTiles();
 
-    //Moves the player one tile over; throws an exception if the move is
+    //Displays the gameplay interface.
+    void displayGameInterface();
+
+    //Refreshes the display controls for THIS player.
+    void refreshDisplay();
+
+    //Updates the roll information text on the display.
+    void updateRollInfoText();
+
+    //Updates the detective notes shown on the display for the specified card.
+    void updateDetectiveNotes(
+        CardEnum card                   //Card to update the display for
+        );
+
+    //Makes the default gameplay options visible.
+    void displayDefaultOptions();
+
+    //Makes the room gameplay options visible.
+    void displayRoomOptions();
+
+    //Makes the corner room gameplay options visible.
+    void displayCornerRoomOptions();
+
+    //Disables all controls.
+    void disableAllControls();
+
+    //Enables all controls
+    void enableAllControls();
+
+    //Disables all movement controls.
+    void disableMovementControls();
+
+    //Enables all movement controls.
+    void enableMovementControls();
+
+    //Displays an exception message box with an error message.
+    void displayExceptionMessageBox(
+        ExceptionClass exceptionText    //Exception text
+        ) const;
+
+    //Displays the accusation window when THIS player makes an accusation.
+    void makePlayerAccusation();
+
+    //Displays the suggestion window when THIS player makes a suggestion.
+    void makePlayerSuggestion();
+
+    //GAME MECHANIC FUNCTIONS
+
+    //Deals the cards to the players.
+    void dealCards(
+        DeckClass &cardDeck             //Card deck to deal the cards from
+        );
+
+    //Sets the game up for the host.
+    void setupGame();
+
+    //Starts the current player's turn up before the current player rolls.
+    void startPlayerTurn();
+
+    //Continues the current player's turn after the roll.
+    void continuePlayerTurn();
+
+    //Handles the suggestion.
+    void handleSuggestion(
+        const SuggestionClass &playerSuggestion   //Suggestion posed
+        );
+
+    //Moves the current player one tile over; throws an exception if the move is
     //invalid.
-    void moveCurrentPlayer(const DirectionEnum &direction);
+    void moveCurrentPlayer(
+        const DirectionEnum &direction  //Direction to move in
+        );
 
     //Moves the player through the secret passage.
     void moveCurrentPlayerToSecretPassage();
 
-    void displaySuggestionResults(CardEnum card);
-
-    void handleSuggestion(
-        const SuggestionClass &playerSuggestion
+    //Moves the suspect included in a suggestion after the suggestion is made.
+    void moveSuggestedSuspect(
+        SuspectEnum suggestedSuspect    //Suggested suspect (to be moved)
         );
 
-    //Inline functions
+    //Moves the current player out of the room through a door; throws an
+    //exception if the door number selected is not a valid door number for the
+    //room.  Overloaded to accept either the door location or the door number.
+    void moveCurrentPlayerOutDoor(BoardLocationClass doorLoc);
 
+    void moveCurrentPlayerOutDoor(
+        int doorNumber        //Door number of the door
+        );
+
+    //Finishes the move.
+    void finishMove();
+
+    //Ends the turn and changes the current player to the next player.
+    void endTurn();
+
+    //AI GAMEPLAY FUNCTIONS
+
+    //Takes the specified Ai action.
+    void takeAiAction(
+        const ActionEnum action         //Action to take
+        );
+
+    //GUI SUPPORT FUNCTIONS
+
+    //Gets the suspect assigned to the current player.
     SuspectEnum getCurrentPlayerSuspect() const
     {
       return currentPlayerIter->first;
     }
 
+    //Gets the current player's room.
+    RoomEnum getCurrentPlayerRoom() const
+    {
+      return currentPlayerIter->second.getPlayerLocation().getRoom();
+    }
+
+    //Gets THIS player's hand.
     std::set<CardEnum> getThisPlayerHand() const
     {
       return gameParticipants.find(thisSuspect)->second.getHand();
@@ -177,12 +216,6 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     //Submits the current move.
     void submitMove();
 
-    //Resets the number of human players in the spinbox to 1.
-    void resetHumanPlayersSpin()
-    {
-      humanPlayersSpin->setValue(humanPlayersSpin->minimum());
-    }
-
     //Makes things visible/invisible or enabled/disabled depending on the
     //option buttons and check boxes selected during game setup for networked
     //play.
@@ -193,12 +226,19 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     //play.
     void setLocalOptVis();
 
+    //Updates the difficulty text in the main window.
     void updateDifficultyText(int sliderPosition);
 
     //Toggles the option to leave the room.
     void toggleLeaveRoomOpt()
     {
       leaveRoomOption->setChecked(true);
+    }
+
+    //Resets the number of human players in the spinbox to 1.
+    void resetHumanPlayersSpin()
+    {
+      humanPlayersSpin->setValue(humanPlayersSpin->minimum());
     }
 };
 
