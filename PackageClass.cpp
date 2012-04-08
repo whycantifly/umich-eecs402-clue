@@ -2,6 +2,51 @@
 
 // PRETTY MUCH EVERYTHING IN THIS CLASS IS NON-FUNCTIONAL EXCEPT FOR TESTING
 
+// Beta wrapping initial package to send to client human player
+string PackageClass::wrapSetupPkg(std::map<SuspectEnum, PlayerClass> gameParticipants, SuggestionClass caseFile, SuspectEnum thisSuspect)
+{ 
+  PlayerClass player;
+  int suspNum;
+  int i;
+  string playerToString;
+  stringstream ss;
+  map< SuspectEnum, PlayerClass >::iterator partIter;
+  
+// This iterator not working for some reason...  
+//  for (partIter = gameParticipants.begin(); partIter != gameParticipants.end(); partIter++) ;
+//  {
+//   cout << "Suspect: " << partIter->first << endl;
+//  }
+    
+  // Get number of people in game
+  int numPlayers = (int) gameParticipants.size();
+  // Open SS and start w/ num players
+  ss << numPlayers << " " << endl;
+  
+  // Set iterator to first player (host)
+  partIter = gameParticipants.begin();
+  // Put inside loop?
+  for (i = 0; i < numPlayers; i++)
+  {
+  suspNum = partIter->first;
+  ss << suspNum << " ";
+  player = partIter->second;
+  playerToString =  player.printPlayerToString();
+  ss << playerToString << " " << endl;
+  partIter++;
+  }
+  
+  cout << ss.str() << endl;
+  return(ss.str());
+}
+
+void PackageClass::unwrapSetupPkg(string package)
+{
+return;
+}
+
+/////// TEST FUNCTIONS
+
 // Test to wrap a few things
 string PackageClass::wrapPackage()
 {
@@ -23,40 +68,6 @@ string PackageClass::wrapPackage()
 //  cout << ss.str();
 
   return (ss.str());
-}
-
-// Beta wrapping initial package to send to client human player
-string PackageClass::wrapSetupPkg(std::map<SuspectEnum, PlayerClass> gameParticipants, SuggestionClass caseFile, SuspectEnum thisSuspect)
-{
-  // Iterator through the map
-  
-  PlayerClass player;
-  BoardLocationClass boardloc;
-  int x;
-  int y;
-  bool aiflag;
-  
-  map< SuspectEnum, PlayerClass >::iterator partIter;
-  
-  //print out map contents
-  for (partIter = gameParticipants.begin(); partIter != gameParticipants.end(); partIter++) ;
-  {
-    cout << "Suspect: " << partIter->first << endl;
-  }
-    
-  int mapsize = (int) gameParticipants.size();
-  partIter = gameParticipants.begin();
-  
-  // Put inside loop?
-  player = partIter->second;
-  boardloc = player.getPlayerLocation();
-  x = boardloc.getXCoord();
-  y = boardloc.getYCoord();
-  aiflag = player.getAiFlag();
-  partIter++;
-  
-  cout << "This suspect is: " << thisSuspect << endl;
-  return("tada");
 }
 
 // Test unwrap

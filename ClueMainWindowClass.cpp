@@ -1339,7 +1339,7 @@ void ClueMainWindowClass::startGame()
         string packageString;
         
         // Wrap up package to pass to other networked game(s)
-        package.wrapSetupPkg(gameParticipants, caseFile, thisSuspect);
+        //package.wrapSetupPkg(gameParticipants, caseFile, thisSuspect);
 
         // Hold for client to connect
         cout << "Waiting for client to connect......." << endl;
@@ -1350,10 +1350,17 @@ void ClueMainWindowClass::startGame()
         cout << "Waiting for message from client" << endl;
         serverSock >> message;
         
-        unwrap = package.unwrapPackage(message);
-        cout << "Received message: " << unwrap << endl;
+        //unwrap = package.unwrapPackage(message);
         
-        serverSock << "Sending this data to the client";        
+        cout << "Received message: " << message << endl;
+        
+        serverSock << "Sending this data to the client"; 
+        
+        serverSock >> message;
+        cout << "Received message: " << message << endl;
+        
+        serverSock << "Sending packet #2!";
+        
       }
     }
     else
@@ -1379,15 +1386,20 @@ void ClueMainWindowClass::startGame()
       // Right now on localhost, replace with IP
       ClientSocket cliSock("localhost", 30000);
       
-      packageString = package.wrapPackage();
+      // packageString = package.wrapPackage();
       
       // Send "I'm here message to server!"
       cout << "Sending message to server: " << endl;
-      cliSock << packageString;
+      cliSock << "I'm here!";
       cout << "Waiting for server response" << endl;
       // Get server response!
       cliSock >> reply;
       cout << reply << endl;
+      
+      cliSock << "Send message #2!";
+      cliSock >> reply;
+      cout << reply << endl;
+      
       
       // SetupGame to stop segfaulting for the time being
       setupGame();

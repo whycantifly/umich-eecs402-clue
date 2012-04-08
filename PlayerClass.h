@@ -10,6 +10,12 @@
 #include "BoardLocationClass.h"
 #include "SuggestionClass.h"
 
+//Added for networking
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+using namespace std;
 
 class PlayerClass
 {
@@ -47,7 +53,10 @@ class PlayerClass
         );
 
     //Function Prototypes
-
+    
+    // Prints out PlayerClass to transfer over network
+    string printPlayerToString();
+    
     //Moves the player over one tile; throws an exception if the move is
     //outside the bounds of the board.
     void move(const QImage &currentBoard, const DirectionEnum &direction);
@@ -99,7 +108,7 @@ class PlayerClass
     {
       return movedThisTurnFlag;
     }
-
+    
     //Sets the AI flag.
     void setAiFlag(bool aiValue)
     {

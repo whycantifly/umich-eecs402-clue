@@ -17,10 +17,12 @@ class PackageClass
 {
    public:
    
-   string wrapPackage();
-   
+   // Functions to implement in Clue
    string wrapSetupPkg(std::map<SuspectEnum, PlayerClass> gameParticipants, SuggestionClass caseFile, SuspectEnum thisSuspect);
+   void unwrapSetupPkg(string package);
    
+   // Test functions
+   string wrapPackage();
    int unwrapPackage(string wrappedString);
    
    private:

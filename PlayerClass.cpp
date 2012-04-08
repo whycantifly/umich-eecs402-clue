@@ -38,6 +38,86 @@ PlayerClass::PlayerClass(const bool aiValue, const bool gameHostValue,
   }
 }
 
+// Prints contents of PlayerClass to a string for packet transfer
+// over a network
+string PlayerClass::printPlayerToString()
+{
+  int i;
+   
+  // Get number of cards in hand and set up iterator for set
+  int numCardsInHand = (int) hand.size();
+  set<CardEnum>::iterator cardIter;
+  
+  // Get number of locations this turn and set up iterator
+  int numLocationsVisited = (int) locationsThisTurn.size();
+  set<BoardLocationClass>::iterator numLocsIter;
+      
+//         BoardLocationClass currentLocation; //Current location on the board
+//     bool hostFlag;                      //True = host (or local play);
+//                                         //False = not host
+//     bool aiFlag;                        //True = AI; false = human player
+//     bool movedThisTurnFlag;             //True = moved this turn; false = not
+//     ActionEnum lastAction;              //Last action taken by the player
+//     std::set<CardEnum> hand;            //Cards in the players hand; ordered in
+//                                         //order of CardEnum
+//     int dieRollThisTurn;                //Value of the die roll this turn
+//     int movesLeftThisTurn;              //Moves left to make this turn
+//     std::set<BoardLocationClass> locationsThisTurn;
+//                                         //List of locations player has visited
+//                                         //this turn
+//     std::pair<CardEnum, SuspectEnum> detectiveNotes[NUMBER_OF_CARDS];
+//     DifficultyEnum aiDifficulty;
+  
+  // Open string stream
+  stringstream ss;
+  
+  // Print boring single value stats
+  ss << currentLocation.getXCoord() << " " << currentLocation.getYCoord() 
+    << " " << hostFlag << " " << aiFlag << " " <<
+    movedThisTurnFlag << " " << lastAction << " " 
+    
+    // Print number of cards in hand
+    << numCardsInHand << " " ;
+    
+    // Print cards in this players hand
+    for (cardIter = hand.begin();
+      cardIter != hand.end();
+      cardIter++)
+      {
+      ss << *cardIter << " ";
+      }
+    
+    ss << dieRollThisTurn << " " << movesLeftThisTurn << " "
+    
+    // Print number of locations visited
+    << numLocationsVisited << " ";
+    
+    // Print Locations this turn
+    for (numLocsIter = locationsThisTurn.begin();
+      numLocsIter != locationsThisTurn.end();
+      numLocsIter++)
+      {
+      ss << (*numLocsIter).getXCoord() << " " << (*numLocsIter).getYCoord() << " ";
+      }
+    
+    // Print detective cards
+    for (i = 0;
+      i < NUMBER_OF_CARDS;
+      i++)
+      {
+      ss << detectiveNotes[i].first << " " << detectiveNotes[i].second << " ";
+      }
+    
+    // Print AI difficult
+    ss << aiDifficulty;
+      
+    // End stringstream
+    ss << endl;
+
+  // Return string
+  return (ss.str());
+}
+
 //Moves the player over one tile; throws an exception if the move is
 //outside the bounds of the board.
 void PlayerClass::move(const QImage &currentBoard, const DirectionEnum
