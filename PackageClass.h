@@ -20,7 +20,12 @@ class PackageClass
    // Functions to implement in Clue
    //string wrapSetupPkg(std::map<SuspectEnum, PlayerClass> gameParticipants, SuggestionClass caseFile, SuspectEnum thisSuspect);
    string wrapSetupPkg(std::map<SuspectEnum, PlayerClass> gameParticipants);
+   string wrapCaseFilePkg(SuggestionClass caseFile);
+   SuggestionClass unwrapCaseFilePkg(string caseFilePkg);
    std::map<SuspectEnum, PlayerClass> unwrapSetupPkg(string wrappedPackage);
+   
+   string wrapSuspectEnum(SuspectEnum suspectNum);
+   SuspectEnum unwrapSuspectEnum(string suspectNumStr);
    
    // Test functions
    string wrapPackage();

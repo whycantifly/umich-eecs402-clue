@@ -40,13 +40,64 @@ string PackageClass::wrapSetupPkg(std::map<SuspectEnum, PlayerClass> gamePartici
   return(ss.str());
 }
 
+string PackageClass::wrapCaseFilePkg(SuggestionClass caseFile)
+{ 
+  stringstream ss;
+  
+  // Put info into a stream
+  ss << caseFile.getSuspect() << " " << caseFile.getWeapon() << " " << caseFile.getRoom() << endl;
+
+  return(ss.str());
+}
+
+SuggestionClass PackageClass::unwrapCaseFilePkg(string caseFilePkg)
+{ 
+  istringstream iss;
+  SuggestionClass caseFile;
+  
+  int suspect, weapon, room;
+  
+  iss.str(caseFilePkg);
+  
+  iss >> suspect;
+  iss >> weapon;
+  iss >> room;
+  
+  caseFile = SuggestionClass(SuspectEnum(suspect), WeaponEnum(weapon), RoomEnum(room));
+
+  return(caseFile);
+}
+
+string PackageClass::wrapSuspectEnum(SuspectEnum suspectNum)
+{ 
+  stringstream ss;
+  
+  // Put info into a stream
+  ss << suspectNum << endl;
+
+  return(ss.str());
+}
+
+SuspectEnum PackageClass::unwrapSuspectEnum(string suspectNumStr)
+{ 
+  istringstream iss;
+  
+  int suspectNum;
+  
+  iss.str(suspectNumStr);
+  
+  iss >> suspectNum;
+
+  return(SuspectEnum(suspectNum));
+}
+
+
+
 // Here we unwrap the gameParticipants string which was passed
 std::map<SuspectEnum, PlayerClass> PackageClass::unwrapSetupPkg(string wrappedPackage)
 {
   std::map<SuspectEnum, PlayerClass> gameParticipants;
   map< SuspectEnum, PlayerClass >::iterator partIter;
-  
-  PlayerClass player;
   
   string singlePlayerString;
   istringstream iss;
@@ -54,6 +105,8 @@ std::map<SuspectEnum, PlayerClass> PackageClass::unwrapSetupPkg(string wrappedPa
   int i; // Loop index
   int numPlayers;
   int suspNumber;
+  
+  gameParticipants.clear();
   
   cout << "The Wrapped Package is..." << endl;
   cout << wrappedPackage << endl;
@@ -66,6 +119,8 @@ std::map<SuspectEnum, PlayerClass> PackageClass::unwrapSetupPkg(string wrappedPa
   
   for (i = 0; i < numPlayers; i++)
   {
+    PlayerClass player;
+    
     // Extract suspect number
     iss >> suspNumber;
     
@@ -76,7 +131,7 @@ std::map<SuspectEnum, PlayerClass> PackageClass::unwrapSetupPkg(string wrappedPa
     // Pass string to PlayerClass to roll up
     player.stringToPlayer(singlePlayerString);
     
-    // INSERT SUSPNUMBER AND PLAYERCLASS INTO GAME PARTICIPANTS MAP
+    gameParticipants[SuspectEnum(suspNumber)] = player;
   }
   
   return(gameParticipants);

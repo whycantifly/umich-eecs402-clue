@@ -134,10 +134,14 @@ void PlayerClass::stringToPlayer(string wrappedString)
   int numCardsInHand;
   int cardInHand;
   int numLocationsVisited;
+  int detectCardInt;
+  int detectSuspInt;
+  int aiDifficultyInt;
   
   // First set player X and Y locations
   iss >> x >> y;
-  cout << "x and y = " << x << " " << y << endl;
+  currentLocation = BoardLocationClass(x,y);
+  cout << currentLocation.getXCoord() << " " << currentLocation.getYCoord() << endl;
   
   iss >> hostFlag;
   cout << "hostflag is " << hostFlag << endl;
@@ -147,16 +151,25 @@ void PlayerClass::stringToPlayer(string wrappedString)
   cout << "movedThisTurnFlag is " << movedThisTurnFlag << endl;
   iss >> lastActionInt;
   cout << "lastActionInt is " << lastActionInt << endl;
+  lastAction = ActionEnum(lastActionInt);
   
+  // Cards in hand
   iss >> numCardsInHand;
   cout << "numCardsInHand is " << numCardsInHand << endl;
-  
   for (i = 0; i < numCardsInHand; i++)
     {
     iss >> cardInHand;
-    cout << CardEnum(cardInHand) << endl;
+    //cout << CardEnum(cardInHand) << endl;
     hand.insert(CardEnum(cardInHand));
     }
+    
+      set<CardEnum>::iterator cardIter;
+      for (cardIter = hand.begin();
+      cardIter != hand.end();
+      cardIter++)
+      {
+      cout << *cardIter << " ";
+      }
 
   iss >> dieRollThisTurn;
   cout << "dieRollThisTurn is " << dieRollThisTurn << endl;
@@ -166,18 +179,25 @@ void PlayerClass::stringToPlayer(string wrappedString)
   // Number of locations visited
   iss >> numLocationsVisited;
   cout << "numLocationsVisited is " << numLocationsVisited << endl;
- 
-  // This is the locations visited
-  for (i = 0; i < numLocationsVisited; i++)
+//  for (i = 0; i < numLocationsVisited; i++)
+//  {
+    iss >> x2 >> y2;
+//    locationsThisTurn.insert(BoardLocationClass(x2,y2));
+//  }
+  
+  // Unwrap detective cards
+  for (i = 0; i < NUMBER_OF_CARDS; i++)
   {
-  // BETTER FOR LOOP
-  iss >> x2 >> y2;
-  cout << "x2 and y2 = " << x2 << " " << y2 << endl;
+    iss >> detectCardInt;
+    iss >> detectSuspInt;
+    detectiveNotes[i] = make_pair(CardEnum(detectCardInt), SuspectEnum(detectSuspInt));
   }
   
-  // STILL NEED TO EXTRACT
-  //     std::pair<CardEnum, SuspectEnum> detectiveNotes[NUMBER_OF_CARDS];
-  //     DifficultyEnum aiDifficulty;
+  // Get ai Difficulty - NOT SET
+  iss >> aiDifficultyInt;
+  cout << "aiDifficulty is " << aiDifficultyInt << endl;
+  aiDifficulty = DifficultyEnum(aiDifficultyInt);
+
   return;
 }
 

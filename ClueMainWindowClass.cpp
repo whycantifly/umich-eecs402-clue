@@ -1493,14 +1493,21 @@ void ClueMainWindowClass::startGame()
         string message;
         PackageClass package;
         int unwrap = 0;
-        string packageString;
+        string gameParticipantsPkgStr, caseFilePkgStr, suspectEnumPkgStr;
         
         // Wrap up package to pass to other networked game(s)
-        packageString = package.wrapSetupPkg(gameParticipants);
-        //packageString = package.wrapSetupPkg(gameParticipants, caseFile, thisSuspect);
+        gameParticipantsPkgStr = package.wrapSetupPkg(gameParticipants);
+        caseFilePkgStr = package.wrapCaseFilePkg(caseFile);
+        suspectEnumPkgStr = package.wrapSuspectEnum(thisSuspect);
         
-        cout << packageString << endl;
+        cout << gameParticipantsPkgStr << endl;
         cout << "------" << endl;
+        cout << caseFilePkgStr << endl;
+        cout << "------" << endl;
+        cout << "This suspect is : " << thisSuspect << endl;
+        
+        
+        
         // Hold for client to connect
         cout << "Waiting for client to connect......." << endl;
         server.accept(serverSock);
@@ -1512,13 +1519,31 @@ void ClueMainWindowClass::startGame()
         cout << "Received message: " << message << endl;
         
         // Send package #1 to client
-        serverSock << packageString; 
+        serverSock << gameParticipantsPkgStr; 
         
         serverSock >> message;
         cout << "Done yet? " << message << endl;
         
         // Send package #2 to client
-        serverSock << "Sending packet #2!";
+        serverSock << caseFilePkgStr;
+        
+        serverSock >> message;
+        cout << message << endl;
+        
+        // Send package #3 to client
+        serverSock << suspectEnumPkgStr;
+        
+        serverSock >> message;
+        cout << message << endl;
+        
+        cout << "Number of players is: " << (int) gameParticipants.size() << endl;
+        
+        cout << gameParticipantsPkgStr << endl;
+        cout << caseFilePkgStr << endl;
+        cout << suspectEnumPkgStr << endl;
+        
+        cout << "Server" << endl;
+        cout << currentPlayerIter->first << endl;
         
       }
     }
@@ -1538,7 +1563,10 @@ void ClueMainWindowClass::startGame()
       // Fun things to create
       PackageClass package;
       string packageString;
-      string reply;
+      string reply, caseFilePkgStr, suspectEnumPkgStr;
+      string gameParticipantsPkgStr;
+      
+      gameParticipants.clear();
       
       // Trying to connect to server
       cout << "Attempting to connect to server" << endl;
@@ -1557,21 +1585,112 @@ void ClueMainWindowClass::startGame()
       cliSock >> reply;
       cout << reply << endl;
       
-      package.unwrapSetupPkg(reply);
+      gameParticipants = package.unwrapSetupPkg(reply);
       
       cliSock << "All done, send me #2!";
       
       // Get package #2
-      cliSock >> reply;
-      cout << reply << endl;
+      cliSock >> caseFilePkgStr;
+      cout << caseFilePkgStr << endl;
+      
+      caseFile = package.unwrapCaseFilePkg(caseFilePkgStr);
+      
+      cliSock << "All done, send me #3!";
+      
+      // Get package #3
+      cliSock >> suspectEnumPkgStr;
+      cout << suspectEnumPkgStr << endl;
+      
+      thisSuspect = package.unwrapSuspectEnum(suspectEnumPkgStr);
+      
+      cout << "This suspect is " << thisSuspect << endl;
+      
+      cliSock << "All done, send me #4!";
+      
+      cout << "Number of players is: " << (int) gameParticipants.size() << endl;
+      
+      gameParticipantsPkgStr = package.wrapSetupPkg(gameParticipants);
+      caseFilePkgStr = package.wrapCaseFilePkg(caseFile);
+      suspectEnumPkgStr = package.wrapSuspectEnum(thisSuspect);
+      cout << gameParticipantsPkgStr << endl;
+      cout << caseFilePkgStr << endl;
+      cout << suspectEnumPkgStr << endl;
       
       
-      
-      
+      //setupGame();
       // SetupGame to stop segfaulting for the time being
-      setupGame();
       
-      //currentPlayerIter = gameParticipants.begin();
+      currentPlayerIter = gameParticipants.begin();
+      
+      cout << "Client" << endl;
+      cout << currentPlayerIter->first << endl;
+      
+///////////////////////////////////////////
+
+        //Variable Declarations
+  set<SuspectEnum> availableCharacters;
+  SuspectEnum randomCharacter;
+  DeckClass cardDeck;
+  bool suspectAvailableFlag;
+
+  //Initialize availableCharacters
+  for(SuspectEnum i = SCARLET; i < NUMBER_OF_SUSPECTS;
+      i = SuspectEnum(int(i) + 1))
+  {
+    availableCharacters.insert(i);
+  }
+
+  //Make sure there are between 3 and 6 players
+  if((humanPlayersSpin->value() + computerPlayersSpin->value()) < MIN_PLAYERS ||
+      (humanPlayersSpin->value() + computerPlayersSpin->value() > MAX_PLAYERS))
+  {
+//    throw(ExceptionClass("Error setting up game", "You must have a minimum of "
+//        "3 and a maximum of 6 players to start a game."));
+  }
+
+// //Add players to gameParticipants
+//   gameParticipants.clear();
+//   for(int i = 0; i < humanPlayersSpin->value() + computerPlayersSpin->value();
+//       i++)
+//   {
+//     //Assign a random character to the player
+//     do
+//     {
+//       randomCharacter = SuspectEnum(rand() % NUMBER_OF_SUSPECTS);
+// 
+//       if(availableCharacters.find(randomCharacter) != availableCharacters.end())
+//       {
+//         gameParticipants.insert(pair<SuspectEnum, PlayerClass>(randomCharacter,
+//             PlayerClass(i >= humanPlayersSpin->value(), i == 0,
+//             STARTING_LOCATIONS[randomCharacter], DifficultyEnum(
+//             difficultySlider->value()))));
+// 
+//         if(i == 0)
+//         {
+//           thisSuspect = randomCharacter;
+//           youAreText->setText("You are " + CARD_VALUES[randomCharacter] + ".");
+//         }
+//         suspectAvailableFlag = true;
+//         availableCharacters.erase(randomCharacter);
+//       }
+//       else
+//       {
+//         suspectAvailableFlag = false;
+//       }
+//     }
+//     while(suspectAvailableFlag == false);
+//   }
+
+  currentPlayerIter = gameParticipants.begin();
+
+//  Make the case file and deal out the remaining cards
+  caseFile = cardDeck.createCaseFile();
+  dealCards(cardDeck);
+  
+  
+  /////////////////////////////////////
+  
+  
 
     }
 
