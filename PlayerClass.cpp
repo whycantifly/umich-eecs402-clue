@@ -113,10 +113,72 @@ string PlayerClass::printPlayerToString()
     ss << aiDifficulty;
       
     // End stringstream
-    ss << endl;
+    //ss << endl;
 
   // Return string
   return (ss.str());
+}
+
+// Takes player string from over network and re-encodes it
+void PlayerClass::stringToPlayer(string wrappedString)
+{
+  istringstream iss;
+  iss.str(wrappedString);
+  
+  int i;  // Loop iter
+  int x;  // x loc to be put in BoardLocationClass
+  int y;  // y loc to be put in BoardLocationClass
+  int x2;
+  int y2;
+  int lastActionInt;  // last i
+  int numCardsInHand;
+  int cardInHand;
+  int numLocationsVisited;
+  
+  // First set player X and Y locations
+  iss >> x >> y;
+  cout << "x and y = " << x << " " << y << endl;
+  
+  iss >> hostFlag;
+  cout << "hostflag is " << hostFlag << endl;
+  iss >> aiFlag;
+  cout << "aiFlag is " << aiFlag << endl;
+  iss >> movedThisTurnFlag;
+  cout << "movedThisTurnFlag is " << movedThisTurnFlag << endl;
+  iss >> lastActionInt;
+  cout << "lastActionInt is " << lastActionInt << endl;
+  
+  iss >> numCardsInHand;
+  cout << "numCardsInHand is " << numCardsInHand << endl;
+  
+  for (i = 0; i < numCardsInHand; i++)
+    {
+    iss >> cardInHand;
+    cout << CardEnum(cardInHand) << endl;
+    hand.insert(CardEnum(cardInHand));
+    }
+
+  iss >> dieRollThisTurn;
+  cout << "dieRollThisTurn is " << dieRollThisTurn << endl;
+  iss >> movesLeftThisTurn;
+  cout << "movesLeftThisTurn is " << movesLeftThisTurn << endl;
+  
+  // Number of locations visited
+  iss >> numLocationsVisited;
+  cout << "numLocationsVisited is " << numLocationsVisited << endl;
+ 
+  // This is the locations visited
+  for (i = 0; i < numLocationsVisited; i++)
+  {
+  // BETTER FOR LOOP
+  iss >> x2 >> y2;
+  cout << "x2 and y2 = " << x2 << " " << y2 << endl;
+  }
+  
+  // STILL NEED TO EXTRACT
+  //     std::pair<CardEnum, SuspectEnum> detectiveNotes[NUMBER_OF_CARDS];
+  //     DifficultyEnum aiDifficulty;
+  return;
 }
 
 //Moves the player over one tile; throws an exception if the move is

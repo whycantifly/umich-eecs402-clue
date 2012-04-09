@@ -1496,26 +1496,28 @@ void ClueMainWindowClass::startGame()
         string packageString;
         
         // Wrap up package to pass to other networked game(s)
-        //package.wrapSetupPkg(gameParticipants, caseFile, thisSuspect);
-
+        packageString = package.wrapSetupPkg(gameParticipants);
+        //packageString = package.wrapSetupPkg(gameParticipants, caseFile, thisSuspect);
+        
+        cout << packageString << endl;
+        cout << "------" << endl;
         // Hold for client to connect
         cout << "Waiting for client to connect......." << endl;
         server.accept(serverSock);
         cout << "The client connected!" << endl;
       
         // Test stuff
-        cout << "Waiting for message from client" << endl;
-        serverSock >> message;
-        
-        //unwrap = package.unwrapPackage(message);
-        
-        cout << "Received message: " << message << endl;
-        
-        serverSock << "Sending this data to the client"; 
-        
+        cout << "Confirmation from client?" << endl;
         serverSock >> message;
         cout << "Received message: " << message << endl;
         
+        // Send package #1 to client
+        serverSock << packageString; 
+        
+        serverSock >> message;
+        cout << "Done yet? " << message << endl;
+        
+        // Send package #2 to client
         serverSock << "Sending packet #2!";
         
       }
@@ -1548,14 +1550,22 @@ void ClueMainWindowClass::startGame()
       // Send "I'm here message to server!"
       cout << "Sending message to server: " << endl;
       cliSock << "I'm here!";
-      cout << "Waiting for server response" << endl;
-      // Get server response!
+      
+      cout << "Waiting for server packets" << endl;
+      
+      // Get package #1!
       cliSock >> reply;
       cout << reply << endl;
       
-      cliSock << "Send message #2!";
+      package.unwrapSetupPkg(reply);
+      
+      cliSock << "All done, send me #2!";
+      
+      // Get package #2
       cliSock >> reply;
       cout << reply << endl;
+      
+      
       
       
       // SetupGame to stop segfaulting for the time being

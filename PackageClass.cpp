@@ -3,7 +3,8 @@
 // PRETTY MUCH EVERYTHING IN THIS CLASS IS NON-FUNCTIONAL EXCEPT FOR TESTING
 
 // Beta wrapping initial package to send to client human player
-string PackageClass::wrapSetupPkg(std::map<SuspectEnum, PlayerClass> gameParticipants, SuggestionClass caseFile, SuspectEnum thisSuspect)
+//string PackageClass::wrapSetupPkg(std::map<SuspectEnum, PlayerClass> gameParticipants, SuggestionClass caseFile, SuspectEnum thisSuspect)
+string PackageClass::wrapSetupPkg(std::map<SuspectEnum, PlayerClass> gameParticipants)
 { 
   PlayerClass player;
   int suspNum;
@@ -21,7 +22,7 @@ string PackageClass::wrapSetupPkg(std::map<SuspectEnum, PlayerClass> gamePartici
   // Get number of people in game
   int numPlayers = (int) gameParticipants.size();
   // Open SS and start w/ num players
-  ss << numPlayers << " " << endl;
+  ss << numPlayers << " " ;
   
   // Set iterator to first player (host)
   partIter = gameParticipants.begin();
@@ -35,15 +36,52 @@ string PackageClass::wrapSetupPkg(std::map<SuspectEnum, PlayerClass> gamePartici
   ss << playerToString << " " << endl;
   partIter++;
   }
-  
-  cout << ss.str() << endl;
+
   return(ss.str());
 }
 
-void PackageClass::unwrapSetupPkg(string package)
+// Here we unwrap the gameParticipants string which was passed
+std::map<SuspectEnum, PlayerClass> PackageClass::unwrapSetupPkg(string wrappedPackage)
 {
-return;
+  std::map<SuspectEnum, PlayerClass> gameParticipants;
+  map< SuspectEnum, PlayerClass >::iterator partIter;
+  
+  PlayerClass player;
+  
+  string singlePlayerString;
+  istringstream iss;
+  
+  int i; // Loop index
+  int numPlayers;
+  int suspNumber;
+  
+  cout << "The Wrapped Package is..." << endl;
+  cout << wrappedPackage << endl;
+  
+  // Set wrapped package to iss
+  iss.str(wrappedPackage);
+  
+  // Get number of players
+  iss >> numPlayers;
+  
+  for (i = 0; i < numPlayers; i++)
+  {
+    // Extract suspect number
+    iss >> suspNumber;
+    
+    // Get singlePlayerString
+    getline( iss, singlePlayerString );
+    cout << singlePlayerString << endl;
+    
+    // Pass string to PlayerClass to roll up
+    player.stringToPlayer(singlePlayerString);
+    
+    // INSERT SUSPNUMBER AND PLAYERCLASS INTO GAME PARTICIPANTS MAP
+  }
+  
+  return(gameParticipants);
 }
+
 
 /////// TEST FUNCTIONS
 

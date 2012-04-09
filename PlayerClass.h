@@ -59,6 +59,9 @@ class PlayerClass
     // Prints out PlayerClass to transfer over network
     string printPlayerToString();
     
+    // Takes string from over network and unwraps it into playerClass
+    void stringToPlayer(string wrappedString);
+    
     //Moves the player over one tile; throws an exception if the move is
     //outside the bounds of the board.
     void move(const QImage &currentBoard, const DirectionEnum &direction);
