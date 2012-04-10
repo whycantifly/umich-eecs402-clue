@@ -274,7 +274,7 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     //Opens the Clue rules page
     void openClueRules()
     {
-      QDesktopServices::openUrl(QUrl("http://www.hasbro.com/common/instruct/clueins.pdf"));
+      QDesktopServices::openUrl(QUrl("files/clueins.pdf"));
     }
 };
 

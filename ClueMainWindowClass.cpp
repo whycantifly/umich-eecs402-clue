@@ -17,9 +17,7 @@
 #include "ExceptionClass.h"
 #include "SuggestionDialogClass.h"
 #include "SuggestionClass.h"
-#include "roomToCard.h"
-#include "suspectToCard.h"
-#include "weaponToCard.h"
+#include "getCard.h"
 #include "getStartingDoorIndex.h"
 
 using namespace std;
@@ -459,7 +457,7 @@ void ClueMainWindowClass::refreshDisplay()
   {
     enableAllControls();
     currentTurnText->setText("It is your turn.  " +
-        CARD_VALUES[suspectToCard(nextPlayerIter->first)] +
+        CARD_VALUES[getCard(nextPlayerIter->first)] +
         "'s turn is next.");
   }
   else
@@ -467,14 +465,14 @@ void ClueMainWindowClass::refreshDisplay()
     if(nextPlayerIter->first == thisSuspect)
     {
       currentTurnText->setText("It is " +
-          CARD_VALUES[suspectToCard(currentPlayerIter->first)]
+          CARD_VALUES[getCard(currentPlayerIter->first)]
           + "'s turn.  Your turn is next.");
     }
     else
     {
       currentTurnText->setText("It is " +
-          CARD_VALUES[suspectToCard(currentPlayerIter->first)]
-          + "'s turn.  " + CARD_VALUES[suspectToCard(nextPlayerIter->first)]
+          CARD_VALUES[getCard(currentPlayerIter->first)]
+          + "'s turn.  " + CARD_VALUES[getCard(nextPlayerIter->first)]
           + "'s turn is next.");
     }
     disableAllControls();
@@ -494,7 +492,7 @@ void ClueMainWindowClass::updateRollInfoText()
 
   if(currentPlayerIter->first != thisSuspect)
   {
-    suspectName = CARD_VALUES[suspectToCard(currentPlayerIter->first)];
+    suspectName = CARD_VALUES[getCard(currentPlayerIter->first)];
     haveTense = "has";
     isTense = "is";
   }
@@ -508,7 +506,7 @@ void ClueMainWindowClass::updateRollInfoText()
       == ROOM_TILE && currentPlayerIter->second.getLastAction() == MOVE)
   {
     rollInfoText->setText(suspectName + " just entered the " +
-        CARD_VALUES[roomToCard(currentPlayerIter->second.
+        CARD_VALUES[getCard(currentPlayerIter->second.
         getPlayerLocation().getRoom())] + " and " + haveTense +
         " no more moves left.");
   }
@@ -518,7 +516,7 @@ void ClueMainWindowClass::updateRollInfoText()
       getLastAction() != ROLL)
   {
     rollInfoText->setText(suspectName + " " + isTense + " in the " +
-        CARD_VALUES[roomToCard(currentPlayerIter->second.getPlayerLocation().
+        CARD_VALUES[getCard(currentPlayerIter->second.getPlayerLocation().
             getRoom())] + ".");
   }
   else
@@ -606,7 +604,7 @@ void ClueMainWindowClass::updateDetectiveNotes(CardEnum updatedCard)
       break;
   }
   textToUpdatePtr->setText("<span style='color:#ff0000;'>" +
-      CARD_VALUES[suspectToCard(gameParticipants.find(thisSuspect)->second.
+      CARD_VALUES[getCard(gameParticipants.find(thisSuspect)->second.
       getDetectiveNotes(updatedCard))] + "</span>");
 }
 
@@ -929,7 +927,7 @@ void ClueMainWindowClass::handleSuggestion(const SuggestionClass
   CardEnum revealedCard;
   HandleSuggestionDialogClass playerSuggestionDialog(this);
   QString revealer;
-  QString suggester = CARD_VALUES[suspectToCard(currentPlayerIter->first)];
+  QString suggester = CARD_VALUES[getCard(currentPlayerIter->first)];
 
   playerSuggestionDialog.setWindowFlags((playerSuggestionDialog.windowFlags()
       | Qt::CustomizeWindowHint) & ~Qt::WindowCloseButtonHint);
@@ -954,11 +952,11 @@ void ClueMainWindowClass::handleSuggestion(const SuggestionClass
         thisSuspect)->second.getGameOverFlag() == false)
     {
       suggestionMessage.setWindowTitle("Suggestion");
-      suggestionMessage.setText(CARD_VALUES[suspectToCard(
+      suggestionMessage.setText(CARD_VALUES[getCard(
           currentPlayerIter->first)] + " suggests that the crime was "
-          "committed in the " + CARD_VALUES[roomToCard(suggestion.getRoom())]
-          + " by " + CARD_VALUES[suspectToCard(suggestion.getSuspect())] +
-          " with the " + CARD_VALUES[weaponToCard(suggestion.getWeapon())]);
+          "committed in the " + CARD_VALUES[getCard(suggestion.getRoom())]
+          + " by " + CARD_VALUES[getCard(suggestion.getSuspect())] +
+          " with the " + CARD_VALUES[getCard(suggestion.getWeapon())]);
       suggestionMessage.exec();
     }
     moveSuggestedSuspect(suggestion.getSuspect());
@@ -976,7 +974,7 @@ void ClueMainWindowClass::handleSuggestion(const SuggestionClass
 
   checkSuggestionAcknowledged();
 
-  revealer = CARD_VALUES[suspectToCard(playerIter->first)];
+  revealer = CARD_VALUES[getCard(playerIter->first)];
 
   if(playerIter != currentPlayerIter)
   {
@@ -1053,7 +1051,7 @@ void ClueMainWindowClass::handleSuggestion(const SuggestionClass
       //All other players/ais
       else
       {
-        suggestionMessage.setText(CARD_VALUES[int(suspectToCard(
+        suggestionMessage.setText(CARD_VALUES[int(getCard(
             playerIter->first))] + " cannot disprove the suggestion.");
       }
       //Comment to test Ai
@@ -1074,7 +1072,7 @@ void ClueMainWindowClass::handleAccusation(const SuggestionClass
 {
   //Variable Declarations
   QMessageBox accusationMessage;
-  QString playerName = CARD_VALUES[suspectToCard(currentPlayerIter->first)];
+  QString playerName = CARD_VALUES[getCard(currentPlayerIter->first)];
   QString haveTense = "has";
   bool activePlayersFlag = false;
   map<SuspectEnum, PlayerClass>::iterator playerIter = gameParticipants.begin();
@@ -1099,9 +1097,9 @@ void ClueMainWindowClass::handleAccusation(const SuggestionClass
     if(currentPlayerIter->first != thisSuspect)
     {
       accusationMessage.setText(playerName + " accused " + CARD_VALUES
-          [suspectToCard(playerAccusation.getSuspect())] + " of committing the "
-          "crime in the " + CARD_VALUES[roomToCard(playerAccusation.getRoom())]
-          + " with the " + CARD_VALUES[weaponToCard(playerAccusation.
+          [getCard(playerAccusation.getSuspect())] + " of committing the "
+          "crime in the " + CARD_VALUES[getCard(playerAccusation.getRoom())]
+          + " with the " + CARD_VALUES[getCard(playerAccusation.
           getWeapon())] + ".<br>" + accusationMessage.text());
     }
 
@@ -1144,9 +1142,9 @@ void ClueMainWindowClass::handleAccusation(const SuggestionClass
     {
       accusationMessage.setText("Game Over");
       accusationMessage.setText(playerName + " accused " + CARD_VALUES
-        [suspectToCard(playerAccusation.getSuspect())] + " of committing the "
-        "crime in the " + CARD_VALUES[roomToCard(playerAccusation.getRoom())] +
-        " with the " + CARD_VALUES[weaponToCard(playerAccusation.getWeapon())] +
+        [getCard(playerAccusation.getSuspect())] + " of committing the "
+        "crime in the " + CARD_VALUES[getCard(playerAccusation.getRoom())] +
+        " with the " + CARD_VALUES[getCard(playerAccusation.getWeapon())] +
         ".<br>" + accusationMessage.text());
     }
 

@@ -4,9 +4,9 @@
 #include "enums.h"
 #include "ExceptionClass.h"
 #include "SuggestionClass.h"
-#include "cardToSuspect.h"
-#include "cardToWeapon.h"
-#include "cardToRoom.h"
+#include "getRoom.h"
+#include "getSuspect.h"
+#include "getWeapon.h"
 
 DeckClass::DeckClass()
 {
@@ -68,10 +68,10 @@ SuggestionClass DeckClass::createCaseFile()
 
     try
     {
-      cardToSuspect(randomCard);
+      getSuspect(randomCard);
       if(haveSuspectFlag == false)
       {
-        suspect = cardToSuspect(randomCard);
+        suspect = getSuspect(randomCard);
         removeCard(randomCard);
         haveSuspectFlag = true;
       }
@@ -80,10 +80,10 @@ SuggestionClass DeckClass::createCaseFile()
     {
       try
       {
-        cardToWeapon(randomCard);
+        getWeapon(randomCard);
         if(haveWeaponFlag == false)
         {
-          weapon = cardToWeapon(randomCard);
+          weapon = getWeapon(randomCard);
           removeCard(randomCard);
           haveWeaponFlag = true;
         }
@@ -92,7 +92,7 @@ SuggestionClass DeckClass::createCaseFile()
       {
         if(haveRoomFlag == false)
         {
-          room = cardToRoom(randomCard);
+          room = getRoom(randomCard);
           removeCard(randomCard);
           haveRoomFlag = true;
         }
