@@ -311,6 +311,8 @@ void ClueMainWindowClass::clearVisitedTiles()
 //Function used for all human players
 void ClueMainWindowClass::displayGameInterface()
 {
+  youAreText->setText("You are " + CARD_VALUES[thisSuspect] + ".");
+
   //Make gameplay interface visible
   currentTurnText->setVisible(true);
   rollInfoText->setVisible(true);
@@ -820,7 +822,6 @@ void ClueMainWindowClass::setupGame()
         if(i == 0)
         {
           thisSuspect = randomCharacter;
-          youAreText->setText("You are " + CARD_VALUES[randomCharacter] + ".");
         }
         suspectAvailableFlag = true;
         availableCharacters.erase(randomCharacter);
