@@ -52,29 +52,13 @@ string PlayerClass::printPlayerToString()
   // Get number of locations this turn and set up iterator
   int numLocationsVisited = (int) locationsThisTurn.size();
   set<BoardLocationClass>::iterator numLocsIter;
-      
-//         BoardLocationClass currentLocation; //Current location on the board
-//     bool hostFlag;                      //True = host (or local play);
-//                                         //False = not host
-//     bool aiFlag;                        //True = AI; false = human player
-//     bool movedThisTurnFlag;             //True = moved this turn; false = not
-//     ActionEnum lastAction;              //Last action taken by the player
-//     std::set<CardEnum> hand;            //Cards in the players hand; ordered in
-//                                         //order of CardEnum
-//     int dieRollThisTurn;                //Value of the die roll this turn
-//     int movesLeftThisTurn;              //Moves left to make this turn
-//     std::set<BoardLocationClass> locationsThisTurn;
-//                                         //List of locations player has visited
-//                                         //this turn
-//     std::pair<CardEnum, SuspectEnum> detectiveNotes[NUMBER_OF_CARDS];
-//     DifficultyEnum aiDifficulty;
   
   // Open string stream
   stringstream ss;
   
   // Print boring single value stats
   ss << currentLocation.getXCoord() << " " << currentLocation.getYCoord() 
-    << " " << hostFlag << " " << aiFlag << " " <<
+    << " " << hostFlag << " " << aiFlag << " " << gameOverFlag << " " <<
     movedThisTurnFlag << " " << lastAction << " " 
     
     // Print number of cards in hand
@@ -110,10 +94,10 @@ string PlayerClass::printPlayerToString()
       }
     
     // Print AI difficult
-    ss << aiDifficulty;
+    ss << aiDifficulty << " ";
       
     // End stringstream
-    //ss << endl;
+    ss << endl;
 
   // Return string
   return (ss.str());
@@ -138,6 +122,8 @@ void PlayerClass::stringToPlayer(string wrappedString)
   int detectSuspInt;
   int aiDifficultyInt;
   
+  hand.clear();
+  
   // First set player X and Y locations
   iss >> x >> y;
   currentLocation = BoardLocationClass(x,y);
@@ -147,6 +133,8 @@ void PlayerClass::stringToPlayer(string wrappedString)
   cout << "hostflag is " << hostFlag << endl;
   iss >> aiFlag;
   cout << "aiFlag is " << aiFlag << endl;
+  iss >> gameOverFlag;
+  cout << "gameOverFlag is " << gameOverFlag << endl;
   iss >> movedThisTurnFlag;
   cout << "movedThisTurnFlag is " << movedThisTurnFlag << endl;
   iss >> lastActionInt;
@@ -170,6 +158,8 @@ void PlayerClass::stringToPlayer(string wrappedString)
       {
       cout << *cardIter << " ";
       }
+      
+      cout << endl;
 
   iss >> dieRollThisTurn;
   cout << "dieRollThisTurn is " << dieRollThisTurn << endl;
@@ -179,11 +169,11 @@ void PlayerClass::stringToPlayer(string wrappedString)
   // Number of locations visited
   iss >> numLocationsVisited;
   cout << "numLocationsVisited is " << numLocationsVisited << endl;
-//  for (i = 0; i < numLocationsVisited; i++)
-//  {
+  for (i = 0; i < numLocationsVisited; i++)
+  {
     iss >> x2 >> y2;
-//    locationsThisTurn.insert(BoardLocationClass(x2,y2));
-//  }
+    locationsThisTurn.insert(BoardLocationClass(x2,y2));
+  }
   
   // Unwrap detective cards
   for (i = 0; i < NUMBER_OF_CARDS; i++)
