@@ -6,6 +6,9 @@
 
 inline CardTypeEnum getCardType(CardEnum card)
 {
+  //Variable Declarations
+  QString cardValue;
+
   if(int(card) < NUMBER_OF_SUSPECTS)
   {
     return SUSPECT_CARD;
@@ -14,9 +17,14 @@ inline CardTypeEnum getCardType(CardEnum card)
   {
     return WEAPON_CARD;
   }
-  else
+  else if(int(card) < NUMBER_OF_CARDS)
   {
     return ROOM_CARD;
+  }
+  else
+  {
+    cardValue.setNum(card);
+    throw(ExceptionClass(cardValue + " is an invalid card value."));
   }
 }
 

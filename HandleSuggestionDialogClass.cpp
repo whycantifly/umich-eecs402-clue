@@ -5,9 +5,7 @@
 #include "enums.h"
 #include "ClueMainWindowClass.h"
 #include "SuggestionDialogClass.h"
-#include "roomToCard.h"
-#include "suspectToCard.h"
-#include "weaponToCard.h"
+#include "getCard.h"
 
 using namespace std;
 
@@ -32,11 +30,11 @@ void HandleSuggestionDialogClass::setupDialogBox(SuggestionClass *suggestionPtr,
   suggPtr = suggestionPtr;
   cardToRevealPtr = cardPtr;
 
-  suggestionInfo->setText(CARD_VALUES[suspectToCard(currentPlayerChar)]
+  suggestionInfo->setText(CARD_VALUES[getCard(currentPlayerChar)]
       + " suggested that the crime was committed in the " +
-      CARD_VALUES[roomToCard(suggestionPtr->getRoom())] + " by " +
-      CARD_VALUES[suspectToCard(suggestionPtr->getSuspect())] + " with the "
-      + CARD_VALUES[weaponToCard(suggestionPtr->getWeapon())] + ".");
+      CARD_VALUES[getCard(suggestionPtr->getRoom())] + " by " +
+      CARD_VALUES[getCard(suggestionPtr->getSuspect())] + " with the "
+      + CARD_VALUES[getCard(suggestionPtr->getWeapon())] + ".");
 
   for(handIter = hand.begin(); handIter != hand.end(); handIter++)
   {

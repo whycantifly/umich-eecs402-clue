@@ -6,12 +6,10 @@
 #include "enums.h"
 #include "BoardLocationClass.h"
 #include "ExceptionClass.h"
-#include "cardToSuspect.h"
-#include "cardToWeapon.h"
-#include "cardToRoom.h"
-#include "roomToCard.h"
-#include "suspectToCard.h"
-#include "weaponToCard.h"
+#include "getCard.h"
+#include "getRoom.h"
+#include "getSuspect.h"
+#include "getWeapon.h"
 #include "getStartingDoorIndex.h"
 #include "getDoorsForRoom.h"
 #include "getCardType.h"
@@ -344,19 +342,19 @@ set<CardEnum> PlayerClass::getSuggestionMatches(SuggestionClass suggestion)
   set<CardEnum> cardMatches;
   CardEnum cardToAdd;
 
-  if(hand.find(suspectToCard(suggestion.getSuspect())) != hand.end())
+  if(hand.find(getCard(suggestion.getSuspect())) != hand.end())
   {
-    cardToAdd = *hand.find(suspectToCard(suggestion.getSuspect()));
+    cardToAdd = *hand.find(getCard(suggestion.getSuspect()));
     cardMatches.insert(cardToAdd);
   }
-  if(hand.find(weaponToCard(suggestion.getWeapon())) != hand.end())
+  if(hand.find(getCard(suggestion.getWeapon())) != hand.end())
   {
-    cardToAdd = *hand.find(weaponToCard(suggestion.getWeapon()));
+    cardToAdd = *hand.find(getCard(suggestion.getWeapon()));
     cardMatches.insert(cardToAdd);
   }
-  if(hand.find(roomToCard(suggestion.getRoom())) != hand.end())
+  if(hand.find(getCard(suggestion.getRoom())) != hand.end())
   {
-    cardToAdd = *hand.find(roomToCard(suggestion.getRoom()));
+    cardToAdd = *hand.find(getCard(suggestion.getRoom()));
     cardMatches.insert(cardToAdd);
   }
 
@@ -751,13 +749,13 @@ SuggestionClass PlayerClass::makeAiAccusation() const
           switch(getCardType(detectiveNotes[i].first))
           {
             case SUSPECT_CARD:
-              suspect = cardToSuspect(detectiveNotes[i].first);
+              suspect = getSuspect(detectiveNotes[i].first);
               break;
             case WEAPON_CARD:
-              weapon = cardToWeapon(detectiveNotes[i].first);
+              weapon = getWeapon(detectiveNotes[i].first);
               break;
             case ROOM_CARD:
-              room = cardToRoom(detectiveNotes[i].first);
+              room = getRoom(detectiveNotes[i].first);
               break;
           }
           missingEntries++;
