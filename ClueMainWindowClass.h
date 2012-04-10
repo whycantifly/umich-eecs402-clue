@@ -40,6 +40,7 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
                                   //Iterator pointing to the current player
     SuggestionClass caseFile;     //Case file include details of the crime
     SuspectEnum thisSuspect;      //Suspect controlled by THIS player
+    int aiMoveDelay;              //Delay of Ai moves in milliseconds
 
   public:
     //CONSTRUCTORS
@@ -265,6 +266,12 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     void resetHumanPlayersSpin()
     {
       humanPlayersSpin->setValue(humanPlayersSpin->minimum());
+    }
+
+    //Opens the Clue rules page
+    void openClueRules()
+    {
+      QDesktopServices::openUrl(QUrl("http://www.hasbro.com/common/instruct/clueins.pdf"));
     }
 };
 

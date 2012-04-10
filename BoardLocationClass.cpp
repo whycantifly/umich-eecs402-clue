@@ -147,27 +147,23 @@ void BoardLocationClass::move(const QImage &currentBoard,
 {
   BoardLocationClass newLocation = getTileInDir(direction);
 
-  if(newLocation.checkBoardBounds() == false)
+  if(newLocation.checkBoardBounds() == false || newLocation.getTileType
+      (currentBoard) == OUT_OF_BOUNDS_TILE)
   {
-    throw(ExceptionClass("Invalid Move", "That tile is not within the bounds "
-        "of the board.  Please try another move."));
-  }
-
-  if(newLocation.getTileType(currentBoard) == OUT_OF_BOUNDS_TILE)
-  {
-    throw(ExceptionClass("That tile is not within the bounds of the "
-        "board.  Please try another move."));
+    throw(ExceptionClass("That tile is not within the bounds of the board.  "
+        "Please select another move and try again."));
   }
 
   if(newLocation.getTileType(currentBoard) == OCCUPIED_TILE)
   {
     throw(ExceptionClass("That tile is occupied by another player.  "
-        "Please try another move."));
+        "Please select another move and try again."));
   }
 
   if(newLocation.getTileType(currentBoard) == VISITED_TILE)
   {
-    throw(ExceptionClass("You have already visited that tile this turn."));
+    throw(ExceptionClass("You have already visited that tile this turn.  "
+        "Please select another move and try again."));
   }
 
   if(newLocation.getTileType(currentBoard) == ROOM_TILE)
@@ -180,7 +176,8 @@ void BoardLocationClass::move(const QImage &currentBoard,
     catch(ExceptionClass notADoor)
     {
       throw(ExceptionClass("That tile is on the other side of a wall.  You "
-          "must use a door to enter a room.  Please try another move."));
+          "must use a door to enter a room.  Please select another move and "
+          "try again."));
     }
   }
   *this = newLocation;

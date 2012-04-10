@@ -43,6 +43,7 @@ ClueMainWindowClass::ClueMainWindowClass() : QWidget()
   connect(startGameButton, SIGNAL(clicked()), this, SLOT(startGame()));
   connect(difficultySlider, SIGNAL(valueChanged(int)), this,
       SLOT(updateDifficultyText(int)));
+  connect(helpButton, SIGNAL(clicked()), this, SLOT(openClueRules()));
 
   //Setup the board
   setupNewBoard();
@@ -782,6 +783,8 @@ void ClueMainWindowClass::setupGame()
   DeckClass cardDeck;
   bool suspectAvailableFlag;
 
+  aiMoveDelay = HOST_AI_DELAY;
+
   //Initialize availableCharacters
   for(SuspectEnum i = SCARLET; i < NUMBER_OF_SUSPECTS;
       i = SuspectEnum(int(i) + 1))
@@ -1164,16 +1167,25 @@ void ClueMainWindowClass::handleAccusation(const SuggestionClass
       if(gameParticipants.find(thisSuspect)->second.getGameOverFlag() == true)
       {
         accusationMessage.setText("All human players have been eliminated.  "
-            "Would you like to play again?");
+            "Would you like to watch the Ai players finish the game?");
       }
 
       if(accusationMessage.exec() == QMessageBox::Yes)
       {
-        setupNewBoard();
+        aiMoveDelay = AI_ONLY_DELAY;
+        endTurn();
       }
       else
       {
-        close();
+        accusationMessage.setText("Would you like to play again?");
+        if(accusationMessage.exec() == QMessageBox::Yes)
+        {
+          setupNewBoard();
+        }
+        else
+        {
+          close();
+        }
       }
     }
   }
@@ -1351,9 +1363,9 @@ BoardLocationClass targetDoorLocation;
       break;
     case USE_SECRET_PASSAGE:
       moveCurrentPlayerToSecretPassage();
-      QTest::qWait(HOST_AI_DELAY / 2);
+      QTest::qWait(aiMoveDelay);
       takeAiAction(SUGGEST);
-      QTest::qWait(HOST_AI_DELAY / 2);
+      QTest::qWait(aiMoveDelay);
       break;
     case MOVE:
       try
@@ -1374,10 +1386,10 @@ BoardLocationClass targetDoorLocation;
             aiPlayerIter == currentPlayerIter && currentPlayerIter->second.
             getPlayerLocation().getTileType(CLUE_BOARD_IMAGE) == UNOCCUPIED_TILE)
         {
-          QTest::qWait(HOST_AI_DELAY / 2);
+          QTest::qWait(aiMoveDelay);
           moveCurrentPlayer(currentPlayerIter->second.getAiMove(
               inProgressBoardImage, targetDoorLocation));
-          QTest::qWait(HOST_AI_DELAY / 2);
+          QTest::qWait(aiMoveDelay);
         }
 
         //Make a suggestion if the player is in a room
