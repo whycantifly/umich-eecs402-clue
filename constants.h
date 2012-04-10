@@ -17,7 +17,9 @@ const int REMOTE_PLAYER_DELAY = 175;
 
 const SuggestionClass EMPTY_SUGGESTION;
 
-const std::queue<DirectionEnum> EMPTY_MOVE_LIST;
+const BoardLocationClass EMPTY_LOCATION;
+
+const int DEFAULT_DIE_ROLL = 0;
 
 const QString CARD_VALUES[21] = {"Miss Scarlet", "Col. Mustard", "Mrs. White",
     "Mr. Green", "Mrs. Peacock", "Prof. Plum", "Knife", "Candlestick",

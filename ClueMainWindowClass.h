@@ -194,11 +194,14 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     //NETWORK FUNCTIONS
 
     //Sends turn information to remote players.
-    void sendRemoteTurnInfo(
+    void sendRemoteMoveInfo(
         ActionEnum playerAction,                //Remote player action
-        int dieRoll,                            //Remote player die roll
-        BoardLocationClass locationAfterMove,   //Location after this move
-        SuggestionClass suggestionMade
+        int dieRoll = DEFAULT_DIE_ROLL,         //Remote player die roll
+        BoardLocationClass locationAfterMove = EMPTY_LOCATION,
+                                                //Location after this move
+        SuggestionClass suggestionMade = EMPTY_SUGGESTION
+                                                //Suggestion made by the
+                                                //player
         );
 
     //Receives turn information from any remote players.

@@ -896,6 +896,10 @@ void ClueMainWindowClass::continuePlayerTurn()
     currentPlayerIter->second.rollDie();
     updateRollInfoText();
     currentPlayerIter->second.setLastAction(ROLL);
+    ////////////////////////////////////////////////////////////////////////////
+    //Network function call
+    sendRemoteMoveInfo(ROLL, currentPlayerIter->second.getDieRoll());
+    ////////////////////////////////////////////////////////////////////////////
   }
 
   //THIS player
@@ -939,6 +943,12 @@ void ClueMainWindowClass::handleSuggestion(const SuggestionClass
   if(playerIter == currentPlayerIter)
   {
     suggestion = playerSuggestion;
+
+    ////////////////////////////////////////////////////////////////////////////
+    //Network function call
+    sendRemoteMoveInfo(SUGGEST, DEFAULT_DIE_ROLL, EMPTY_LOCATION,
+        playerSuggestion);
+    ////////////////////////////////////////////////////////////////////////////
 
     if(currentPlayerIter->first != thisSuspect && gameParticipants.find(
         thisSuspect)->second.getGameOverFlag() == false)
@@ -1212,7 +1222,14 @@ void ClueMainWindowClass::moveCurrentPlayer(const DirectionEnum &direction)
       clearVisitedTiles();
       refreshDisplay();
     }
+    ////////////////////////////////////////////////////////////////////////////
+    //Network function call
+    sendRemoteMoveInfo(MOVE, DEFAULT_DIE_ROLL, currentPlayerIter->second.
+        getPlayerLocation().getTileInDir(direction));
+    ////////////////////////////////////////////////////////////////////////////
+
     finishMove();
+
   }
   catch(ExceptionClass newException)
   {
@@ -1251,7 +1268,11 @@ void ClueMainWindowClass::moveCurrentPlayerToSecretPassage()
   drawMove(currentPlayerIter->first, currentPlayerIter->second.
       getPlayerLocation(), newLocation);
   currentPlayerIter->second.setPlayerLocation(newLocation);
-
+  //////////////////////////////////////////////////////////////////////////////
+  //Network function call
+  sendRemoteMoveInfo(USE_SECRET_PASSAGE, DEFAULT_DIE_ROLL,
+      newLocation);
+  //////////////////////////////////////////////////////////////////////////////
   finishMove();
   refreshDisplay();
 }
@@ -1430,7 +1451,7 @@ BoardLocationClass targetDoorLocation;
   }
 }
 
-void ClueMainWindowClass::sendRemoteTurnInfo(ActionEnum playerAction,
+void ClueMainWindowClass::sendRemoteMoveInfo(ActionEnum playerAction,
     int dieRoll, BoardLocationClass locationAfterMove, SuggestionClass
     suggestionMade)
 {
