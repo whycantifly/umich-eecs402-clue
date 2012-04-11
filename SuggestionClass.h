@@ -1,6 +1,7 @@
 #ifndef _SUGGESTIONCLASS_H_
 #define _SUGGESTIONCLASS_H_
 
+#include <map>
 #include <set>
 
 #include "enums.h"
@@ -42,9 +43,11 @@ class SuggestionClass
       return !(*this == rhs);
     }
 
-    bool operator==(std::set<CardEnum> &playerHand) const;
+    bool operator==(std::map<CardEnum, std::set<SuspectEnum> > &playerHand)
+        const;
 
-    bool operator!=(std::set<CardEnum> &playerHand) const;
+    bool operator!=(std::map<CardEnum, std::set<SuspectEnum> > &playerHand)
+        const;
 
     bool operator==(CardEnum card) const;
 

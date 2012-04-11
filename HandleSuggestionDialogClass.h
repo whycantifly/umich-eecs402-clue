@@ -25,7 +25,7 @@ class HandleSuggestionDialogClass : public QDialog,
     CardEnum *cardToRevealPtr;
     SuspectEnum currentPlayerChar;
     std::map<int, CardEnum> cardChoices;
-    std::set<CardEnum> hand;
+    std::map<CardEnum, std::set<SuspectEnum> > hand;
 
   public slots:
     void showCard();

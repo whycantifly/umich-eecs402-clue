@@ -245,7 +245,7 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     }
 
     //Gets THIS player's hand.
-    std::set<CardEnum> getThisPlayerHand() const
+    std::map<CardEnum, std::set<SuspectEnum> > getThisPlayerHand() const
     {
       return gameParticipants.find(thisSuspect)->second.getHand();
     }

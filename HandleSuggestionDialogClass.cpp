@@ -25,7 +25,7 @@ HandleSuggestionDialogClass::HandleSuggestionDialogClass(
 void HandleSuggestionDialogClass::setupDialogBox(SuggestionClass *suggestionPtr,
     CardEnum *cardPtr)
 {
-  set<CardEnum>::iterator handIter;
+  map<CardEnum, set<SuspectEnum> >::iterator handIter;
 
   suggPtr = suggestionPtr;
   cardToRevealPtr = cardPtr;
@@ -38,11 +38,11 @@ void HandleSuggestionDialogClass::setupDialogBox(SuggestionClass *suggestionPtr,
 
   for(handIter = hand.begin(); handIter != hand.end(); handIter++)
   {
-    if(*suggestionPtr == *handIter)
+    if(*suggestionPtr == handIter->first)
     {
-      cardChoices.insert(pair<int, CardEnum>(cardSelectionBox->count(), *
-          handIter));
-      cardSelectionBox->insertItem(hand.size(), CARD_VALUES[*handIter]);
+      cardChoices.insert(pair<int, CardEnum>(cardSelectionBox->count(),
+          handIter->first));
+      cardSelectionBox->insertItem(hand.size(), CARD_VALUES[handIter->first]);
     }
   }
 }

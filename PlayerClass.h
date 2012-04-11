@@ -28,7 +28,8 @@ class PlayerClass
                                         //False = has lost the game
     bool movedThisTurnFlag;             //True = moved this turn; false = not
     ActionEnum lastAction;              //Last action taken by the player
-    std::set<CardEnum> hand;            //Cards in the players hand; ordered in
+    std::map<CardEnum, std::set<SuspectEnum> > hand;
+                                        //Cards in the players hand; ordered in
                                         //order of CardEnum
     int dieRollThisTurn;                //Value of the die roll this turn
     int movesLeftThisTurn;              //Moves left to make this turn
@@ -194,9 +195,14 @@ class PlayerClass
       currentLocation = newLocation;
     }
 
-    std::set<CardEnum> getHand() const
+    std::map<CardEnum, std::set<SuspectEnum> > getHand() const
     {
       return hand;
+    }
+
+    void addSuspectShowed(CardEnum cardRevealed, SuspectEnum suspectShowed)
+    {
+      hand.find(cardRevealed)->second.insert(suspectShowed);
     }
 
     SuspectEnum getDetectiveNotes(CardEnum card)
@@ -231,8 +237,6 @@ class PlayerClass
     SuggestionClass makeAiSuggestion() const;
 
     SuggestionClass makeAiAccusation() const;
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
 
 };
 

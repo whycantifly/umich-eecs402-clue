@@ -96,9 +96,10 @@ void ClueMainWindowClass::setupNewBoard()
 void ClueMainWindowClass::displayCardsInHand()
 {
   //Variable Declarations
-  set<CardEnum>hand = gameParticipants.find(thisSuspect)->second.getHand();
+  map<CardEnum, set<SuspectEnum> > hand = gameParticipants.find(thisSuspect)->
+      second.getHand();
                             //THIS player's hand
-  set<CardEnum>::iterator currentCardIter = hand.begin();
+  map<CardEnum, set<SuspectEnum> >::iterator currentCardIter = hand.begin();
                             //Iterator used to progress through the hand
   QLabel *cardPtr;          //Pointer to the QLabel on the form to show the card
 
@@ -126,9 +127,9 @@ void ClueMainWindowClass::displayCardsInHand()
         break;
     }
 
-    cardPtr->setPixmap(QPixmap::fromImage(CARD_IMAGES[*currentCardIter]));
+    cardPtr->setPixmap(QPixmap::fromImage(CARD_IMAGES[currentCardIter->first]));
 
-    updateDetectiveNotes(*currentCardIter);
+    updateDetectiveNotes(currentCardIter->first);
   }
 }
 
@@ -925,7 +926,7 @@ void ClueMainWindowClass::handleSuggestion(const SuggestionClass
   static map<SuspectEnum, PlayerClass>::iterator
       playerIter = gameParticipants.end();
   static QMessageBox suggestionMessage(this);
-  set<CardEnum> playerHand;
+  map<CardEnum, set<SuspectEnum> > playerHand;
   CardEnum revealedCard;
   HandleSuggestionDialogClass playerSuggestionDialog(this);
   QString revealer;
@@ -1028,14 +1029,16 @@ void ClueMainWindowClass::handleSuggestion(const SuggestionClass
 
           suggestionMessage.exec();
         }
+      }
 
-        //Add to and update detective notes
-        currentPlayerIter->second.addToDetectiveNotes(revealedCard,
-            playerIter->first);
-        if(currentPlayerIter->first == thisSuspect)
-        {
-          updateDetectiveNotes(revealedCard);
-        }
+      //Add to and update detective notes and hand
+      currentPlayerIter->second.addToDetectiveNotes(revealedCard,
+          playerIter->first);
+      playerIter->second.addSuspectShowed(revealedCard, currentPlayerIter->
+          first);
+      if(currentPlayerIter->first == thisSuspect)
+      {
+        updateDetectiveNotes(revealedCard);
       }
 
       playerIter = gameParticipants.end();

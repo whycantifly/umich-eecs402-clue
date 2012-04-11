@@ -45,7 +45,7 @@ string PlayerClass::printPlayerToString()
    
   // Get number of cards in hand and set up iterator for set
   int numCardsInHand = (int) hand.size();
-  set<CardEnum>::iterator cardIter;
+  map<CardEnum, set<SuspectEnum> >::iterator cardIter;
   
   // Get number of locations this turn and set up iterator
   int numLocationsVisited = (int) locationsThisTurn.size();
@@ -67,7 +67,7 @@ string PlayerClass::printPlayerToString()
       cardIter != hand.end();
       cardIter++)
       {
-      ss << *cardIter << " ";
+      ss << cardIter->first << " ";
       }
     
     ss << dieRollThisTurn << " " << movesLeftThisTurn << " "
@@ -119,6 +119,7 @@ void PlayerClass::stringToPlayer(string wrappedString)
   int detectCardInt;
   int detectSuspInt;
   int aiDifficultyInt;
+  set<SuspectEnum> emptySuspectList;
   
   hand.clear();
   
@@ -146,15 +147,16 @@ void PlayerClass::stringToPlayer(string wrappedString)
     {
     iss >> cardInHand;
     //cout << CardEnum(cardInHand) << endl;
-    hand.insert(CardEnum(cardInHand));
+    hand.insert(pair<CardEnum, set<SuspectEnum> >(CardEnum(cardInHand),
+        emptySuspectList));
     }
     
-      set<CardEnum>::iterator cardIter;
+      map<CardEnum, set<SuspectEnum> >::iterator cardIter;
       for (cardIter = hand.begin();
       cardIter != hand.end();
       cardIter++)
       {
-      cout << *cardIter << " ";
+      cout << cardIter->first << " ";
       }
       
       cout << endl;
@@ -217,7 +219,10 @@ void PlayerClass::move(const QImage &currentBoard, const DirectionEnum
 
 void PlayerClass::addCardToHand(CardEnum cardToAdd)
 {
-  hand.insert(cardToAdd);
+  //Variable Declarations
+  set<SuspectEnum> emptySuspectList;
+
+  hand.insert(pair<CardEnum, set<SuspectEnum> >(cardToAdd, emptySuspectList));
 }
 
 void PlayerClass::addToDetectiveNotes(CardEnum card, SuspectEnum suspect)
@@ -344,17 +349,17 @@ set<CardEnum> PlayerClass::getSuggestionMatches(SuggestionClass suggestion)
 
   if(hand.find(getCard(suggestion.getSuspect())) != hand.end())
   {
-    cardToAdd = *hand.find(getCard(suggestion.getSuspect()));
+    cardToAdd = hand.find(getCard(suggestion.getSuspect()))->first;
     cardMatches.insert(cardToAdd);
   }
   if(hand.find(getCard(suggestion.getWeapon())) != hand.end())
   {
-    cardToAdd = *hand.find(getCard(suggestion.getWeapon()));
+    cardToAdd = hand.find(getCard(suggestion.getWeapon()))->first;
     cardMatches.insert(cardToAdd);
   }
   if(hand.find(getCard(suggestion.getRoom())) != hand.end())
   {
-    cardToAdd = *hand.find(getCard(suggestion.getRoom()));
+    cardToAdd = hand.find(getCard(suggestion.getRoom()))->first;
     cardMatches.insert(cardToAdd);
   }
 
