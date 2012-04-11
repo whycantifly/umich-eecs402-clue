@@ -4,11 +4,18 @@
 
 #include "ClueMainWindowClass.h"
 
+#include "ServerSocket.h"
+#include "PackageClass.h"
+#include "ClientSocket.h"
+#include "SocketException.h"
+#include <iostream>
+
 
 
 int main(int argc, char *argv[])
 {
   QApplication app(argc, argv);
+  
   ClueMainWindowClass *clueGame = new ClueMainWindowClass;
 
   srand(time(0));

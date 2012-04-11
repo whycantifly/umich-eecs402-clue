@@ -41,6 +41,14 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     SuggestionClass caseFile;     //Case file include details of the crime
     SuspectEnum thisSuspect;      //Suspect controlled by THIS player
     int aiMoveDelay;              //Delay of Ai moves in milliseconds
+    
+    //ServerSocket server;
+    //ServerSocket serverSock;
+    //ClientSocket cliSock();
+    
+    //ServerSocket server(int);
+    //ServerSocket serverSock;
+    //ClientSocket cliSock(string, int);
 
   public:
     //CONSTRUCTORS
@@ -203,6 +211,10 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
                                                 //Suggestion made by the
                                                 //player
         );
+        
+    void sendInfoFromHost();
+    
+    void receiveInfoFromHost();
 
     //Receives turn information from any remote players.
     void receiveRemoteTurnInfo();
@@ -276,6 +288,8 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     {
       QDesktopServices::openUrl(QUrl("files/clueins.pdf"));
     }
+    
+    void setClientSocket(ClientSocket &cliSock, int ipAddress, int portNumber);
 };
 
 #endif

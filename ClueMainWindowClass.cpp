@@ -20,7 +20,9 @@
 #include "getCard.h"
 #include "getStartingDoorIndex.h"
 
-using namespace std;
+//ServerSocket server(3000);
+//ServerSocket serverSock;
+//ClientSocket cliSock("localhost", 3000);
 
 //Function used by all human players
 ClueMainWindowClass::ClueMainWindowClass() : QWidget()
@@ -1461,6 +1463,72 @@ void ClueMainWindowClass::sendRemoteMoveInfo(ActionEnum playerAction,
   ////////////////////////////////////////////////////////////////////////////
 }
 
+void ClueMainWindowClass::sendInfoFromHost()
+{
+        // Open server socket
+
+        ServerSocket server(30000);
+        ServerSocket serverSock;
+  
+        string clientReply;
+        PackageClass package;
+        string gameParticipantsPkgStr;
+        
+        // Wrap up package to pass to other networked game(s)
+        gameParticipantsPkgStr = package.wrapSetupPkg(gameParticipants);
+        
+        // Hold for client to connect
+        //cout << "Waiting for client to connect......." << endl;
+        //server.accept(serverSock);
+        //cout << "The client connected!" << endl;
+      
+        // Test stuff
+        //cout << "Confirmation from client?" << endl;
+        serverSock >> clientReply;
+        cout << "Received message: " << clientReply << endl;
+        
+        // Send game participants (package #1) to client
+        serverSock << gameParticipantsPkgStr; 
+        
+        serverSock >> clientReply;
+        cout << "Done yet? " << clientReply << endl;
+        
+        cout << "Successfully sent info!!!!!" << endl;
+}
+
+void ClueMainWindowClass::receiveInfoFromHost()
+{
+      PackageClass package;
+      string packageString;
+      string gameParticipantsPkgStr;
+      
+      // Make sure this array is clear
+      //gameParticipants.clear();
+      
+      // Trying to connect to server
+      //cout << "Attempting to connect to server" << endl;
+      
+      ClientSocket cliSock("localhost", 30000);
+      
+      // Send "I'm here message to server!"
+      cout << "Sending message to server: " << endl;
+      cliSock << "I'm here!";
+      
+      cout << "Waiting for server packets" << endl;
+      
+      // Get game participants package (pack #1)
+      cliSock >> gameParticipantsPkgStr;
+      cout << gameParticipantsPkgStr << endl;
+      
+      gameParticipants = package.unwrapSetupPkg(gameParticipantsPkgStr);
+      
+      cliSock << "All done!";
+      
+      cout << "Successfully received info!!!!!" << endl;
+      
+      currentPlayerIter = gameParticipants.begin();
+}
+
 void ClueMainWindowClass::receiveRemoteTurnInfo()
 {
   //Variable Declarations
@@ -1519,6 +1587,7 @@ void ClueMainWindowClass::startGame()
         ////////////////////////////////////////////////////////////////////////
         
         // Open server socket
+
         ServerSocket server(30000);
         ServerSocket serverSock;
   
@@ -1599,6 +1668,8 @@ void ClueMainWindowClass::startGame()
       // Trying to connect to server
       cout << "Attempting to connect to server" << endl;
       // Right now on localhost, replace with IP
+      //setClientSocket(cliSock,ip,port);
+      
       ClientSocket cliSock("localhost", 30000);
       
       // packageString = package.wrapPackage();
@@ -1631,9 +1702,32 @@ void ClueMainWindowClass::startGame()
       
       thisSuspect = package.unwrapSuspectEnum(suspectEnumPkgStr);
       
-      cout << "This suspect is " << thisSuspect << endl;
+      cout << "Server suspect is " << thisSuspect << endl;
       
-      cliSock << "All done, send me #4!";
+      // Cheap way of finding out the non-human, non-host player for now.
+      // Get number of people in game
+      int numPlayers = (int) gameParticipants.size();
+      // Set iterator to first player (host)
+      map< SuspectEnum, PlayerClass >::iterator partIter;
+      partIter = gameParticipants.begin();
+      PlayerClass player;
+      int suspNum;
+      int i;
+      // Put inside loop?
+      for (i = 0; i < numPlayers; i++)
+      {
+        suspNum = partIter->first;
+        player = partIter->second;
+        if (player.getHostFlag() == FALSE && player.getAiFlag() == FALSE )
+        {
+          thisSuspect = SuspectEnum(suspNum);
+        }
+      partIter++;
+      }
+      
+      cout << "Client suspect is " << thisSuspect << endl;
+      
+      cliSock << "All done!";
       
 //       TEST BLOCK
 //       gameParticipantsPkgStr = package.wrapSetupPkg(gameParticipants);
@@ -1651,6 +1745,21 @@ void ClueMainWindowClass::startGame()
     drawStartingPieces();
     displayGameInterface();
     displayDefaultOptions();
+    
+    if (currentPlayerIter->second.getAiFlag() == true &&
+        gameParticipants.find(thisSuspect)->second.getHostFlag() == true)
+        {
+//        sendInfoFromHost();
+        }
+    else if (currentPlayerIter->second.getAiFlag() == false &&
+        gameParticipants.find(thisSuspect)->second.getHostFlag() == true)
+        {
+//        sendInfoFromHost();
+        }
+    else
+    {
+    receiveInfoFromHost();
+    }
 
     //Start the first turn
     startPlayerTurn();
@@ -1782,3 +1891,10 @@ void ClueMainWindowClass::updateDifficultyText(int sliderPosition)
       break;
   }
 }
+
+void ClueMainWindowClass::setClientSocket(ClientSocket &cliSock, int ipAddress, int portNumber)
+  {
+    //ClientSocket *newSocket = new ClientSocket("localhost", 30000)
+    //cliSock("localhost", 30000);
+    return;
+  }
