@@ -53,13 +53,13 @@ void DeckClass::resetDeck()
 SuggestionClass DeckClass::createCaseFile()
 {
   //Variable Declarations
-  SuspectEnum suspect;
-  WeaponEnum weapon;
-  RoomEnum room;
-  bool haveSuspectFlag = false;
-  bool haveWeaponFlag = false;
-  bool haveRoomFlag = false;
-  CardEnum randomCard;
+  SuspectEnum suspect;              //Suspect in the case file
+  WeaponEnum weapon;                //Weapon in the case file
+  RoomEnum room;                    //Room in the case file
+  bool haveSuspectFlag = false;     //True = have a suspect in the case file      
+  bool haveWeaponFlag = false;      //True = have a weapon in the case file
+  bool haveRoomFlag = false;        //True = have a room in the case file
+  CardEnum randomCard;              //Random card chosen from the deck
 
   while(haveSuspectFlag == false || haveWeaponFlag == false || haveRoomFlag ==
       false)

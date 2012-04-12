@@ -97,12 +97,12 @@ void ClueMainWindowClass::displayCardsInHand()
 {
   //Variable Declarations
   map<CardEnum, set<SuspectEnum> > hand = gameParticipants.find(thisSuspect)->
-      second.getHand();
-                            //THIS player's hand
+      second.getHand();     //THIS player's hand
   map<CardEnum, set<SuspectEnum> >::iterator currentCardIter = hand.begin();
                             //Iterator used to progress through the hand
   QLabel *cardPtr;          //Pointer to the QLabel on the form to show the card
 
+  //Display the cards in THIS player's hand
   for(int i = 1; currentCardIter != hand.end(); i++, currentCardIter++)
   {
     switch(i)
@@ -129,6 +129,7 @@ void ClueMainWindowClass::displayCardsInHand()
 
     cardPtr->setPixmap(QPixmap::fromImage(CARD_IMAGES[currentCardIter->first]));
 
+    //Updates the detective notes on the screen for the cards in THIS player's hand
     updateDetectiveNotes(currentCardIter->first);
   }
 }
@@ -154,6 +155,7 @@ void ClueMainWindowClass::drawStartingPieces()
 {
   //Variable Declarations
   map<SuspectEnum, PlayerClass>::iterator playerIterator;
+                        //Iterator to go through gameParticipants
 
   for(playerIterator = gameParticipants.begin(); playerIterator !=
       gameParticipants.end(); playerIterator++)
@@ -342,8 +344,10 @@ void ClueMainWindowClass::displayGameInterface()
 void ClueMainWindowClass::refreshDisplay()
 {
   //Variable Declarations
-  map<SuspectEnum, PlayerClass>::iterator nextPlayerIter;
+  map<SuspectEnum, PlayerClass>::const_iterator nextPlayerIter;
+                                    //Iterator pointing at the next player
 
+  //Enable or disable controls depending on player status
   if(currentPlayerIter->first == thisSuspect ||
       gameParticipants.find(thisSuspect)->second.getLastAction() == MOVE)
   {
@@ -420,7 +424,7 @@ void ClueMainWindowClass::refreshDisplay()
      }
     }
   }
-
+  
   if((currentPlayerIter->second.getMovesLeft() <= 0 && currentPlayerIter->
       second.getMovedThisTurnFlag() == true) || (currentPlayerIter->
       second.getPlayerLocation().getTileType(CLUE_BOARD_IMAGE) ==
@@ -453,6 +457,8 @@ void ClueMainWindowClass::refreshDisplay()
       nextPlayerIter = gameParticipants.begin();
     }
   }
+  
+  //Update the current player is text
   while(nextPlayerIter->second.getGameOverFlag() == true);
 
   //Current player is this player.
@@ -487,12 +493,14 @@ void ClueMainWindowClass::refreshDisplay()
 void ClueMainWindowClass::updateRollInfoText()
 {
   //Variable Declarations
-  QString textManip;
-  QString suspectName = "You";
-  QString pluralString = "";
-  QString haveTense = "have";
-  QString isTense = "are";
+  QString textManip;                //String for text manipulation
+  QString suspectName = "You";      //Suspect's name
+  QString pluralString = "";        //Plural suffix
+  QString haveTense = "have";       //Tense of have
+  QString isTense = "are";          //Tense of is
 
+  //If the current player is someone other than THIS player, change the 
+  //tense
   if(currentPlayerIter->first != thisSuspect)
   {
     suspectName = CARD_VALUES[getCard(currentPlayerIter->first)];
@@ -500,11 +508,13 @@ void ClueMainWindowClass::updateRollInfoText()
     isTense = "is";
   }
 
+  //If there are 0 or more than 1 moves left, change the plural string
   if(currentPlayerIter->second.getMovesLeft() != 1)
   {
     pluralString = "s";
   }
 
+  //Display roll info text
   if(currentPlayerIter->second.getPlayerLocation().getTileType(CLUE_BOARD_IMAGE)
       == ROOM_TILE && currentPlayerIter->second.getLastAction() == MOVE)
   {
@@ -538,7 +548,7 @@ void ClueMainWindowClass::updateRollInfoText()
 void ClueMainWindowClass::updateDetectiveNotes(CardEnum updatedCard)
 {
   //Variable Declarations
-  QLabel *textToUpdatePtr;
+  QLabel *textToUpdatePtr;        //Pointer to the label on the gui to update
 
   switch(updatedCard)
   {
@@ -692,9 +702,6 @@ void ClueMainWindowClass::disableMovementControls()
   useSecretPassageOption->setEnabled(false);
   leaveRoomOption->setEnabled(false);
   doorNumberSpin->setEnabled(false);
-
-//  endTurnOption->toggle();
-//  endTurnOption->setFocus();
 }
 
 //Function used for all human players; triggered only upon THIS player's turn
@@ -727,8 +734,9 @@ void ClueMainWindowClass::displayExceptionMessageBox(ExceptionClass
 void ClueMainWindowClass::makePlayerAccusation()
 {
   //Variable Declarations
-  SuggestionClass accusation;
-  AccusationDialogClass accusationDialog(&accusation, this);
+  SuggestionClass accusation;                      //Accusation
+  AccusationDialogClass accusationDialog(          //Accusation dialog
+      &accusation, this);
 
   if(accusationDialog.exec() == QDialog::Accepted)
   {
@@ -741,8 +749,9 @@ void ClueMainWindowClass::makePlayerAccusation()
 void ClueMainWindowClass::makePlayerSuggestion()
 {
   //Variable Declarations
-  SuggestionClass suggestion;
-  SuggestionDialogClass suggestionDialog(&suggestion, this);
+  SuggestionClass suggestion;                //Suggestion
+  SuggestionDialogClass suggestionDialog(    //Suggestion dialog
+      &suggestion, this);
 
   disableAllControls();
   if(suggestionDialog.exec() == QDialog::Accepted)
@@ -758,7 +767,7 @@ void ClueMainWindowClass::dealCards(DeckClass &cardDeck)
 {
   //Variable Declarations
   map<SuspectEnum, PlayerClass>::iterator playerBeingDealtTo =
-      gameParticipants.begin();  //Iterator for the player to deal a card to
+      gameParticipants.begin();              //Iterator for the player to deal a card to
   CardEnum randomCard;
 
   //Deal the cards to the players until there are no cards in the deck
@@ -786,7 +795,7 @@ void ClueMainWindowClass::setupGame()
   DeckClass cardDeck;
   bool suspectAvailableFlag;
 
-  aiMoveDelay = HOST_AI_DELAY;
+  aiMoveDelay = AI_DELAY;
 
   //Initialize availableCharacters
   for(SuspectEnum i = SCARLET; i < NUMBER_OF_SUSPECTS;
@@ -799,8 +808,8 @@ void ClueMainWindowClass::setupGame()
   if((humanPlayersSpin->value() + computerPlayersSpin->value()) < MIN_PLAYERS ||
       (humanPlayersSpin->value() + computerPlayersSpin->value() > MAX_PLAYERS))
   {
-//    throw(ExceptionClass("Error setting up game", "You must have a minimum of "
-//        "3 and a maximum of 6 players to start a game."));
+    throw(ExceptionClass("Error setting up game", "You must have a minimum of "
+        "3 and a maximum of 6 players to start a game."));
   }
 
   //Add players to gameParticipants
@@ -919,25 +928,34 @@ void ClueMainWindowClass::continuePlayerTurn()
 void ClueMainWindowClass::handleSuggestion(const SuggestionClass
     &playerSuggestion)
 {
-  QPoint pos;
-
   //Variable Declarations
-  static SuggestionClass suggestion;
-  static map<SuspectEnum, PlayerClass>::iterator
-      playerIter = gameParticipants.end();
-  static QMessageBox suggestionMessage(this);
-  map<CardEnum, set<SuspectEnum> > playerHand;
-  CardEnum revealedCard;
-  HandleSuggestionDialogClass playerSuggestionDialog(this);
-  QString revealer;
-  QString suggester = CARD_VALUES[getCard(currentPlayerIter->first)];
+  static SuggestionClass suggestion;              //Suggestion
+  static map<SuspectEnum, PlayerClass>::iterator  //Iterator pointing to the player
+      playerIter = gameParticipants.end();        //handling the suggestion
+  static QMessageBox suggestionMessage(this);     //Suggestion information message box
+  map<CardEnum, set<SuspectEnum> > playerHand;    //playerIter's hand
+  CardEnum revealedCard;                          //Card revealed to the suggester
+  HandleSuggestionDialogClass                     //Dialog box to show when human 
+      playerSuggestionDialog(this);               //players handle the suggestion
+  QString playerName;                             //Name of the suspect handling the 
+                                                  //suggestion
+  QString suggesterName = CARD_VALUES[getCard(    //Name of the suspect who made the 
+      currentPlayerIter->first)];                 //suggestion
+      
+  if(currentPlayerIter->first == thisSuspect)
+  {
+    suggesterName = "you";
+  }
 
+  //Set window flags for the player suggestion dialog.
   playerSuggestionDialog.setWindowFlags((playerSuggestionDialog.windowFlags()
       | Qt::CustomizeWindowHint) & ~Qt::WindowCloseButtonHint);
-  currentPlayerIter->second.setLastAction(SUGGEST);
 
+  //Setup for the first time the current suggestion is handled      
   if(playerIter == gameParticipants.end())
   {
+    //Set the last action of the current player to SUGGEST
+    currentPlayerIter->second.setLastAction(SUGGEST);
     playerIter = currentPlayerIter;
     suggestion = playerSuggestion;
 
@@ -965,33 +983,45 @@ void ClueMainWindowClass::handleSuggestion(const SuggestionClass
     }
   }
 
+  //Move the player handling the suggestion to the next player
   playerIter++;
   if(playerIter == gameParticipants.end())
   {
     playerIter = gameParticipants.begin();
   }
 
+  if(playerIter->first == thisSuspect)
+  {
+    playerName = "You";
+  }
+  else
+  {
+    playerName = CARD_VALUES[getCard(playerIter->first)];
+  }
+  
+  ////////////////////////////////////////////////////////////////////////////////
+  //Network function call
   checkSuggestionAcknowledged();
-
-  revealer = CARD_VALUES[getCard(playerIter->first)];
+  ////////////////////////////////////////////////////////////////////////////////
 
   if(playerIter != currentPlayerIter)
   {
     playerHand = playerIter->second.getHand();
-
+    
+    //There is a card matching the suggestion in the player's hand
     if(suggestion == playerHand)
     {
-      pos = suggestionMessage.pos();
-
-      //THIS player is receiving the suggestion
+      //THIS player is handling the suggestion
       if(playerIter->first == thisSuspect && gameParticipants.find(
           thisSuspect)->second.getGameOverFlag() == false)
       {
+        //Setup and show the player suggestion dialog
         playerSuggestionDialog.setupDialogBox(&suggestion, &revealedCard);
         playerSuggestionDialog.exec();
 
         sendRevealedCard(revealedCard);
       }
+      //Any other player is handling the suggestion
       else
       {
         //Ais are revealing a card if THIS player is host
@@ -1011,17 +1041,8 @@ void ClueMainWindowClass::handleSuggestion(const SuggestionClass
             false)
         {
           suggestionMessage.setWindowTitle("Card Revealed");
-
-          if(currentPlayerIter->first != thisSuspect)
-          {
-            suggestionMessage.setText(revealer + " reveals a card to " +
-                suggester + ".");
-          }
-          else
-          {
-            suggestionMessage.setText(revealer + " reveals the " +
-                CARD_VALUES[revealedCard] + " card to you.");
-          }
+          suggestionMessage.setText(playerName + " reveals a card to " +
+              suggesterName + ".");
 
           suggestionMessage.exec();
         }
@@ -1040,23 +1061,15 @@ void ClueMainWindowClass::handleSuggestion(const SuggestionClass
       playerIter = gameParticipants.end();
       finishMove();
     }
+    //No cards matching the suggestion in the player's hand
     else
     {
       if(gameParticipants.find(thisSuspect)->second.getGameOverFlag() ==
         false)
       {
         suggestionMessage.setWindowTitle("No Card Shown");
-        //THIS player
-        if(playerIter->first == thisSuspect)
-        {
-          suggestionMessage.setText("You cannot disprove the suggestion.");
-        }
-        //All other players/ais
-        else
-        {
-          suggestionMessage.setText(CARD_VALUES[int(getCard(
-              playerIter->first))] + " cannot disprove the suggestion.");
-        }
+        suggestionMessage.setText(playerName + " cannot disprove the "
+            "suggestion.");
         suggestionMessage.exec();
       }
       handleSuggestion(suggestion);
@@ -1078,11 +1091,14 @@ void ClueMainWindowClass::handleAccusation(const SuggestionClass
     playerAccusation)
 {
   //Variable Declarations
-  QMessageBox accusationMessage;
-  QString playerName = CARD_VALUES[getCard(currentPlayerIter->first)];
-  QString haveTense = "has";
-  bool activePlayersFlag = false;
-  map<SuspectEnum, PlayerClass>::iterator playerIter = gameParticipants.begin();
+  QMessageBox accusationMessage;                  //Accusation information message box
+  QString playerName = CARD_VALUES[getCard(       //Player name of the accuser
+      currentPlayerIter->first)];
+  QString haveTense = "has";                      //Have tense
+  bool activePlayersFlag = false;                 //True = active human players; False = 
+                                                  //False = no active human players
+  map<SuspectEnum, PlayerClass>::const_iterator   //Iterator used to go through the
+      playerIter = gameParticipants.begin();      //game participants
 
   if(currentPlayerIter->first == thisSuspect)
   {
@@ -1129,6 +1145,7 @@ void ClueMainWindowClass::handleAccusation(const SuggestionClass
   //Accusation was incorrect
   else
   {
+    //If the player piece is in a doorway, move it into the room
     try
     {
       moveCurrentPlayer(DOOR_DIRECTIONS[currentPlayerIter->second.
@@ -1141,13 +1158,12 @@ void ClueMainWindowClass::handleAccusation(const SuggestionClass
 
     accusationMessage.setStandardButtons(QMessageBox::Ok);
 
-    accusationMessage.setWindowTitle("Player Eliminated");
     accusationMessage.setText(playerName + " " + haveTense + " made an "
         "incorrect accusation and can make no further moves this game.");
 
     if(currentPlayerIter->first != thisSuspect)
     {
-      accusationMessage.setWindowTitle("Game Over");
+      accusationMessage.setWindowTitle("Player Eliminated");
       accusationMessage.setText(playerName + " accused " + CARD_VALUES
         [getCard(playerAccusation.getSuspect())] + " of committing the "
         "crime in the " + CARD_VALUES[getCard(playerAccusation.getRoom())] +
@@ -1160,6 +1176,7 @@ void ClueMainWindowClass::handleAccusation(const SuggestionClass
 
     accusationMessage.exec();
 
+    //Check if there are still active human players
     while(playerIter != gameParticipants.end() && activePlayersFlag == false)
     {
       if(playerIter->second.getGameOverFlag() == false &&
@@ -1169,13 +1186,15 @@ void ClueMainWindowClass::handleAccusation(const SuggestionClass
       }
       playerIter++;
     }
-
+    
+    //There are still active human players
     if(activePlayersFlag == true)
     {
       checkSuggestionAcknowledged();
 
       endTurn();
     }
+    //No active human players left
     else
     {
       accusationMessage.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
@@ -1211,8 +1230,8 @@ void ClueMainWindowClass::handleAccusation(const SuggestionClass
 void ClueMainWindowClass::moveCurrentPlayer(const DirectionEnum &direction)
 {
   //Variable Declarations
-  BoardLocationClass oldLocation = currentPlayerIter->second.
-      getPlayerLocation();
+  BoardLocationClass oldLocation = currentPlayerIter->  //Old player location
+      second.getPlayerLocation();
 
   try
   {
@@ -1246,7 +1265,8 @@ void ClueMainWindowClass::moveCurrentPlayer(const DirectionEnum &direction)
 //Function used for all players
 void ClueMainWindowClass::moveCurrentPlayerToSecretPassage()
 {
-  BoardLocationClass newLocation;
+  //Variable Declarations
+  BoardLocationClass newLocation;    //New location of the player
 
   switch(currentPlayerIter->second.getPlayerLocation().getRoom())
   {
@@ -1285,10 +1305,14 @@ void ClueMainWindowClass::moveCurrentPlayerToSecretPassage()
 //Function used for all players
 void ClueMainWindowClass::moveSuggestedSuspect(SuspectEnum suggestedSuspect)
 {
-  map<SuspectEnum, PlayerClass>::iterator playerIter = gameParticipants.
-      find(suggestedSuspect);
-  BoardLocationClass newLocation;
+  //Variable Declarations
+  map<SuspectEnum, PlayerClass>::iterator playerIter =   //Iterator pointing to
+      gameParticipants.find(suggestedSuspect);           //the suggested suspect
+  BoardLocationClass newLocation;                        //New location of the 
+                                                         //suggested suspect
 
+  //Player didn't suggest himself and the suggested suspect is not in the current
+  //room
   if(gameParticipants.find(suggestedSuspect) != gameParticipants.end() &&
       playerIter->second.getGameOverFlag() == false && (playerIter->
       second.getPlayerLocation().getTileType(CLUE_BOARD_IMAGE) !=
@@ -1341,6 +1365,8 @@ void ClueMainWindowClass::moveCurrentPlayerOutDoor(int doorNumber)
 void ClueMainWindowClass::finishMove()
 {
   currentPlayerIter->second.decrementMovesLeft();
+  //THIS player is the current player and either has no moves left, is blocked
+  //and isn't in a corner room, or moved through a secret passage this turn
   if(currentPlayerIter->first == thisSuspect && (currentPlayerIter->second.
       getMovesLeft() <= 0 || (currentPlayerIter->second.getPlayerLocation().
       getTileType(CLUE_BOARD_IMAGE) == UNOCCUPIED_TILE && currentPlayerIter->
@@ -1367,6 +1393,8 @@ void ClueMainWindowClass::endTurn()
   clearVisitedTiles();
   currentPlayerIter->second.setDieRoll(0);
 
+  //Move the current player iterator to the next player or the first player if 
+  //it is pointing at the end of the list of game participants
   currentPlayerIter++;
   if(currentPlayerIter == gameParticipants.end())
   {

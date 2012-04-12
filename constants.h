@@ -9,11 +9,11 @@
 
 #include "BoardLocationClass.h"
 
+//Ai move delay when all human players have been eliminated
 const int AI_ONLY_DELAY = 5;
 
-const int HOST_AI_DELAY = 150;
-
-const int REMOTE_PLAYER_DELAY = 175;
+//Default Ai move delay
+const int AI_DELAY = 150;
 
 const SuggestionClass EMPTY_SUGGESTION;
 

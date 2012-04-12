@@ -28,6 +28,8 @@ class DeckClass : private std::set<CardEnum>
     //Resets the deck so that it includes all values of CardEnum.
     void resetDeck();
 
+    //Creates a case file from the deck and removes those cards from the
+    //deck.
     SuggestionClass createCaseFile();
 
     //Inline Functions

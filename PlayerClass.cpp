@@ -255,7 +255,7 @@ multimap<int, BoardLocationClass> PlayerClass::getTargetDoors() const
 }
 
 set<BoardLocationClass> PlayerClass::getValidExitDoors(const QImage
-    &currentBoard)
+    &currentBoard) const
 {
   //Variable Declarations
   set<BoardLocationClass> doors = getDoorsForRoom(currentLocation.getRoom());
@@ -275,7 +275,7 @@ set<BoardLocationClass> PlayerClass::getValidExitDoors(const QImage
 }
 
 set<DirectionEnum> PlayerClass::getValidMoveDirections(const QImage
-    &currentBoard)
+    &currentBoard) const
 {
   //Variable Declarations
   set<DirectionEnum> validDirections;
@@ -328,7 +328,7 @@ set<DirectionEnum> PlayerClass::getValidMoveDirections(const QImage
   return validDirections;
 }
 
-set<ActionEnum> PlayerClass::getValidPrerollMoves()
+set<ActionEnum> PlayerClass::getValidPrerollMoves() const
 {
   //Variable Declarations
   set<ActionEnum> validMoves;
@@ -357,7 +357,7 @@ set<ActionEnum> PlayerClass::getValidPrerollMoves()
   return validMoves;
 }
 
-ActionEnum PlayerClass::handleAfterRollAi()
+ActionEnum PlayerClass::handleAfterRollAi() const
 {
   try
   {
@@ -371,7 +371,7 @@ ActionEnum PlayerClass::handleAfterRollAi()
 }
 
 map<CardEnum, set<SuspectEnum> > PlayerClass::getSuggestionMatches(
-    SuggestionClass &suggestion)
+    SuggestionClass &suggestion) const
 {
   //Variable Declarations
   map<CardEnum, set<SuspectEnum> > cardMatches;
@@ -405,7 +405,7 @@ map<CardEnum, set<SuspectEnum> > PlayerClass::getSuggestionMatches(
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-BoardLocationClass PlayerClass::getAiTargetDoor()
+BoardLocationClass PlayerClass::getAiTargetDoor() const
 {
   multimap<int, BoardLocationClass> targetDoorList = getTargetDoors();
   multimap<int, BoardLocationClass>::iterator doorIter = targetDoorList.begin();
@@ -485,7 +485,7 @@ BoardLocationClass PlayerClass::getAiTargetDoor()
 }
 
 BoardLocationClass PlayerClass::getAiExitDoor(QImage &currentBoard,
-    BoardLocationClass &target)
+    BoardLocationClass &target) const
 {
   //Variable Declarations
   set<BoardLocationClass> doors = getValidExitDoors(currentBoard);
@@ -528,138 +528,126 @@ BoardLocationClass PlayerClass::getAiExitDoor(QImage &currentBoard,
 }
 
 DirectionEnum PlayerClass::getAiMove(QImage &currentBoard, BoardLocationClass
-    &target)
+    &target) const
 {
   //Variable Declarations
-  OrientationEnum moveOrientation;
-  bool validMoveFlag = false;
-  queue<DirectionEnum> moveDirection;
-  set<DirectionEnum> validDirections = getValidMoveDirections(currentBoard);
-  DirectionEnum direction;
+  OrientationEnum moveOrientation;          //Orientation suspect prefers to
+                                            //move in
+  bool validMoveFlag = false;               //True = valid move has been found
+  queue<DirectionEnum> moveDirection;       //List of move directions
+  set<DirectionEnum> validDirections =      //List of all valid move
+      getValidMoveDirections(currentBoard); //directions
+  DirectionEnum direction;                  //Move direction
 
   if(validDirections.empty() == true)
   {
     throw(ExceptionClass("No valid move directions"));
   }
-
-  switch(aiDifficulty)
+    
+  if(target == currentLocation && validDirections.find(
+    DOOR_DIRECTIONS[target.getDoorIndex()]) != validDirections.end())
   {
-    case VERY_EASY:
-    case EASY:                  //Comment me out
-    case MEDIUM:                //Comment me out
-    case HARD:                  //Comment me out
-    case EXPERT:                //Comment me out
-      if(target == currentLocation && validDirections.find(
-          DOOR_DIRECTIONS[target.getDoorIndex()]) != validDirections.end())
+    moveDirection.push(DOOR_DIRECTIONS[target.getDoorIndex()]);
+  }
+  else
+  {
+    if(target.getXCoord() == currentLocation.getXCoord())
+    {
+      moveOrientation = VERTICAL;
+    }
+    else if(target.getYCoord() == currentLocation.getYCoord())
+    {
+      moveOrientation = HORIZONTAL;
+    }
+    else
+    {
+      switch(aiDifficulty)
       {
-        moveDirection.push(DOOR_DIRECTIONS[target.getDoorIndex()]);
-      }
-      else
-      {
-        if(target.getXCoord() == currentLocation.getXCoord())
-        {
-          moveOrientation = VERTICAL;
-        }
-        else if(target.getYCoord() == currentLocation.getYCoord())
-        {
-          moveOrientation = HORIZONTAL;
-        }
-        else
-        {
-          moveOrientation = OrientationEnum(rand() % 2);
-        }
-
-        while(moveDirection.size() < NUMBER_OF_DIRECTIONS / 2)
-        {
-          switch(moveOrientation)
+        case VERY_EASY:
+          moveOrientation = OrientationEnum(rand() %
+              (NUMBER_OF_DIRECTIONS / 2));
+          break;
+        default:
+          if (target.getYCoord() != currentLocation.getYCoord())
           {
-            case HORIZONTAL:
-              if(target.getXCoord() < currentLocation.getXCoord() || (target.
-                  getXCoord() == currentLocation.getXCoord() && currentLocation.
-                  getXCoord() >= BOARD_WIDTH / 2))
-              {
-                moveDirection.push(LEFT);
-              }
-              else
-              {
-                moveDirection.push(RIGHT);
-              }
-              moveOrientation = VERTICAL;
-              break;
-            case VERTICAL:
-              if(target.getYCoord() < currentLocation.getYCoord() || (target.
-                  getYCoord() == currentLocation.getYCoord() && currentLocation.
-                  getYCoord() >= BOARD_WIDTH / 2))
-              {
-                moveDirection.push(UP);
-              }
-              else
-              {
-                moveDirection.push(DOWN);
-              }
-              moveOrientation = HORIZONTAL;
-              break;
-          }
-        }
-
-        while(moveDirection.size() < NUMBER_OF_DIRECTIONS * 3 / 2)
-        {
-          switch(moveOrientation)
-          {
-            case HORIZONTAL:
-              moveDirection.push(LEFT);
-              moveDirection.push(RIGHT);
-              moveOrientation = VERTICAL;
-              break;
-            case VERTICAL:
-              moveDirection.push(UP);
-              moveDirection.push(DOWN);
-              moveOrientation = HORIZONTAL;
-              break;
-          }
-        }
-
-        while(validMoveFlag == false)
-        {
-          if(validDirections.find(moveDirection.front()) != validDirections.end())
-          {
-            validMoveFlag = true;
+            moveOrientation = VERTICAL;
           }
           else
           {
-            moveDirection.pop();
+            moveOrientation = HORIZONTAL;
           }
-        }
+          break;
       }
+    }
 
-      direction = moveDirection.front();
-      break;
-//Insert AI code - set direction based on validDirections.
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-//    case EASY:
-//
-//      break;
-//
-//    case MEDIUM:
-//
-//      break;
-//
-//    case HARD:
-//
-//      break;
-//
-//    case EXPERT:
-//
-//      break;
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
+    while(moveDirection.size() < NUMBER_OF_DIRECTIONS / 2)
+    {
+      switch(moveOrientation)
+      {
+        case HORIZONTAL:
+          if(target.getXCoord() < currentLocation.getXCoord() || (target.
+              getXCoord() == currentLocation.getXCoord() && currentLocation.
+              getXCoord() >= BOARD_WIDTH / 2))
+          {
+            moveDirection.push(LEFT);
+          }
+          else
+          {
+            moveDirection.push(RIGHT);
+          }
+          moveOrientation = VERTICAL;
+          break;
+        case VERTICAL:
+          if(target.getYCoord() < currentLocation.getYCoord() || (target.
+              getYCoord() == currentLocation.getYCoord() && currentLocation.
+              getYCoord() >= BOARD_WIDTH / 2))
+          {
+            moveDirection.push(UP);
+          }
+          else
+          {
+            moveDirection.push(DOWN);
+          }
+          moveOrientation = HORIZONTAL;
+          break;
+      }
+    }
+
+    while(moveDirection.size() < NUMBER_OF_DIRECTIONS * 3 / 2)
+    {
+      switch(moveOrientation)
+      {
+        case HORIZONTAL:
+          moveDirection.push(LEFT);
+          moveDirection.push(RIGHT);
+          moveOrientation = VERTICAL;
+          break;
+        case VERTICAL:
+          moveDirection.push(UP);
+          moveDirection.push(DOWN);
+          moveOrientation = HORIZONTAL;
+          break;
+      }
+    }
+
+    while(validMoveFlag == false)
+    {
+      if(validDirections.find(moveDirection.front()) != validDirections.end())
+      {
+        validMoveFlag = true;
+      }
+      else
+      {
+        moveDirection.pop();
+      }
+    }
   }
 
+  direction = moveDirection.front();
   return direction;
 }
 
-CardEnum PlayerClass::handleSuggestionAi(SuggestionClass suggestion)
+CardEnum PlayerClass::handleSuggestionAi(SuggestionClass suggestion) const
 {
   //Variable Declarations
   map<CardEnum, set<SuspectEnum> > cardMatches =
@@ -719,7 +707,7 @@ CardEnum PlayerClass::handleSuggestionAi(SuggestionClass suggestion)
   return cardToReveal;
 }
 
-ActionEnum PlayerClass::handlePrerollAi(const QImage &currentBoard)
+ActionEnum PlayerClass::handlePrerollAi(const QImage &currentBoard) const
 {
   //Variable Declarations
   set<ActionEnum> validMoves = getValidPrerollMoves();

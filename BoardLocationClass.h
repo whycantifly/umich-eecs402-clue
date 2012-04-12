@@ -35,6 +35,9 @@ class BoardLocationClass
     }
 
     //Overloaded functions
+    
+    //Two BoardLocationClasse objects are equal if both the x and y 
+    //coordinates are both equal.
     bool operator==(const BoardLocationClass &rhs) const
     {
       if(xCoord == rhs.xCoord && yCoord == rhs.yCoord)
@@ -47,23 +50,30 @@ class BoardLocationClass
       }
     }
 
+    //Two BoardLocationClass objects are not equal of either the x
+    //or y coordinates are not equal.
     bool operator!=(const BoardLocationClass &rhs) const
     {
       return !(*this == rhs);
     }
-
+    
+    //The x-coordinate takes precendence when determining whether a
+    //BoardLocationClass object is less or greater than another 
+    //BoardLocationClass object; arbitrary rule implemented in order 
+    //to avoid errors when dealing with set<BoardLocationClass> 
+    //objects.
     bool operator<(const BoardLocationClass &rhs) const
     {
       return (xCoord < rhs.xCoord || (xCoord == rhs.xCoord && yCoord <
           rhs.yCoord));
     }
-
+    
     bool operator>(const BoardLocationClass &rhs) const
     {
       return (xCoord > rhs.xCoord || (xCoord == rhs.xCoord && yCoord >
           rhs.yCoord));
     }
-
+    
     bool operator<=(const BoardLocationClass &rhs) const
     {
       return !(*this > rhs);
@@ -95,40 +105,46 @@ class BoardLocationClass
     //Gets the middle pixel of this tile.
     const QPoint getMiddlePixel() const;
 
+    //Checks if the BoardLocationClass object belongs to a corner room.
+    //Returns true if it belongs to a corner room, returns false if it belongs 
+    //to a non-corner room, and throws an exception if the object does not
+    //belong to a room.
     bool checkCornerRoom() const;
 
-    //Returns true if the location is within the bounds of the board, false
-    //otherwise.
+    //Checks if the object is within board bounds.  Returns true if it is
+    //within board bounds, false otherwise.
     bool checkBoardBounds() const;
 
-    //Moves this location over one tile; throws an exception if this exceeds
-    //the bounds of the board.
+    //Moves this location over one tile. Throws an exception if this is an
+    //invalid move.
     void move(
-        const QImage &currentBoard,
+        const QImage &currentBoard,       //Board to move on,
         const DirectionEnum &direction    //Direction to move
         );
 
-    int getClosestDoorIndex() const;
-
+    //Overloaded function.  Returns the room for a door location.  Throws an
+    //exception if the BoardLocationClass object is not a door or the door index
+    //provided is an invalid door index.
     RoomEnum getRoomForDoor(BoardLocationClass doorLocation) const;
 
     RoomEnum getRoomForDoor(int doorIndex) const;
 
-    std::queue<DirectionEnum> getMovesToDoor(const QImage &currentBoard,
-        int movesLeft, const int doorIndex) const;
-
-
-    //If the tile is a door tile, gets the room that it belongs to.  If the tile
-    //is not a room tile, throws an exception.
+    //Gets the room a door belongs to.  Throws an exception if the 
+    //BoardLocationClass object is not a door.
     RoomEnum getRoomDoor() const;
 
+    //Gets an empty room tile for the room the BoardLocationClass object belongs
+    //to.
     const BoardLocationClass getEmptyRoomTile(const QImage &currentBoard) const;
 
+    //Gets the door index of the BoardLocationClass object.
     int getDoorIndex() const;
 
-    //Inline functions
-
+    //Gets the tile in the direction indicated direction relative to this
+    //BoardLocationClass object.
     BoardLocationClass getTileInDir(const DirectionEnum direction) const;
+
+    //Inline functions
 
     //Gets the x-coordinate.
     int getXCoord() const
@@ -142,6 +158,7 @@ class BoardLocationClass
       return yCoord;
     }
 
+    //Gets the distance from this location to the location indicated.
     int getDistanceTo(const BoardLocationClass location) const
     {
       return (abs(location.xCoord - xCoord) + abs(location.yCoord - yCoord));
