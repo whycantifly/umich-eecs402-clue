@@ -29,12 +29,11 @@ PlayerClass::PlayerClass(const bool aiValue, const bool gameHostValue,
   lastAction = END_TURN;
   movedThisTurnFlag = false;
   gameOverFlag = false;
-  correctAiSuggestionFlag = false;
   resetLocationsThisTurn();
 
   for(int i = 0; i < NUMBER_OF_CARDS; i++)
   {
-    detectiveNotes[i] = make_pair(CardEnum(i), UNKNOWN);
+    detectiveNotes[i] = make_pair(CardEnum(i), UNKNOWN_SUSPECT);
   }
 }
 
@@ -328,7 +327,7 @@ set<DirectionEnum> PlayerClass::getValidMoveDirections(const QImage
   return validDirections;
 }
 
-set<ActionEnum> PlayerClass::getValidPrerollMoves() const
+set<ActionEnum> PlayerClass::getValidPrerollMoves()
 {
   //Variable Declarations
   set<ActionEnum> validMoves;
@@ -357,7 +356,7 @@ set<ActionEnum> PlayerClass::getValidPrerollMoves() const
   return validMoves;
 }
 
-ActionEnum PlayerClass::handleAfterRollAi() const
+ActionEnum PlayerClass::handleAfterRollAi()
 {
   try
   {
@@ -420,7 +419,7 @@ BoardLocationClass PlayerClass::getAiTargetDoor() const
     //Look through detective notes for all unknown rooms
     for(int i = 0; i < NUMBER_OF_ROOMS; i++)
     {
-      if (detectiveNotes[getCard(RoomEnum(i))].second == UNKNOWN)
+      if (detectiveNotes[getCard(RoomEnum(i))].second == UNKNOWN_SUSPECT)
       {
         unknownRooms.insert(RoomEnum(i));
       }
@@ -707,21 +706,27 @@ CardEnum PlayerClass::handleSuggestionAi(SuggestionClass suggestion) const
   return cardToReveal;
 }
 
-ActionEnum PlayerClass::handlePrerollAi(const QImage &currentBoard) const
+ActionEnum PlayerClass::handlePrerollAi()
 {
   //Variable Declarations
   set<ActionEnum> validMoves = getValidPrerollMoves();
   set<ActionEnum>::iterator moveIter = validMoves.begin();
+  set<RoomEnum> unknownRooms;
   int randomNumber;
-  ActionEnum aiAction;
+  ActionEnum aiAction = END_TURN;
+
+  //Get all unknown rooms
+  for(int i = 0; i < NUMBER_OF_ROOMS; i++)
+  {
+    if(detectiveNotes[getCard(RoomEnum(i))].second == UNKNOWN_SUSPECT)
+    {
+      unknownRooms.insert(RoomEnum(i));
+    }
+  }
 
   switch(aiDifficulty)
   {
     case VERY_EASY:
-    case EASY:                //Comment me out
-    case MEDIUM:              //Comment me out
-    case HARD:                //Comment me out
-    case EXPERT:              //Comment me out
       randomNumber = rand() % validMoves.size();
       for(int i = 0; i < randomNumber; i++)
       {
@@ -729,29 +734,34 @@ ActionEnum PlayerClass::handlePrerollAi(const QImage &currentBoard) const
       }
       aiAction = *moveIter;
       break;
-
-//Insert AI code - set aiAction based on the moves in validMoves.
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-//    case EASY:
-//
-//      break;
-//
-//    case MEDIUM:
-//
-//      break;
-//
-//    case HARD:
-//
-//      break;
-//
-//    case EXPERT:
-//
-//      break;
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
+    default:
+      if(validMoves.find(ACCUSE) != validMoves.end())
+      {
+        aiAction = ACCUSE;
+      }
+      else if(validMoves.find(SUGGEST) != validMoves.end() && (aiDifficulty ==
+          EASY || unknownRooms.find(currentLocation.getRoom()) !=
+          unknownRooms.end()))
+      {
+        aiAction = SUGGEST;
+      }
+      else if(validMoves.find(USE_SECRET_PASSAGE) != validMoves.end() &&
+          ((currentLocation.getRoom() == LOUNGE &&
+          unknownRooms.find(CONSERVATORY) != unknownRooms.end()) ||
+          (currentLocation.getRoom() == CONSERVATORY &&
+          unknownRooms.find(LOUNGE) != unknownRooms.end()) ||
+          (currentLocation.getRoom() == KITCHEN &&
+          unknownRooms.find(STUDY) != unknownRooms.end()) ||
+          (currentLocation.getRoom() == STUDY &&
+          unknownRooms.find(KITCHEN) != unknownRooms.end())))
+      {
+        aiAction = USE_SECRET_PASSAGE;
+      }
+      else
+      {
+        aiAction = ROLL;
+      }
   }
-
   return aiAction;
 }
 
@@ -762,7 +772,6 @@ SuggestionClass PlayerClass::makeAiSuggestion() const
   RoomEnum room;
   set<SuspectEnum> unknownSuspects;
   set<WeaponEnum> unknownWeapons;
-  set<RoomEnum> unknownRooms;
 
   switch(aiDifficulty)
   {
@@ -774,7 +783,7 @@ SuggestionClass PlayerClass::makeAiSuggestion() const
       //Get all unknown suspects
       for(int i = 0; i < NUMBER_OF_SUSPECTS; i++)
       {
-        if(detectiveNotes[getCard(SuspectEnum(i))].second == UNKNOWN)
+        if(detectiveNotes[getCard(SuspectEnum(i))].second == UNKNOWN_SUSPECT)
         {
           unknownSuspects.insert(SuspectEnum(i));
         }
@@ -782,7 +791,7 @@ SuggestionClass PlayerClass::makeAiSuggestion() const
       //Get all unknown weapons
       for(int i = 0; i < NUMBER_OF_WEAPONS; i++)
       {
-        if(detectiveNotes[getCard(WeaponEnum(i))].second == UNKNOWN)
+        if(detectiveNotes[getCard(WeaponEnum(i))].second == UNKNOWN_SUSPECT)
         {
           unknownWeapons.insert(WeaponEnum(i));
         }
@@ -820,54 +829,105 @@ SuggestionClass PlayerClass::makeAiSuggestion() const
   return SuggestionClass(suspect, weapon, room);
 }
 
-SuggestionClass PlayerClass::makeAiAccusation() const
+void PlayerClass::makeAiAccusation()
 {
-  bool readyToAccuseFlag = false;
-  SuggestionClass accusation;
-  SuspectEnum suspect;
-  WeaponEnum weapon;
-  RoomEnum room;
-  int missingEntries = 0;
-  int i = 0;
+  SuspectEnum suspect = UNKNOWN_SUSPECT;
+  WeaponEnum weapon = UNKNOWN_WEAPON;
+  RoomEnum room = UNKNOWN_ROOM;
+  bool oneUnknownFlag;
+  int i;
 
-  if(correctAiSuggestionFlag == true)
+  i = 0;
+  oneUnknownFlag = true;
+  while(i < NUMBER_OF_SUSPECTS && oneUnknownFlag == true && aiAccusation.
+      getSuspect() == UNKNOWN_SUSPECT)
   {
-    accusation = aiAccusation;
-  }
-  else
-  {
-    while(i < NUMBER_OF_CARDS && missingEntries <= NUMBER_OF_CARD_TYPES)
+    if(detectiveNotes[getCard(SuspectEnum(i))].second == UNKNOWN_SUSPECT)
     {
-      if(detectiveNotes[i].second == UNKNOWN)
+      if(suspect == UNKNOWN_SUSPECT)
       {
-        switch(getCardType(detectiveNotes[i].first))
+        suspect = getSuspect(detectiveNotes[getCard(SuspectEnum(i))].first);
+      }
+      else
+      {
+        oneUnknownFlag = false;
+      }
+    }
+    i++;
+  }
+
+  if(oneUnknownFlag == true && aiAccusation.getSuspect() == UNKNOWN_SUSPECT)
+  {
+    aiAccusation.setSuspect(suspect);
+
+    i = 0;
+    while(i < NUMBER_OF_WEAPONS && oneUnknownFlag == true && aiAccusation.
+        getWeapon() == UNKNOWN_WEAPON)
+    {
+      if(detectiveNotes[getCard(WeaponEnum(i))].second == UNKNOWN_WEAPON)
+      {
+        if(weapon == UNKNOWN_WEAPON)
         {
-          case SUSPECT_CARD:
-            suspect = getSuspect(detectiveNotes[i].first);
-            break;
-          case WEAPON_CARD:
-            weapon = getWeapon(detectiveNotes[i].first);
-            break;
-          case ROOM_CARD:
-            room = getRoom(detectiveNotes[i].first);
-            break;
+          weapon = getWeapon(detectiveNotes[getCard(WeaponEnum(i))].first);
         }
-        missingEntries++;
+        else
+        {
+          oneUnknownFlag = false;
+        }
       }
       i++;
     }
 
-    if(missingEntries == NUMBER_OF_CARD_TYPES)
+    if(oneUnknownFlag == true && aiAccusation.getWeapon() == UNKNOWN_WEAPON)
     {
-      readyToAccuseFlag = true;
-      accusation = SuggestionClass(suspect, weapon, room);
-    }
+      aiAccusation.setWeapon(weapon);
 
-    if(readyToAccuseFlag == false)
-    {
-      throw(ExceptionClass("Ai not ready to accuse"));
+      i = 0;
+      while(i < NUMBER_OF_ROOMS && oneUnknownFlag == true && aiAccusation.
+          getRoom() == UNKNOWN_ROOM)
+      {
+        if(detectiveNotes[getCard(RoomEnum(i))].second == UNKNOWN_ROOM)
+        {
+          if(room == UNKNOWN_ROOM)
+          {
+            room = getRoom(detectiveNotes[getCard(RoomEnum(i))].first);
+          }
+          else
+          {
+            oneUnknownFlag = false;
+          }
+        }
+        i++;
+      }
+
+      if(oneUnknownFlag == true && aiAccusation.getRoom() == UNKNOWN_ROOM)
+      {
+        aiAccusation.setRoom(room);
+      }
     }
   }
 
-  return accusation;
+  if(aiAccusation.getSuspect() == UNKNOWN_SUSPECT || aiAccusation.getWeapon()
+      == UNKNOWN_WEAPON || aiAccusation.getRoom() == UNKNOWN_ROOM)
+  {
+    throw(ExceptionClass("Ai not ready to accuse"));
+  }
+}
+
+void PlayerClass::setAiAccusation(const SuggestionClass &suggestion)
+{
+  if(hand.find(getCard(suggestion.getSuspect())) == hand.end())
+  {
+    aiAccusation.setSuspect(suggestion.getSuspect());
+  }
+
+  if(hand.find(getCard(suggestion.getWeapon())) == hand.end())
+  {
+    aiAccusation.setWeapon(suggestion.getWeapon());
+  }
+
+  if(hand.find(getCard(suggestion.getRoom())) == hand.end())
+  {
+    aiAccusation.setRoom(suggestion.getRoom());
+  }
 }

@@ -16,20 +16,21 @@ class SuggestionClass
   public:
     //Constructors
 
-    SuggestionClass(SuspectEnum suspectSug, WeaponEnum weaponSug,
-        RoomEnum roomSug)
+    SuggestionClass(SuspectEnum suspectSug = UNKNOWN_SUSPECT, WeaponEnum
+        weaponSug = UNKNOWN_WEAPON, RoomEnum roomSug = UNKNOWN_ROOM)
     {
       suspect = suspectSug;
       weapon = weaponSug;
       room = roomSug;
     }
 
-    SuggestionClass(int suspectSug = 0, int weaponSug = 0, int roomSug = 0)
+    SuggestionClass(int suspectSug, int weaponSug, int roomSug)
     {
       suspect = SuspectEnum(suspectSug);
       weapon = WeaponEnum(weaponSug);
       room = RoomEnum(roomSug);
     }
+
 
     //Overloaded operators
     bool operator==(const SuggestionClass &rhs) const
@@ -58,13 +59,30 @@ class SuggestionClass
     {
       return suspect;
     }
+
+    void setSuspect(const SuspectEnum newSuspect)
+    {
+      suspect = newSuspect;
+    }
+
     WeaponEnum getWeapon() const
     {
       return weapon;
     }
+
+    void setWeapon(const WeaponEnum newWeapon)
+    {
+      weapon = newWeapon;
+    }
+
     RoomEnum getRoom() const
     {
       return room;
+    }
+
+    void setRoom(const RoomEnum newRoom)
+    {
+      room = newRoom;
     }
 };
 

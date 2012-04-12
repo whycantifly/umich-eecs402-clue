@@ -88,7 +88,7 @@ class PlayerClass
     void addToDetectiveNotes(CardEnum card, SuspectEnum suspect);
     
     //Gets the list of valid preroll moves for the Ai player.
-    std::set<ActionEnum> getValidPrerollMoves() const;
+    std::set<ActionEnum> getValidPrerollMoves();
 
     //Gets the cards in the players hand that match the indicated suggestion.
     map<CardEnum, set<SuspectEnum> > getSuggestionMatches(SuggestionClass
@@ -127,17 +127,20 @@ class PlayerClass
     CardEnum handleSuggestionAi(SuggestionClass suggestion) const;
 
     //Handles all preroll decisions for the Ai.
-    ActionEnum handlePrerollAi(const QImage &currentBoard) const;
+    ActionEnum handlePrerollAi();
 
     //Handles all decisions after the roll for the Ai.
-    ActionEnum handleAfterRollAi() const;
+    ActionEnum handleAfterRollAi();
 
     //Makes suggestions for the Ai.
     SuggestionClass makeAiSuggestion() const;
 
-    //Makes an accusation for the Ai.  Throws an exception if the Ai cannot make an
-    //accusation this turn.
-    SuggestionClass makeAiAccusation() const;
+    //Makes an accusation for the Ai.  Throws an exception if the Ai cannot make
+    //an accusation this turn.
+    void makeAiAccusation();
+
+    //Sets the accusation for Ai players.
+    void setAiAccusation(const SuggestionClass &suggestion);
 
     //Inline Functions
 
@@ -265,14 +268,6 @@ class PlayerClass
       movesLeftThisTurn--;
     }
 
-    //Sets the correct suggestion for Ai players and changes the correct
-    //Ai suggestion flag to true.
-    void setCorrectSuggestion(const SuggestionClass &suggestion)
-    {
-      correctAiSuggestionFlag = true;
-      aiAccusation = suggestion;
-    }
-
     //Sets currentLocation to newLocation.
     void setPlayerLocation(const BoardLocationClass newLocation)
     {
@@ -297,6 +292,12 @@ class PlayerClass
     SuspectEnum getDetectiveNotes(const CardEnum card) const
     {
       return detectiveNotes[int(card)].second;
+    }
+
+    //Gets the Ai accusation.
+    SuggestionClass getAiAccusation() const
+    {
+      return aiAccusation;
     }
 };
 

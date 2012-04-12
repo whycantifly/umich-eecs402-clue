@@ -882,8 +882,7 @@ void ClueMainWindowClass::startPlayerTurn()
       //Ai in a special situation (corner room or can make suggestion)
       else if(currentPlayerIter->second.getAiFlag() == true)
       {
-        takeAiAction(currentPlayerIter->second.handlePrerollAi(
-            inProgressBoardImage));
+        takeAiAction(currentPlayerIter->second.handlePrerollAi());
       }
     }
     //Other player or Ai controlled by other player is up
@@ -1077,10 +1076,7 @@ void ClueMainWindowClass::handleSuggestion(const SuggestionClass
   }
   else
   {
-    if(playerSuggestion != currentPlayerIter->second.getHand())
-    {
-      currentPlayerIter->second.setCorrectSuggestion(playerSuggestion);
-    }
+    currentPlayerIter->second.setAiAccusation(playerSuggestion);
     finishMove();
     playerIter = gameParticipants.end();
   }
@@ -1471,7 +1467,8 @@ BoardLocationClass targetDoorLocation;
     case ACCUSE:
       try
       {
-        handleAccusation(currentPlayerIter->second.makeAiAccusation());
+        currentPlayerIter->second.makeAiAccusation();
+        handleAccusation(currentPlayerIter->second.getAiAccusation());
       }
       catch(ExceptionClass notReadyToAccuse)
       {
