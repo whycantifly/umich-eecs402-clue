@@ -6,7 +6,7 @@
 
 using namespace std;
 
-bool SuggestionClass::operator==(map<CardEnum, set<SuspectEnum> > &playerHand)
+bool SuggestionClass::operator==(const map<CardEnum, set<SuspectEnum> > &playerHand)
     const
 {
   if(playerHand.find(getCard(suspect)) == playerHand.end() &&
@@ -21,13 +21,13 @@ bool SuggestionClass::operator==(map<CardEnum, set<SuspectEnum> > &playerHand)
   }
 }
 
-bool SuggestionClass::operator!=(map<CardEnum, set<SuspectEnum> > &playerHand)
+bool SuggestionClass::operator!=(const map<CardEnum, set<SuspectEnum> > &playerHand)
     const
 {
   return !(*this == playerHand);
 }
 
-bool SuggestionClass::operator==(CardEnum card) const
+bool SuggestionClass::operator==(const CardEnum card) const
 {
   try
   {
@@ -47,7 +47,7 @@ bool SuggestionClass::operator==(CardEnum card) const
   }
 }
 
-bool SuggestionClass::operator!=(CardEnum card) const
+bool SuggestionClass::operator!=(const CardEnum card) const
 {
   return !(*this == card);
 }

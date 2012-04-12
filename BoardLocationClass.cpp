@@ -216,30 +216,6 @@ RoomEnum BoardLocationClass::getRoomDoor() const
   return room;
 }
 
-multimap<int, BoardLocationClass> BoardLocationClass::getTargetDoors() const
-{
-  //Variable Declarations
-  multimap<int, BoardLocationClass> targetDoors;
-  set<BoardLocationClass> invalidDoors;
-
-  if(getTileType(CLUE_BOARD_IMAGE) == ROOM_TILE)
-  {
-    invalidDoors = getDoorsForRoom(getRoom());
-  }
-
-  for(int i = 0; i < TOTAL_NUMBER_OF_DOORS; i++)
-  {
-    if(invalidDoors.find(DOOR_LOCATIONS[i]) == invalidDoors.end())
-    {
-      targetDoors.insert(pair<int, BoardLocationClass>(abs(DOOR_LOCATIONS[i].
-          getXCoord() - xCoord) + abs(DOOR_LOCATIONS[i].getYCoord() - yCoord),
-          DOOR_LOCATIONS[i]));
-    }
-  }
-
-  return targetDoors;
-}
-
 RoomEnum BoardLocationClass::getRoomForDoor(BoardLocationClass doorLocation)
 const
 {

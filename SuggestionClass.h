@@ -43,15 +43,15 @@ class SuggestionClass
       return !(*this == rhs);
     }
 
-    bool operator==(std::map<CardEnum, std::set<SuspectEnum> > &playerHand)
+    bool operator==(const std::map<CardEnum, std::set<SuspectEnum> > &playerHand)
         const;
 
-    bool operator!=(std::map<CardEnum, std::set<SuspectEnum> > &playerHand)
+    bool operator!=(const std::map<CardEnum, std::set<SuspectEnum> > &playerHand)
         const;
 
-    bool operator==(CardEnum card) const;
+    bool operator==(const CardEnum card) const;
 
-    bool operator!=(CardEnum card) const;
+    bool operator!=(const CardEnum card) const;
 
     //Inline functions
     SuspectEnum getSuspect() const

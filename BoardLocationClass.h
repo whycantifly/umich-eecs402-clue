@@ -3,6 +3,7 @@
 
 #include <QImage>
 #include <QPoint>
+#include <cmath>
 #include <map>
 
 #include "enums.h"
@@ -109,9 +110,6 @@ class BoardLocationClass
 
     int getClosestDoorIndex() const;
 
-    std::multimap<int, BoardLocationClass> getTargetDoors()
-        const;
-
     RoomEnum getRoomForDoor(BoardLocationClass doorLocation) const;
 
     RoomEnum getRoomForDoor(int doorIndex) const;
@@ -142,6 +140,11 @@ class BoardLocationClass
     int getYCoord() const
     {
       return yCoord;
+    }
+
+    int getDistanceTo(const BoardLocationClass location) const
+    {
+      return (abs(location.xCoord - xCoord) + abs(location.yCoord - yCoord));
     }
 };
 

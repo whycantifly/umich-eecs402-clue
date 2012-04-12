@@ -939,10 +939,6 @@ void ClueMainWindowClass::handleSuggestion(const SuggestionClass
   if(playerIter == gameParticipants.end())
   {
     playerIter = currentPlayerIter;
-  }
-
-  if(playerIter == currentPlayerIter)
-  {
     suggestion = playerSuggestion;
 
     ////////////////////////////////////////////////////////////////////////////
@@ -1044,28 +1040,34 @@ void ClueMainWindowClass::handleSuggestion(const SuggestionClass
       playerIter = gameParticipants.end();
       finishMove();
     }
-    else if(gameParticipants.find(thisSuspect)->second.getGameOverFlag() ==
-        false)
+    else
     {
-      suggestionMessage.setWindowTitle("No Card Shown");
-      //THIS player
-      if(playerIter->first == thisSuspect)
+      if(gameParticipants.find(thisSuspect)->second.getGameOverFlag() ==
+        false)
       {
-        suggestionMessage.setText("You cannot disprove the suggestion.");
+        suggestionMessage.setWindowTitle("No Card Shown");
+        //THIS player
+        if(playerIter->first == thisSuspect)
+        {
+          suggestionMessage.setText("You cannot disprove the suggestion.");
+        }
+        //All other players/ais
+        else
+        {
+          suggestionMessage.setText(CARD_VALUES[int(getCard(
+              playerIter->first))] + " cannot disprove the suggestion.");
+        }
+        suggestionMessage.exec();
       }
-      //All other players/ais
-      else
-      {
-        suggestionMessage.setText(CARD_VALUES[int(getCard(
-            playerIter->first))] + " cannot disprove the suggestion.");
-      }
-      //Comment to test Ai
-      suggestionMessage.exec();
       handleSuggestion(suggestion);
     }
   }
   else
   {
+    if(playerSuggestion != currentPlayerIter->second.getHand())
+    {
+      currentPlayerIter->second.setCorrectSuggestion(playerSuggestion);
+    }
     finishMove();
     playerIter = gameParticipants.end();
   }
@@ -1145,7 +1147,7 @@ void ClueMainWindowClass::handleAccusation(const SuggestionClass
 
     if(currentPlayerIter->first != thisSuspect)
     {
-      accusationMessage.setText("Game Over");
+      accusationMessage.setWindowTitle("Game Over");
       accusationMessage.setText(playerName + " accused " + CARD_VALUES
         [getCard(playerAccusation.getSuspect())] + " of committing the "
         "crime in the " + CARD_VALUES[getCard(playerAccusation.getRoom())] +
@@ -1403,7 +1405,7 @@ BoardLocationClass targetDoorLocation;
             CLUE_BOARD_IMAGE) == ROOM_TILE)
         {
           moveCurrentPlayerOutDoor(currentPlayerIter->second.getAiExitDoor(
-              inProgressBoardImage));
+              inProgressBoardImage, targetDoorLocation));
         }
 
         //Move while there are moves left and the player hasn't reached the room

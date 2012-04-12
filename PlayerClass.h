@@ -38,6 +38,8 @@ class PlayerClass
                                         //this turn
     std::pair<CardEnum, SuspectEnum> detectiveNotes[NUMBER_OF_CARDS];
     DifficultyEnum aiDifficulty;
+    bool correctAiSuggestionFlag;
+    SuggestionClass aiAccusation;
 
   public:
     //Constructors
@@ -189,6 +191,12 @@ class PlayerClass
       movesLeftThisTurn--;
     }
 
+    void setCorrectSuggestion(const SuggestionClass &suggestion)
+    {
+      correctAiSuggestionFlag = true;
+      aiAccusation = suggestion;
+    }
+
     //Sets currentLocation to newLocation.
     void setPlayerLocation(BoardLocationClass newLocation)
     {
@@ -212,8 +220,10 @@ class PlayerClass
 
     std::set<ActionEnum> getValidPrerollMoves();
 
-    std::set<CardEnum> getSuggestionMatches(SuggestionClass
-        suggestion);
+    map<CardEnum, set<SuspectEnum> > getSuggestionMatches(SuggestionClass
+        &suggestion);
+
+    std::multimap<int, BoardLocationClass> getTargetDoors()const;
 
     std::set<BoardLocationClass> getValidExitDoors(const QImage &currentBoard);
 
@@ -223,7 +233,8 @@ class PlayerClass
 
     BoardLocationClass getAiTargetDoor();
 
-    BoardLocationClass getAiExitDoor(QImage &currentBoard);
+    BoardLocationClass getAiExitDoor(QImage &currentBoard, BoardLocationClass
+        &target);
 
     DirectionEnum getAiMove(QImage &currentBoard, BoardLocationClass &target);
 
