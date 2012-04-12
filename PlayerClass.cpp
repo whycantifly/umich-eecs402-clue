@@ -837,56 +837,47 @@ void PlayerClass::makeAiAccusation()
   bool oneUnknownFlag;
   int i;
 
-  i = 0;
-  oneUnknownFlag = true;
-  while(i < NUMBER_OF_SUSPECTS && oneUnknownFlag == true && aiAccusation.
-      getSuspect() == UNKNOWN_SUSPECT)
+  switch(aiDifficulty)
   {
-    if(detectiveNotes[getCard(SuspectEnum(i))].second == UNKNOWN_SUSPECT)
-    {
-      if(suspect == UNKNOWN_SUSPECT)
-      {
-        suspect = getSuspect(detectiveNotes[getCard(SuspectEnum(i))].first);
-      }
-      else
-      {
-        oneUnknownFlag = false;
-      }
-    }
-    i++;
-  }
+    case VERY_EASY:
+      aiAccusation = SuggestionClass();
+      oneUnknownFlag = true;
 
-  if(oneUnknownFlag == true && aiAccusation.getSuspect() == UNKNOWN_SUSPECT)
-  {
-    aiAccusation.setSuspect(suspect);
-
-    i = 0;
-    while(i < NUMBER_OF_WEAPONS && oneUnknownFlag == true && aiAccusation.
-        getWeapon() == UNKNOWN_WEAPON)
-    {
-      if(detectiveNotes[getCard(WeaponEnum(i))].second == UNKNOWN_WEAPON)
+      i = 0;
+      while(i < NUMBER_OF_SUSPECTS && oneUnknownFlag == true)
       {
-        if(weapon == UNKNOWN_WEAPON)
+        if(suspect == UNKNOWN_SUSPECT)
         {
-          weapon = getWeapon(detectiveNotes[getCard(WeaponEnum(i))].first);
+          suspect = getSuspect(detectiveNotes[getCard(SuspectEnum(i))].first);
         }
         else
         {
           oneUnknownFlag = false;
         }
       }
-      i++;
-    }
-
-    if(oneUnknownFlag == true && aiAccusation.getWeapon() == UNKNOWN_WEAPON)
-    {
-      aiAccusation.setWeapon(weapon);
 
       i = 0;
+      while(i < NUMBER_OF_WEAPONS && oneUnknownFlag == true && aiAccusation.
+          getWeapon() == UNKNOWN_WEAPON)
+      {
+        if(detectiveNotes[getCard(WeaponEnum(i))].second == UNKNOWN_SUSPECT)
+        {
+          if(weapon == UNKNOWN_WEAPON)
+          {
+            weapon = getWeapon(detectiveNotes[getCard(WeaponEnum(i))].first);
+          }
+          else
+          {
+            oneUnknownFlag = false;
+          }
+        }
+        i++;
+      }
+
       while(i < NUMBER_OF_ROOMS && oneUnknownFlag == true && aiAccusation.
           getRoom() == UNKNOWN_ROOM)
       {
-        if(detectiveNotes[getCard(RoomEnum(i))].second == UNKNOWN_ROOM)
+        if(detectiveNotes[getCard(RoomEnum(i))].second == UNKNOWN_SUSPECT)
         {
           if(room == UNKNOWN_ROOM)
           {
@@ -900,11 +891,83 @@ void PlayerClass::makeAiAccusation()
         i++;
       }
 
-      if(oneUnknownFlag == true && aiAccusation.getRoom() == UNKNOWN_ROOM)
+      if(oneUnknownFlag == true)
       {
-        aiAccusation.setRoom(room);
+        aiAccusation = SuggestionClass(suspect, weapon, room);
       }
-    }
+      break;
+
+    default:
+      i = 0;
+      oneUnknownFlag = true;
+      while(i < NUMBER_OF_SUSPECTS && oneUnknownFlag == true && aiAccusation.
+          getSuspect() == UNKNOWN_SUSPECT)
+      {
+        if(detectiveNotes[getCard(SuspectEnum(i))].second == UNKNOWN_SUSPECT)
+        {
+          if(suspect == UNKNOWN_SUSPECT)
+          {
+            suspect = getSuspect(detectiveNotes[getCard(SuspectEnum(i))].first);
+          }
+          else
+          {
+            oneUnknownFlag = false;
+          }
+        }
+        i++;
+      }
+
+      if(oneUnknownFlag == true && aiAccusation.getSuspect() == UNKNOWN_SUSPECT)
+      {
+        aiAccusation.setSuspect(suspect);
+
+        i = 0;
+        while(i < NUMBER_OF_WEAPONS && oneUnknownFlag == true && aiAccusation.
+            getWeapon() == UNKNOWN_WEAPON)
+        {
+          if(detectiveNotes[getCard(WeaponEnum(i))].second == UNKNOWN_SUSPECT)
+          {
+            if(weapon == UNKNOWN_WEAPON)
+            {
+              weapon = getWeapon(detectiveNotes[getCard(WeaponEnum(i))].first);
+            }
+            else
+            {
+              oneUnknownFlag = false;
+            }
+          }
+          i++;
+        }
+
+        if(oneUnknownFlag == true && aiAccusation.getWeapon() == UNKNOWN_WEAPON)
+        {
+          aiAccusation.setWeapon(weapon);
+
+          i = 0;
+          while(i < NUMBER_OF_ROOMS && oneUnknownFlag == true && aiAccusation.
+              getRoom() == UNKNOWN_ROOM)
+          {
+            if(detectiveNotes[getCard(RoomEnum(i))].second == UNKNOWN_SUSPECT)
+            {
+              if(room == UNKNOWN_ROOM)
+              {
+                room = getRoom(detectiveNotes[getCard(RoomEnum(i))].first);
+              }
+              else
+              {
+                oneUnknownFlag = false;
+              }
+            }
+            i++;
+          }
+
+          if(oneUnknownFlag == true && aiAccusation.getRoom() == UNKNOWN_ROOM)
+          {
+            aiAccusation.setRoom(room);
+          }
+        }
+      }
+      break;
   }
 
   if(aiAccusation.getSuspect() == UNKNOWN_SUSPECT || aiAccusation.getWeapon()
