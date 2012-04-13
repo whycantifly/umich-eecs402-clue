@@ -23,7 +23,7 @@
 int socketPort = 30000;
 //ServerSocket server(socketPort);
 //ServerSocket serverSock;
-ClientSocket cliSock("localhost", socketPort);
+//ClientSocket cliSock("localhost", socketPort);
 
 //Function used by all human players
 ClueMainWindowClass::ClueMainWindowClass() : QWidget()
@@ -1667,7 +1667,7 @@ void ClueMainWindowClass::sendInfoFromHost()
 void ClueMainWindowClass::receiveInfoFromHost()
 {
 
-        //ClientSocket cliSock("localhost", socketPort);
+        ClientSocket cliSock("localhost", socketPort);
       
       
       
@@ -1735,7 +1735,7 @@ void ClueMainWindowClass::receiveInfoFromHost()
 void ClueMainWindowClass::sendInfoFromClient()
 {
 
-      //ClientSocket cliSock("localhost", socketPort);
+      ClientSocket cliSock("localhost", socketPort);
 
       
       
@@ -1993,7 +1993,7 @@ void ClueMainWindowClass::startGame()
       // Fun things to create
       
 
-        //ClientSocket cliSock("localhost", socketPort);
+        ClientSocket cliSock("localhost", socketPort);
 
       
       
