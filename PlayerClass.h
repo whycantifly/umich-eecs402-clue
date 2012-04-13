@@ -124,7 +124,8 @@ class PlayerClass
         const;
 
     //Handles suggestions passed to the Ai.
-    CardEnum handleSuggestionAi(SuggestionClass suggestion) const;
+    CardEnum handleSuggestionAi(SuggestionClass suggestion, SuspectEnum
+        currentSuspect) const;
 
     //Handles all preroll decisions for the Ai.
     ActionEnum handlePrerollAi();

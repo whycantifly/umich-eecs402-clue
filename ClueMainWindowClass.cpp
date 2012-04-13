@@ -1027,7 +1027,8 @@ void ClueMainWindowClass::handleSuggestion(const SuggestionClass
         if(playerIter->second.getAiFlag() == true &&
             gameParticipants.find(thisSuspect)->second.getHostFlag() == true)
         {
-          revealedCard = playerIter->second.handleSuggestionAi(suggestion);
+          revealedCard = playerIter->second.handleSuggestionAi(suggestion,
+              currentPlayerIter->first);
           sendRevealedCard(revealedCard);
         }
         //Remote players are revealing a card

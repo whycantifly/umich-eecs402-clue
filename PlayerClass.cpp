@@ -646,31 +646,36 @@ DirectionEnum PlayerClass::getAiMove(QImage &currentBoard, BoardLocationClass
   return direction;
 }
 
-CardEnum PlayerClass::handleSuggestionAi(SuggestionClass suggestion) const
+CardEnum PlayerClass::handleSuggestionAi(SuggestionClass suggestion, SuspectEnum
+    currentSuspect) const
 {
   //Variable Declarations
   map<CardEnum, set<SuspectEnum> > cardMatches =
       getSuggestionMatches(suggestion);
   map<CardEnum, set<SuspectEnum> >::iterator cardMatchesIter;
   map<CardEnum, set<SuspectEnum> > alreadyShownCards;
-  int randomIndex;
+  int playersShown = -1;
+  int cardIndex;
+  bool cardPickedFlag = false;
   CardEnum cardToReveal;
 
 
   switch(aiDifficulty)
   {
     case VERY_EASY:
-      randomIndex = rand() % cardMatches.size();
+    case EASY:
+      cardIndex = rand() % cardMatches.size();
       cardMatchesIter = cardMatches.begin();
-      for(int i = 0; i < randomIndex; i++)
+      for(int i = 0; i < cardIndex; i++)
       {
         cardMatchesIter++;
       }
       cardToReveal = cardMatchesIter->first;
     break;
-    default:
-      //Look at current player's detective notes.  If a suggestion has already
-      //been shown, then show that card.  Otherwise, show a random card.
+    case MEDIUM:
+      //Look at current player's detective notes.  If one or more cards that
+      //match the suggestion has already been shown, then show one of those
+      //cards.  Otherwise, show a random card.
       cardMatchesIter = cardMatches.begin();
 
       if(cardMatches.size() > 1)
@@ -687,15 +692,54 @@ CardEnum PlayerClass::handleSuggestionAi(SuggestionClass suggestion) const
         if(alreadyShownCards.empty() == false)
         {
           cardMatchesIter = alreadyShownCards.begin();
-          randomIndex = rand() % alreadyShownCards.size();
+
+          switch(aiDifficulty)
+          {
+            case MEDIUM:
+              cardIndex = rand() % alreadyShownCards.size();
+              break;
+            default:
+              //Show the first card the player has already seen
+              cardIndex = 0;
+              while(cardMatchesIter != alreadyShownCards.end() &&
+                  cardPickedFlag == false)
+              {
+                if(cardMatchesIter->second.find(currentSuspect) !=
+                    cardMatchesIter->second.end())
+                {
+                  cardPickedFlag = true;
+                }
+                else
+                {
+                  cardIndex++;
+                  cardMatchesIter++;
+                }
+              }
+
+              //Player has not seen any matching cards, so pick the first
+              //card that players have seen the most.
+              cardMatchesIter = alreadyShownCards.begin();
+              if(cardPickedFlag == false)
+              {
+                for(int i = 0; i < alreadyShownCards.size(); i++)
+                {
+                  if(cardMatchesIter->second.size() > playersShown)
+                  {
+                    playersShown = cardMatchesIter->second.size();
+                    cardIndex = i;
+                  }
+                }
+              }
+              break;
+          }
         }
         else
         {
           cardMatchesIter = cardMatches.begin();
-          randomIndex = rand() % cardMatches.size();
+          cardIndex = rand() % cardMatches.size();
         }
 
-        for(int i = 0; i < randomIndex; i++)
+        for(int i = 0; i < cardIndex; i++)
         {
           cardMatchesIter++;
         }
@@ -835,63 +879,36 @@ void PlayerClass::makeAiAccusation()
   WeaponEnum weapon = UNKNOWN_WEAPON;
   RoomEnum room = UNKNOWN_ROOM;
   bool oneUnknownFlag;
+  int unknownCards = 0;
   int i;
 
   switch(aiDifficulty)
   {
     case VERY_EASY:
       aiAccusation = SuggestionClass();
-      oneUnknownFlag = true;
-
       i = 0;
-      while(i < NUMBER_OF_SUSPECTS && oneUnknownFlag == true)
+      while(i < NUMBER_OF_CARDS && unknownCards <= NUMBER_OF_CARD_TYPES)
       {
-        if(suspect == UNKNOWN_SUSPECT)
+        if(detectiveNotes[i].second == UNKNOWN_SUSPECT)
         {
-          suspect = getSuspect(detectiveNotes[getCard(SuspectEnum(i))].first);
-        }
-        else
-        {
-          oneUnknownFlag = false;
-        }
-      }
-
-      i = 0;
-      while(i < NUMBER_OF_WEAPONS && oneUnknownFlag == true && aiAccusation.
-          getWeapon() == UNKNOWN_WEAPON)
-      {
-        if(detectiveNotes[getCard(WeaponEnum(i))].second == UNKNOWN_SUSPECT)
-        {
-          if(weapon == UNKNOWN_WEAPON)
+          switch(getCardType(detectiveNotes[i].first))
           {
-            weapon = getWeapon(detectiveNotes[getCard(WeaponEnum(i))].first);
+            case SUSPECT_CARD:
+              suspect = getSuspect(detectiveNotes[i].first);
+              break;
+            case WEAPON_CARD:
+              weapon = getWeapon(detectiveNotes[i].first);
+              break;
+            case ROOM_CARD:
+              room = getRoom(detectiveNotes[i].first);
+              break;
           }
-          else
-          {
-            oneUnknownFlag = false;
-          }
+          unknownCards++;
         }
         i++;
       }
 
-      while(i < NUMBER_OF_ROOMS && oneUnknownFlag == true && aiAccusation.
-          getRoom() == UNKNOWN_ROOM)
-      {
-        if(detectiveNotes[getCard(RoomEnum(i))].second == UNKNOWN_SUSPECT)
-        {
-          if(room == UNKNOWN_ROOM)
-          {
-            room = getRoom(detectiveNotes[getCard(RoomEnum(i))].first);
-          }
-          else
-          {
-            oneUnknownFlag = false;
-          }
-        }
-        i++;
-      }
-
-      if(oneUnknownFlag == true)
+      if(unknownCards == NUMBER_OF_CARD_TYPES)
       {
         aiAccusation = SuggestionClass(suspect, weapon, room);
       }
