@@ -76,6 +76,7 @@ void ClueMainWindowClass::setupNewBoard()
   personalNotesLabel->setVisible(false);
   personalNotes->setVisible(false);
   youAreText->setVisible(false);
+  yourCardsLabel->setVisible(false);
 
   //Make game setup interface visible
   gameWelcomeLabel->setVisible(true);
@@ -311,6 +312,7 @@ void ClueMainWindowClass::displayGameInterface()
   }
 
   youAreText->setVisible(true);
+  yourCardsLabel->setVisible(true);
 
   //Make game setup interface invisible
   gameWelcomeLabel->setVisible(false);

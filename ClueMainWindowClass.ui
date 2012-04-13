@@ -1413,26 +1413,6 @@ p, li { white-space: pre-wrap; }
      </property>
     </item>
    </widget>
-   <zorder>humanPlayersSpin</zorder>
-   <zorder>localPlayOption</zorder>
-   <zorder>humanPlayersLabel</zorder>
-   <zorder>networkedPlayOption</zorder>
-   <zorder>computerPlayersLabel</zorder>
-   <zorder>gameHostCheck</zorder>
-   <zorder>computerPlayersSpin</zorder>
-   <zorder>hostIPLabel</zorder>
-   <zorder>hostIPEdit</zorder>
-   <zorder>ai1DifficultyLabel</zorder>
-   <zorder>ai2DifficultyLabel</zorder>
-   <zorder>errorMessageLabel</zorder>
-   <zorder>ai4DifficultyLabel</zorder>
-   <zorder>ai5DifficultyLabel</zorder>
-   <zorder>ai3DifficultyLabel</zorder>
-   <zorder>ai1Difficulty</zorder>
-   <zorder>ai2Difficulty</zorder>
-   <zorder>ai3Difficulty</zorder>
-   <zorder>ai4Difficulty</zorder>
-   <zorder>ai5Difficulty</zorder>
   </widget>
   <widget class="QPushButton" name="startGameButton">
    <property name="geometry">
@@ -1463,7 +1443,7 @@ p, li { white-space: pre-wrap; }
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QLabel" name="label_2">
+  <widget class="QLabel" name="yourCardsLabel">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -1622,7 +1602,7 @@ p, li { white-space: pre-wrap; }
   <zorder>personalNotes</zorder>
   <zorder>detectiveNotesLabel</zorder>
   <zorder>personalNotesLabel</zorder>
-  <zorder>label_2</zorder>
+  <zorder>yourCardsLabel</zorder>
   <zorder>mustardNameLabel</zorder>
   <zorder>peacockNameLabel</zorder>
   <zorder>plumNameLabel</zorder>
