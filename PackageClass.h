@@ -38,10 +38,6 @@ class PackageClass
    string wrapSuspectEnum(SuspectEnum suspectNum);
    SuspectEnum unwrapSuspectEnum(string suspectNumStr);
    
-   // Test functions
-   string wrapPackage();
-   int unwrapPackage(string wrappedString);
-   
    private:
 
 };

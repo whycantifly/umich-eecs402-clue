@@ -1,10 +1,13 @@
 //Name:       Elaine Pang, Taylor Tappe, Colin Zarzycki
 //Date:       04/13/2012
 //Assignment: EECS402 Project 5
-//Purpose:    PackageClass class definition
+//Purpose:    PackageClass member function definitions
+//Info:       Class for wrapping and unwrapping strings to be passed back
+//            and forth for networking purposes
 
 #include "PackageClass.h"
 
+// Wraps game state into string
 string PackageClass::wrapSetupPkg(std::map<SuspectEnum, PlayerClass>
     gameParticipants)
 { 
@@ -36,6 +39,7 @@ string PackageClass::wrapSetupPkg(std::map<SuspectEnum, PlayerClass>
   return(ss.str());
 }
 
+// Wraps case file into string
 string PackageClass::wrapCaseFilePkg(SuggestionClass caseFile)
 { 
   stringstream ss;
@@ -47,6 +51,7 @@ string PackageClass::wrapCaseFilePkg(SuggestionClass caseFile)
   return(ss.str());
 }
 
+// Unwrap case file
 SuggestionClass PackageClass::unwrapCaseFilePkg(string caseFilePkg)
 { 
   istringstream iss;
@@ -66,6 +71,7 @@ SuggestionClass PackageClass::unwrapCaseFilePkg(string caseFilePkg)
   return(caseFile);
 }
 
+// Wrap suspectEnum
 string PackageClass::wrapSuspectEnum(SuspectEnum suspectNum)
 { 
   stringstream ss;
@@ -76,6 +82,7 @@ string PackageClass::wrapSuspectEnum(SuspectEnum suspectNum)
   return(ss.str());
 }
 
+// Unwrap SuspectEnum
 SuspectEnum PackageClass::unwrapSuspectEnum(string suspectNumStr)
 { 
   istringstream iss;
@@ -104,7 +111,6 @@ std::map<SuspectEnum, PlayerClass> PackageClass::unwrapSetupPkg(string
   int suspNumber;
   
   gameParticipants.clear();
-  
   
   // Set wrapped package to iss
   iss.str(wrappedPackage);
@@ -156,53 +162,4 @@ SuspectEnum PackageClass::unwrapCurrentPlayerPackage(string inputString)
   suspEnum = SuspectEnum(suspect);
 
   return(suspEnum);
-}
-
-/////// TEST FUNCTIONS
-
-// Test to wrap a few things
-string PackageClass::wrapPackage()
-{
-  string str,strTotal;
-  ifstream in;
-  in.open("myfile.txt");
-  getline(in,str);
-  while(in)
-  {
-    strTotal += str;
-    getline(in,str);
-  }
-  
-  int myInt = 6;
-  float myFloat = 12.12;
-  string myString = "test_test_test";
-  stringstream ss;
-  ss << myInt << " " << myFloat << " " << myString << endl;
-//  cout << ss.str();
-
-  return (ss.str());
-}
-
-// Test unwrap
-int PackageClass::unwrapPackage(string wrappedString)
-{
-  int myInt;
-  float myFloat;
-  string myString;
-  istringstream iss;
-  
-  cout << "The Wrapped String is..." << endl;
-  
-  cout << wrappedString << endl;
-  
-  iss.str(wrappedString);
-  iss >> myInt;
-  iss >> myFloat;
-  iss >> myString;
-  
-  cout << "Int val: " << myInt << endl;
-  cout << "Float val: " << myFloat << endl;
-  cout << "String val: " << myString << endl;
-  
-  return(myInt);
 }

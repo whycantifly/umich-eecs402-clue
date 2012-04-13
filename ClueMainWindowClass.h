@@ -291,8 +291,6 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     }
     
     void updateNumberOfAis(int numberOfAis);
-
-    void setClientSocket(ClientSocket &cliSock, int ipAddress, int portNumber);
 };
 
 #endif

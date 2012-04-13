@@ -2042,7 +2042,6 @@ void ClueMainWindowClass::startGame()
 //         }
 //       }
 //     }
-    
 
   }
   catch(ExceptionClass newException)
@@ -2169,12 +2168,4 @@ void ClueMainWindowClass::updateNumberOfAis(int numberOfAis)
   startGameButton->setGeometry(startGameButton->x(), START_GAME_BUTTON_Y +
       VERTICAL_GUI_SPACING * numberOfAis, startGameButton->width(),
       startGameButton->height());
-}
-
-void ClueMainWindowClass::setClientSocket(ClientSocket &cliSock, int ipAddress,
-    int portNumber)
-{
-  //ClientSocket *newSocket = new ClientSocket("localhost", 30000)
-  //cliSock("localhost", 30000);
-  return;
 }
