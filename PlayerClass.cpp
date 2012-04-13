@@ -114,9 +114,9 @@ void PlayerClass::stringToPlayer(string wrappedString)
   int i;  // Loop iter
   int x;  // x loc to be put in BoardLocationClass
   int y;  // y loc to be put in BoardLocationClass
-  int x2;
-  int y2;
-  int lastActionInt;  // last i
+  int x2;  // x loc for places visited
+  int y2;  // y loc for places visited
+  int lastActionInt;
   int numCardsInHand;
   int cardInHand;
   int numLocationsVisited;
@@ -130,23 +130,24 @@ void PlayerClass::stringToPlayer(string wrappedString)
   // First set player X and Y locations
   iss >> x >> y;
   currentLocation = BoardLocationClass(x,y);
-  cout << currentLocation.getXCoord() << " " << currentLocation.getYCoord() << endl;
+  //cout << currentLocation.getXCoord() << 
+  //  " " << currentLocation.getYCoord() << endl;
   
   iss >> hostFlag;
-  cout << "hostflag is " << hostFlag << endl;
+  //cout << "hostflag is " << hostFlag << endl;
   iss >> aiFlag;
-  cout << "aiFlag is " << aiFlag << endl;
+  //cout << "aiFlag is " << aiFlag << endl;
   iss >> gameOverFlag;
-  cout << "gameOverFlag is " << gameOverFlag << endl;
+  //cout << "gameOverFlag is " << gameOverFlag << endl;
   iss >> movedThisTurnFlag;
-  cout << "movedThisTurnFlag is " << movedThisTurnFlag << endl;
+  //cout << "movedThisTurnFlag is " << movedThisTurnFlag << endl;
   iss >> lastActionInt;
-  cout << "lastActionInt is " << lastActionInt << endl;
+  //cout << "lastActionInt is " << lastActionInt << endl;
   lastAction = ActionEnum(lastActionInt);
   
   // Cards in hand
   iss >> numCardsInHand;
-  cout << "numCardsInHand is " << numCardsInHand << endl;
+  //cout << "numCardsInHand is " << numCardsInHand << endl;
   for (i = 0; i < numCardsInHand; i++)
     {
     iss >> cardInHand;
@@ -155,24 +156,24 @@ void PlayerClass::stringToPlayer(string wrappedString)
         emptySuspectList));
     }
     
-      map<CardEnum, set<SuspectEnum> >::iterator cardIter;
-      for (cardIter = hand.begin();
-      cardIter != hand.end();
-      cardIter++)
-      {
-      cout << cardIter->first << " ";
-      }
-      
-      cout << endl;
+    // Print cards in hand
+//     map<CardEnum, set<SuspectEnum> >::iterator cardIter;
+//     for (cardIter = hand.begin();
+//     cardIter != hand.end();
+//     cardIter++)
+//     {
+//       cout << cardIter->first << " ";
+//     }
+//     cout << endl;
 
   iss >> dieRollThisTurn;
-  cout << "dieRollThisTurn is " << dieRollThisTurn << endl;
+  //cout << "dieRollThisTurn is " << dieRollThisTurn << endl;
   iss >> movesLeftThisTurn;
-  cout << "movesLeftThisTurn is " << movesLeftThisTurn << endl;
+  //cout << "movesLeftThisTurn is " << movesLeftThisTurn << endl;
   
   // Number of locations visited
   iss >> numLocationsVisited;
-  cout << "numLocationsVisited is " << numLocationsVisited << endl;
+  //cout << "numLocationsVisited is " << numLocationsVisited << endl;
   for (i = 0; i < numLocationsVisited; i++)
   {
     iss >> x2 >> y2;
@@ -189,11 +190,11 @@ void PlayerClass::stringToPlayer(string wrappedString)
   
   // Get ai Difficulty - NOT SET
   iss >> aiDifficultyInt;
-  cout << "aiDifficulty is " << aiDifficultyInt << endl;
+  //cout << "aiDifficulty is " << aiDifficultyInt << endl;
   aiDifficulty = DifficultyEnum(aiDifficultyInt);
   
   iss >> correctAiSuggestionFlag;
-  cout << "correctAiSuggestionFlag is " << correctAiSuggestionFlag << endl;
+  //cout << "correctAiSuggestionFlag is " << correctAiSuggestionFlag << endl;
 
   return;
 }

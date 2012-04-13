@@ -20,6 +20,8 @@
 #include "getCard.h"
 #include "getStartingDoorIndex.h"
 
+// These are used for building two binaries to keep sockets in scope
+// If successful, will figure out a way to hardwire into main.cpp or something
 int socketPort = 30000;
 //ServerSocket server(socketPort);
 //ServerSocket serverSock;
@@ -1420,49 +1422,54 @@ void ClueMainWindowClass::endTurn()
   clearVisitedTiles();
   currentPlayerIter->second.setDieRoll(0);
   
-/// COLIN
+///// This block sends from client/host depending on whose turn it just was
 
-    cout << "FIRST SEND BLOCK" << endl;
-    cout << "networkedPlayOption->isChecked() " << networkedPlayOption->isChecked() << endl;
-    cout << "gameParticipants.find(thisSuspect)->second.getHostFlag() " << gameParticipants.find(thisSuspect)->second.getHostFlag() << endl;
-    cout << "currentPlayerIter->second.getHostFlag() " << currentPlayerIter->second.getHostFlag() << endl;
-    cout << "currentPlayerIter->second.getAiFlag() " << currentPlayerIter->second.getAiFlag() << endl;
+// Print Send Block details
+//     cout << "FIRST SEND BLOCK" << endl;
+//     cout << "networkedPlayOption->isChecked() "
+//       << networkedPlayOption->isChecked() << endl;
+//     cout << "gameParticipants.find(thisSuspect)->second.getHostFlag() "
+//       << gameParticipants.find(thisSuspect)->second.getHostFlag() << endl;
+//     cout << "currentPlayerIter->second.getHostFlag() "
+//       << currentPlayerIter->second.getHostFlag() << endl;
+//     cout << "currentPlayerIter->second.getAiFlag() "
+//       << currentPlayerIter->second.getAiFlag() << endl;
 
-  if(networkedPlayOption->isChecked() == true)
-    {
-      if (gameParticipants.find(thisSuspect)->second.getHostFlag() == true) // HOST
-      {
-        if (currentPlayerIter->second.getHostFlag() == true)
-        {
-          sendInfoFromHost();
-        }
-        else if (currentPlayerIter->second.getAiFlag() == true)
-        {
-          sendInfoFromHost();
-        }
-        else
-        {
-          //sendInfoFromClient();
-        }
-      }
-      else // The client
-      {
-        if (currentPlayerIter->second.getHostFlag() == true)
-        {
-          //sendInfoFromHost();
-        }
-        else if (currentPlayerIter->second.getAiFlag() == true)
-        {
-          //sendInfoFromHost();
-        }
-        else
-        {
-          sendInfoFromClient();
-        }
-      }
-    }
+//   if(networkedPlayOption->isChecked() == true)
+//     {
+//       if (gameParticipants.find(thisSuspect)->second.getHostFlag() == true) // HOST
+//       {
+//         if (currentPlayerIter->second.getHostFlag() == true)
+//         {
+//           sendInfoFromHost();
+//         }
+//         else if (currentPlayerIter->second.getAiFlag() == true)
+//         {
+//           sendInfoFromHost();
+//         }
+//         else
+//         {
+//           //sendInfoFromClient();
+//         }
+//       }
+//       else // The client
+//       {
+//         if (currentPlayerIter->second.getHostFlag() == true)
+//         {
+//           //sendInfoFromHost();
+//         }
+//         else if (currentPlayerIter->second.getAiFlag() == true)
+//         {
+//           //sendInfoFromHost();
+//         }
+//         else
+//         {
+//           sendInfoFromClient();
+//         }
+//       }
+//     }
     
-/////
+///// End networking block //////
 
   //Move the current player iterator to the next player or the first player if 
   //it is pointing at the end of the list of game participants
@@ -1472,50 +1479,56 @@ void ClueMainWindowClass::endTurn()
     currentPlayerIter = gameParticipants.begin();
   }
   
-/// COLIN
+///// Begin networking block //////
+///// This block listens if it's not the turn of client/host
 
-    cout << "SECOND LISTEN BLOCK" << endl;
-    cout << "networkedPlayOption->isChecked() " << networkedPlayOption->isChecked() << endl;
-    cout << "gameParticipants.find(thisSuspect)->second.getHostFlag() " << gameParticipants.find(thisSuspect)->second.getHostFlag() << endl;
-    cout << "currentPlayerIter->second.getHostFlag() " << currentPlayerIter->second.getHostFlag() << endl;
-    cout << "currentPlayerIter->second.getAiFlag() " << currentPlayerIter->second.getAiFlag() << endl;
+// Print Listen Block details
+//   cout << "SECOND LISTEN BLOCK" << endl;
+//   cout << "networkedPlayOption->isChecked() " 
+//     << networkedPlayOption->isChecked() << endl;
+//   cout << "gameParticipants.find(thisSuspect)->second.getHostFlag() "
+//     << gameParticipants.find(thisSuspect)->second.getHostFlag() << endl;
+//   cout << "currentPlayerIter->second.getHostFlag() "
+//     << currentPlayerIter->second.getHostFlag() << endl;
+//   cout << "currentPlayerIter->second.getAiFlag() "
+//     << currentPlayerIter->second.getAiFlag() << endl;
     
-    if(networkedPlayOption->isChecked() == true)
-    {
-      if (gameParticipants.find(thisSuspect)->second.getHostFlag() == true) // HOST
-      {
-        if (currentPlayerIter->second.getHostFlag() == true)
-        {
-          //receiveInfoFromHost();
-        }
-        else if (currentPlayerIter->second.getAiFlag() == true)
-        {
-          //receiveInfoFromHost();
-        }
-        else
-        {
-          receiveInfoFromClient();
-        }
-      }
-      else // The client
-      {
-        if (currentPlayerIter->second.getHostFlag() == true)
-        {
-          receiveInfoFromHost();
-        }
-        else if (currentPlayerIter->second.getAiFlag() == true)
-        {
-          receiveInfoFromHost();
-        }
-        else
-        {
-          //receiveInfoFromClient();
-        }
-      }
-    }
+    // Listen Block
+//     if(networkedPlayOption->isChecked() == true)
+//     {
+//       if (gameParticipants.find(thisSuspect)->second.getHostFlag() == true) // HOST
+//       {
+//         if (currentPlayerIter->second.getHostFlag() == true)
+//         {
+//           //receiveInfoFromHost();
+//         }
+//         else if (currentPlayerIter->second.getAiFlag() == true)
+//         {
+//           //receiveInfoFromHost();
+//         }
+//         else
+//         {
+//           receiveInfoFromClient();
+//         }
+//       }
+//       else // The client
+//       {
+//         if (currentPlayerIter->second.getHostFlag() == true)
+//         {
+//           receiveInfoFromHost();
+//         }
+//         else if (currentPlayerIter->second.getAiFlag() == true)
+//         {
+//           receiveInfoFromHost();
+//         }
+//         else
+//         {
+//           //receiveInfoFromClient();
+//         }
+//       }
+//     }
     
-///
-
+///// End networking block //////
 
   startPlayerTurn();
 }
@@ -1613,111 +1626,95 @@ void ClueMainWindowClass::sendRemoteMoveInfo(ActionEnum playerAction,
   ////////////////////////////////////////////////////////////////////////////
 }
 
+// Sends info from host to client
 void ClueMainWindowClass::sendInfoFromHost()
 {
-        // Open server socket
-        
+  // Open server socket
+  ServerSocket server(socketPort);
+  ServerSocket serverSock;
 
-          ServerSocket server(socketPort);
-          ServerSocket serverSock;
 
+  string clientReply;
+  PackageClass package;
+  string gameParticipantsPkgStr, currentPlayerStr;
   
-        string clientReply;
-        PackageClass package;
-        string gameParticipantsPkgStr, currentPlayerStr;
-        
-        // Wrap up package to pass to other networked game(s)
-        gameParticipantsPkgStr = package.wrapSetupPkg(gameParticipants);
-        currentPlayerStr = package.wrapCurrentPlayerPackage(currentPlayerIter->first);
-        cout << gameParticipantsPkgStr << endl;
-        cout << currentPlayerStr << endl;
-        
-        cout << "BEGIN SEND INFO FROM HOST" << endl;
-        cout << "--------------------------" << endl;
-        
-        // Hold for client to connect
-        //cout << "Waiting for client to connect......." << endl;
-        //server.accept(serverSock);
-        //cout << "The client connected!" << endl;
-        
-//        serverSock << "Let's roll!";
-      
-        // Test stuff
-        //cout << "Confirmation from client?" << endl;
-        serverSock >> clientReply;
-        cout << "Connection message: " << clientReply << endl;
-        
-        // Send game participants (package #1) to client
-        cout << "Sending gameParticipantsPkgStr..." << endl;
-        serverSock << gameParticipantsPkgStr; 
-        
-        serverSock >> clientReply;
-        cout << "Received this reply: " << clientReply;
-        
-        cout << "Sending gameParticipantsPkgStr..." << endl;
-        serverSock << currentPlayerStr;
-        
-        serverSock >> clientReply;
-        
-        cout << "END SEND INFO FROM HOST" << endl;
-      cout << "--------------------------" << endl;
-        
+  // Wrap up package to pass to other networked game(s)
+  gameParticipantsPkgStr = package.wrapSetupPkg(gameParticipants);
+  currentPlayerStr = package.wrapCurrentPlayerPackage(currentPlayerIter->first);
+  cout << gameParticipantsPkgStr << endl;
+  cout << currentPlayerStr << endl;
+  
+  cout << "BEGIN SEND INFO FROM HOST" << endl;
+  cout << "--------------------------" << endl;
+  
+  //cout << "Confirmation from client?" << endl;
+  serverSock >> clientReply;
+  cout << "Connection message: " << clientReply << endl;
+  
+  // Send game participants (package #1) to client
+  cout << "Sending gameParticipantsPkgStr..." << endl;
+  serverSock << gameParticipantsPkgStr; 
+  
+  serverSock >> clientReply;
+  cout << "Received this reply: " << clientReply;
+  
+  cout << "Sending gameParticipantsPkgStr..." << endl;
+  serverSock << currentPlayerStr;
+  
+  serverSock >> clientReply;
+  
+  cout << "END SEND INFO FROM HOST" << endl;
+  cout << "--------------------------" << endl;
 }
 
+// Client receives info from host
 void ClueMainWindowClass::receiveInfoFromHost()
 {
+  ClientSocket cliSock("localhost", socketPort);
+  
+  
+  PackageClass package;
+  string packageString;
+  string gameParticipantsPkgStr, currentPlayerStr;
+  SuspectEnum currentSuspectExchange;
 
-        ClientSocket cliSock("localhost", socketPort);
-      
-      
-      
-      
-      PackageClass package;
-      string packageString;
-      string gameParticipantsPkgStr, currentPlayerStr;
-      SuspectEnum currentSuspectExchange;
-      
-      // Make sure this array is clear
-      //gameParticipants.clear();
-      
-      // Trying to connect to server
-      //cout << "Attempting to connect to server" << endl;
-
-      cout << "BEGIN RECEIVE INFO FROM HOST" << endl;
-      cout << "--------------------------" << endl;
-      
-      // Send "I'm here message to server!"
-      cout << "Sending message to server: " << endl;
-      cliSock << "Connected!";
-      
-      cout << "Waiting for server packets" << endl;
-      
-      // Get game participants package (pack #1)
-      cliSock >> gameParticipantsPkgStr;
-      cout << "Received gameParticipantsPkgStr" << endl;
-      
-      gameParticipants = package.unwrapSetupPkg(gameParticipantsPkgStr);
-      
-      cliSock << "Send next packet!";
-      
-      // Get Suspect Enum (pack #2)
-      cliSock >> currentPlayerStr;
-      cout << "Received currentPlayerStr" << endl;
-      
-      currentSuspectExchange = package.unwrapCurrentPlayerPackage(currentPlayerStr);
-      
-      currentPlayerIter = gameParticipants.find(SuspectEnum(currentSuspectExchange));
-      
-      cliSock << "All done!";
-      
-      cout << "END RECIEVE INFO FROM HOST" << endl;
-      cout << "--------------------------" << endl;
-      
-      refreshDisplay();
-      
-      // IF STILL HOSTS TURN
-      // CALL REC INFO (go back into listen mode)
-      
+  cout << "BEGIN RECEIVE INFO FROM HOST" << endl;
+  cout << "--------------------------" << endl;
+  
+  // Send "I'm here message to server!"
+  cout << "Sending message to server: " << endl;
+  cliSock << "Connected!";
+  
+  cout << "Waiting for server packets" << endl;
+  
+  // Get game participants package (pack #1)
+  cliSock >> gameParticipantsPkgStr;
+  cout << "Received gameParticipantsPkgStr" << endl;
+  
+  gameParticipants = package.unwrapSetupPkg(gameParticipantsPkgStr);
+  
+  cliSock << "Send next packet!";
+  
+  // Get Suspect Enum (pack #2)
+  cliSock >> currentPlayerStr;
+  cout << "Received currentPlayerStr" << endl;
+  
+  currentSuspectExchange = 
+    package.unwrapCurrentPlayerPackage(currentPlayerStr);
+  
+  currentPlayerIter = 
+    gameParticipants.find(SuspectEnum(currentSuspectExchange));
+  
+  cliSock << "All done!";
+  
+  cout << "END RECIEVE INFO FROM HOST" << endl;
+  cout << "--------------------------" << endl;
+  
+  refreshDisplay();
+  
+  // IF STILL HOSTS TURN
+  // CALL REC INFO (go back into listen mode)
+  
 //       if (currentPlayerIter->second.getHostFlag() == true)
 //         {
 //           receiveInfoFromHost();
@@ -1732,110 +1729,99 @@ void ClueMainWindowClass::receiveInfoFromHost()
 //       }
 }
 
+// Client sends info to host
 void ClueMainWindowClass::sendInfoFromClient()
 {
 
-      ClientSocket cliSock("localhost", socketPort);
-
-      
-      
-      
-      PackageClass package;
-      string packageString;
-      string gameParticipantsPkgStr, currentPlayerStr;
-//      string testString = "Time Here!";
-      
-      gameParticipantsPkgStr = package.wrapSetupPkg(gameParticipants);
-      currentPlayerStr = package.wrapCurrentPlayerPackage(currentPlayerIter->first);
-      cout << gameParticipantsPkgStr << endl;
-      cout << currentPlayerStr << endl;
-      
-      cout << "BEGIN SEND INFO FROM CLIENT" << endl;
-      cout << "--------------------------" << endl;
-      // Send "I'm here message to server!"
-      
-//      cliSock >> testString;
-      
-      cout << "Sending message to server: " << endl;
-      cliSock << gameParticipantsPkgStr;
-      
-      cout << "Waiting for server packets" << endl;
-      
-      // Get game participants package (pack #1)
-      cliSock >> gameParticipantsPkgStr;
-      cout << "Sent gameParticipantsPkgStr" << endl;
-      
-      cliSock << "One more to go!";
-      
-      // Get game participants package (pack #2)
-      cliSock >> currentPlayerStr;
-      cout << "Sent currentPlayerStr" << endl;
-      
-      cliSock << "All done!";
-      
-      cout << "END SEND INFO FROM CLIENT" << endl;
-      cout << "--------------------------" << endl;
-      
-//      currentPlayerIter = gameParticipants.begin();
+  ClientSocket cliSock("localhost", socketPort);
+  
+  
+  PackageClass package;
+  string packageString;
+  string gameParticipantsPkgStr, currentPlayerStr;
+  
+  gameParticipantsPkgStr = package.wrapSetupPkg(gameParticipants);
+  currentPlayerStr = package.wrapCurrentPlayerPackage(currentPlayerIter->first);
+  cout << gameParticipantsPkgStr << endl;
+  cout << currentPlayerStr << endl;
+  
+  cout << "BEGIN SEND INFO FROM CLIENT" << endl;
+  cout << "--------------------------" << endl;
+  
+  cout << "Sending message to server: " << endl;
+  cliSock << gameParticipantsPkgStr;
+  
+  cout << "Waiting for server packets" << endl;
+  
+  // Get game participants package (pack #1)
+  cliSock >> gameParticipantsPkgStr;
+  cout << "Sent gameParticipantsPkgStr" << endl;
+  
+  cliSock << "One more to go!";
+  
+  // Get game participants package (pack #2)
+  cliSock >> currentPlayerStr;
+  cout << "Sent currentPlayerStr" << endl;
+  
+  cliSock << "All done!";
+  
+  cout << "END SEND INFO FROM CLIENT" << endl;
+  cout << "--------------------------" << endl;
 }
 
+// Host gets info from client
 void ClueMainWindowClass::receiveInfoFromClient()
 {
-        // Open server socket
+  ServerSocket server(socketPort);
+  ServerSocket serverSock;
 
-
-          ServerSocket server(socketPort);
-          ServerSocket serverSock;
-
-        
-        
-        
-        cout << "BEGIN RECEIVE INFO FROM CLIENT" << endl;
-        cout << "--------------------------" << endl;
   
-        string clientReply;
-        PackageClass package;
-        string gameParticipantsPkgStr, currentPlayerStr;
-        SuspectEnum currentSuspectExchange;
-        
-        // Wrap up package to pass to other networked game(s)
-        
-        
-        // Hold for client to connect
-        //cout << "Waiting for client to connect......." << endl;
-        //server.accept(serverSock);
-        //cout << "The client connected!" << endl;
-      
-        // Test stuff
-        
-        cout << "Waiting for message from client..." << endl;
-        serverSock >> gameParticipantsPkgStr;
-        cout << "Received message: gameParticipantsPkgStr" << endl;
-        
-        gameParticipants = package.unwrapSetupPkg(gameParticipantsPkgStr);
-        
-        serverSock << "OK, send the next one!"; 
-        
-        serverSock >> currentPlayerStr;
-        cout << "Received message: currentPlayerStr" << endl;
-        
-        currentSuspectExchange = package.unwrapCurrentPlayerPackage(currentPlayerStr);
-      
-        currentPlayerIter = gameParticipants.find(SuspectEnum(currentSuspectExchange));
-        
-        serverSock << "All set!";
-        
-        serverSock >> clientReply;
-        
-      cout << "END RECEIVE INFO FROM CLIENT" << endl;
-      cout << "--------------------------" << endl;
+  cout << "BEGIN RECEIVE INFO FROM CLIENT" << endl;
+  cout << "--------------------------" << endl;
 
-        
-        refreshDisplay();
-        
-      // IF STILL CLIENTS TURN
-      // CALL REC INFO (go back into listen mode)
-      
+  string clientReply;
+  PackageClass package;
+  string gameParticipantsPkgStr, currentPlayerStr;
+  SuspectEnum currentSuspectExchange;
+  
+  // Wrap up package to pass to other networked game(s)
+  
+  
+  // Hold for client to connect
+  //cout << "Waiting for client to connect......." << endl;
+  //server.accept(serverSock);
+  //cout << "The client connected!" << endl;
+
+  // Test stuff
+  
+  cout << "Waiting for message from client..." << endl;
+  serverSock >> gameParticipantsPkgStr;
+  cout << "Received message: gameParticipantsPkgStr" << endl;
+  
+  gameParticipants = package.unwrapSetupPkg(gameParticipantsPkgStr);
+  
+  serverSock << "OK, send the next one!"; 
+  
+  serverSock >> currentPlayerStr;
+  cout << "Received message: currentPlayerStr" << endl;
+  
+  currentSuspectExchange = package.unwrapCurrentPlayerPackage(currentPlayerStr);
+
+  currentPlayerIter = gameParticipants.find(SuspectEnum(currentSuspectExchange));
+  
+  serverSock << "All set!";
+  
+  serverSock >> clientReply;
+  
+  cout << "END RECEIVE INFO FROM CLIENT" << endl;
+  cout << "--------------------------" << endl;
+
+  
+  refreshDisplay();
+  
+// IF STILL CLIENTS TURN
+// CALL REC INFO (go back into listen mode)
+
 //       if (currentPlayerIter->second.getAiFlag() == true)
 //         {
 //           //receiveInfoFromClient();
@@ -1907,16 +1893,11 @@ void ClueMainWindowClass::startGame()
         //
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
+
+        ServerSocket server(socketPort);
+        ServerSocket serverSock;
         
-        // Open server socket
 
-
-          ServerSocket server(socketPort);
-          ServerSocket serverSock;
-
-  
-  
-  
         string clientReply;
         PackageClass package;
         string gameParticipantsPkgStr, caseFilePkgStr, suspectEnumPkgStr, iterString;
@@ -1956,12 +1937,6 @@ void ClueMainWindowClass::startGame()
         serverSock >> clientReply;
         cout << clientReply << endl;
         
-//         Send case file (package #2.5) to client
-//         serverSock << iterString;
-//         
-//         serverSock >> clientReply;
-//         cout << clientReply << endl;
-        
         // Send suspect number (package #3) to client
         serverSock << suspectEnumPkgStr;
         
@@ -1973,8 +1948,7 @@ void ClueMainWindowClass::startGame()
 //         TEST BLOCK
 //         cout << gameParticipantsPkgStr << endl;
 //         cout << caseFilePkgStr << endl;
-//         cout << suspectEnumPkgStr << endl;
-        
+//         cout << suspectEnumPkgStr << endl;      
       }
     }
     else
@@ -1991,11 +1965,8 @@ void ClueMainWindowClass::startGame()
       //////////////////////////////////////////////////////////////////////////
       
       // Fun things to create
-      
-
-        ClientSocket cliSock("localhost", socketPort);
-
-      
+    
+      ClientSocket cliSock("localhost", socketPort);
       
       
       PackageClass package;
@@ -2007,10 +1978,6 @@ void ClueMainWindowClass::startGame()
       
       // Trying to connect to server
       cout << "Attempting to connect to server" << endl;
-      // Right now on localhost, replace with IP
-      //setClientSocket(cliSock,ip,port);
-      
-      // packageString = package.wrapPackage();
       
       // Send "I'm here message to server!"
       cout << "Sending message to server: " << endl;
@@ -2031,14 +1998,6 @@ void ClueMainWindowClass::startGame()
       cout << caseFilePkgStr << endl;
       
       caseFile = package.unwrapCaseFilePkg(caseFilePkgStr);
-      
-//       cliSock << "All done, send me #2.5!";
-//       
-//       // Get iterstring (pack #2.5)
-//       cliSock >> iterString;
-//       cout << iterString << endl;
-//       
-//       currentPlayerIter = package.unwrapCurrentPlayerPackage(iterString,gameParticipants);
       
       cliSock << "All done, send me #3!";
       
@@ -2084,9 +2043,10 @@ void ClueMainWindowClass::startGame()
 //       cout << suspectEnumPkgStr << endl;
 
       currentPlayerIter = gameParticipants.begin();
+      
     }
     
-    cout << " ALL DONE WITH SETUP " << endl;
+    cout << " Game setup completed" << endl;
     cout << " --------------------------------------" << endl;
     
     //Display gameplay interface
@@ -2095,51 +2055,54 @@ void ClueMainWindowClass::startGame()
     displayGameInterface();
     displayDefaultOptions();
     
-    /// COLIN
-/// If not this player, go into listen mode
-
-    cout << "BLOCK JUST AFTER INIT" << endl;
-    cout << "networkedPlayOption->isChecked() " << networkedPlayOption->isChecked() << endl;
-    cout << "gameParticipants.find(thisSuspect)->second.getHostFlag() " << gameParticipants.find(thisSuspect)->second.getHostFlag() << endl;
-    cout << "currentPlayerIter->second.getHostFlag() " << currentPlayerIter->second.getHostFlag() << endl;
-    cout << "currentPlayerIter->second.getAiFlag() " << currentPlayerIter->second.getAiFlag() << endl;
+    
+/// Test block for client/host going into listen mode after init
+//     cout << "BLOCK JUST AFTER INIT" << endl;
+//     cout << "networkedPlayOption->isChecked() "
+//       << networkedPlayOption->isChecked() << endl;
+//     cout << "gameParticipants.find(thisSuspect)->second.getHostFlag() "
+//       << gameParticipants.find(thisSuspect)->second.getHostFlag() << endl;
+//     cout << "currentPlayerIter->second.getHostFlag() "
+//       << currentPlayerIter->second.getHostFlag() << endl;
+//     cout << "currentPlayerIter->second.getAiFlag() "
+//       << currentPlayerIter->second.getAiFlag() << endl;
     
     //Start the first turn
     startPlayerTurn();
     
-    if(networkedPlayOption->isChecked() == true)
-    {
-      if (gameParticipants.find(thisSuspect)->second.getHostFlag() == true) // HOST
-      {
-        if (currentPlayerIter->second.getHostFlag() == true)
-        {
-          //receiveInfoFromHost();
-        }
-        else if (currentPlayerIter->second.getAiFlag() == true)
-        {
-          //receiveInfoFromHost();
-        }
-        else
-        {
-          receiveInfoFromClient();
-        }
-      }
-      else // The client
-      {
-        if (currentPlayerIter->second.getHostFlag() == true)
-        {
-          receiveInfoFromHost();
-        }
-        else if (currentPlayerIter->second.getAiFlag() == true)
-        {
-          receiveInfoFromHost();
-        }
-        else
-        {
-          //receiveInfoFromClient();
-        }
-      }
-    }
+//     if(networkedPlayOption->isChecked() == true)
+//     {
+//       if (gameParticipants.find(thisSuspect)->second.getHostFlag() == true) // HOST
+//       {
+//         if (currentPlayerIter->second.getHostFlag() == true)
+//         {
+//           //receiveInfoFromHost();
+//         }
+//         else if (currentPlayerIter->second.getAiFlag() == true)
+//         {
+//           //receiveInfoFromHost();
+//         }
+//         else
+//         {
+//           receiveInfoFromClient();
+//         }
+//       }
+//       else // The client
+//       {
+//         if (currentPlayerIter->second.getHostFlag() == true)
+//         {
+//           receiveInfoFromHost();
+//         }
+//         else if (currentPlayerIter->second.getAiFlag() == true)
+//         {
+//           receiveInfoFromHost();
+//         }
+//         else
+//         {
+//           //receiveInfoFromClient();
+//         }
+//       }
+//     }
     
 
   }

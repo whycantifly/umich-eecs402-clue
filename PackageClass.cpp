@@ -1,9 +1,5 @@
 #include "PackageClass.h"
 
-// PRETTY MUCH EVERYTHING IN THIS CLASS IS NON-FUNCTIONAL EXCEPT FOR TESTING
-
-// Beta wrapping initial package to send to client human player
-//string PackageClass::wrapSetupPkg(std::map<SuspectEnum, PlayerClass> gameParticipants, SuggestionClass caseFile, SuspectEnum thisSuspect)
 string PackageClass::wrapSetupPkg(std::map<SuspectEnum, PlayerClass> gameParticipants)
 { 
   PlayerClass player;
@@ -12,12 +8,6 @@ string PackageClass::wrapSetupPkg(std::map<SuspectEnum, PlayerClass> gamePartici
   string playerToString;
   stringstream ss;
   map< SuspectEnum, PlayerClass >::iterator partIter;
-  
-// This iterator not working for some reason...  
-//  for (partIter = gameParticipants.begin(); partIter != gameParticipants.end(); partIter++) ;
-//  {
-//   cout << "Suspect: " << partIter->first << endl;
-//  }
     
   // Get number of people in game
   int numPlayers = (int) gameParticipants.size();
@@ -106,8 +96,6 @@ std::map<SuspectEnum, PlayerClass> PackageClass::unwrapSetupPkg(string wrappedPa
   
   gameParticipants.clear();
   
-//  cout << "The Wrapped Package is..." << endl;
-//  cout << wrappedPackage << endl;
   
   // Set wrapped package to iss
   iss.str(wrappedPackage);
@@ -160,37 +148,6 @@ SuspectEnum PackageClass::unwrapCurrentPlayerPackage(string inputString)
 
   return(suspEnum);
 }
-
-// map< SuspectEnum, PlayerClass >::iterator PackageClass::unwrapCurrentPlayerPackage(string inputString, std::map<SuspectEnum, PlayerClass> gameParticipants)
-// {
-//   map< SuspectEnum, PlayerClass >::iterator currentPlayerIter, outputPlayerIter;
-//   SuspectEnum suspEnum;
-//   istringstream iss;
-//   int suspect;
-//   int i;
-//   int NUM_PLAYERS = 3;
-//   
-//   iss.str(inputString);
-//   
-//   iss >> suspect;
-//   
-//   suspEnum = SuspectEnum(suspect);
-//   
-//   currentPlayerIter = gameParticipants.begin();
-//   
-//   for (i = 0; i < NUM_PLAYERS; i++)
-//   {
-//     if (currentPlayerIter->first == suspEnum)
-//     {
-//       outputPlayerIter = currentPlayerIter;
-//     }
-//     currentPlayerIter++;
-//   }
-//   
-//   return(outputPlayerIter);
-// }
-
-
 
 /////// TEST FUNCTIONS
 

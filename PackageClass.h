@@ -17,19 +17,19 @@ class PackageClass
 {
    public:
    
-   // Functions to implement in Clue
-   //string wrapSetupPkg(std::map<SuspectEnum, PlayerClass> gameParticipants, SuggestionClass caseFile, SuspectEnum thisSuspect);
+   // Pass game state (gameParticipants) back and forth
    string wrapSetupPkg(std::map<SuspectEnum, PlayerClass> gameParticipants);
-   string wrapCaseFilePkg(SuggestionClass caseFile);
-   SuggestionClass unwrapCaseFilePkg(string caseFilePkg);
    std::map<SuspectEnum, PlayerClass> unwrapSetupPkg(string wrappedPackage);
    
-   string wrapCurrentPlayerPackage(SuspectEnum suspEnum);
+   // pass Case File back and forth
+   string wrapCaseFilePkg(SuggestionClass caseFile);
+   SuggestionClass unwrapCaseFilePkg(string caseFilePkg);
    
+   // Pass currentPlayer back and forth
+   string wrapCurrentPlayerPackage(SuspectEnum suspEnum);
    SuspectEnum unwrapCurrentPlayerPackage(string inputString);
    
-//   map< SuspectEnum, PlayerClass >::iterator unwrapCurrentPlayerPackage(string inputString, std::map<SuspectEnum, PlayerClass> gameParticipants);
-   
+   // Pass suspectEnum back and forth
    string wrapSuspectEnum(SuspectEnum suspectNum);
    SuspectEnum unwrapSuspectEnum(string suspectNumStr);
    
