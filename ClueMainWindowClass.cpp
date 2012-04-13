@@ -2149,6 +2149,61 @@ void ClueMainWindowClass::startGame()
   }
 }
 
+void ClueMainWindowClass::submitMove()
+{
+  try
+  {
+    errorMessageLabel->setText("");
+    if(rollDieOption->isChecked() == true)
+    {
+      continuePlayerTurn();
+    }
+    else if(useSecretPassageOption->isChecked() == true)
+    {
+      moveCurrentPlayerToSecretPassage();
+    }
+    else if(moveUpOption->isChecked() == true)
+    {
+      moveCurrentPlayer(UP);
+    }
+    else if(moveDownOption->isChecked() == true)
+    {
+      moveCurrentPlayer(DOWN);
+    }
+    else if(moveLeftOption->isChecked() == true)
+    {
+      moveCurrentPlayer(LEFT);
+    }
+    else if(moveRightOption->isChecked() == true)
+    {
+      moveCurrentPlayer(RIGHT);
+    }
+    else if(leaveRoomOption->isChecked() == true)
+    {
+      moveCurrentPlayerOutDoor(doorNumberSpin->value());
+    }
+    else if(makeSuggestionOption->isChecked() == true)
+    {
+      makePlayerSuggestion();
+    }
+    else if(makeAccusationOption->isChecked() == true)
+    {
+      makePlayerAccusation();
+    }
+    else if(endTurnOption->isChecked() == true)
+    {
+      endTurn();
+    }
+  }
+  catch(ExceptionClass newException)
+  {
+    errorMessageLabel->setText("<span style=' font-weight:600; color:#ff0000;'>"
+        + newException.getErrorMessage() + "</span>");
+  }
+}
+
+
+
 void ClueMainWindowClass::setNetworkOptVis()
 {
   gameHostCheck->setVisible(true);
