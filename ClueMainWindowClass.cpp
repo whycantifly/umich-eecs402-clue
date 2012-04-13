@@ -1903,7 +1903,9 @@ void ClueMainWindowClass::startGame()
       
       // Fun things to create
     
+      
       ClientSocket cliSock("localhost", socketPort);
+      //ClientSocket cliSock(hostIPEdit->value(), socketPort);
       
       
       PackageClass package;
@@ -1925,7 +1927,7 @@ void ClueMainWindowClass::startGame()
       
       // Get game participants package (pack #1)
       cliSock >> gameParticipantsPkgStr;
-      cout << gameParticipantsPkgStr << endl;
+//      cout << gameParticipantsPkgStr << endl;
       
       gameParticipants = package.unwrapSetupPkg(gameParticipantsPkgStr);
       
@@ -1933,7 +1935,7 @@ void ClueMainWindowClass::startGame()
       
       // Get case file package (pack #2)
       cliSock >> caseFilePkgStr;
-      cout << caseFilePkgStr << endl;
+//      cout << caseFilePkgStr << endl;
       
       caseFile = package.unwrapCaseFilePkg(caseFilePkgStr);
       
@@ -1941,7 +1943,7 @@ void ClueMainWindowClass::startGame()
       
       // Get THIS suspect's number package (pack #3)
       cliSock >> suspectEnumPkgStr;
-      cout << suspectEnumPkgStr << endl;
+//      cout << suspectEnumPkgStr << endl;
       
       thisSuspect = package.unwrapSuspectEnum(suspectEnumPkgStr);
       

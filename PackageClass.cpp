@@ -127,7 +127,7 @@ std::map<SuspectEnum, PlayerClass> PackageClass::unwrapSetupPkg(string
     
     // Get singlePlayerString
     getline( iss, singlePlayerString );
-    cout << singlePlayerString << endl;
+    //cout << singlePlayerString << endl;
     
     // Pass string to PlayerClass to roll up
     player.stringToPlayer(singlePlayerString);
