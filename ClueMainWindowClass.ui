@@ -1041,7 +1041,7 @@ p, li { white-space: pre-wrap; }
      <x>600</x>
      <y>90</y>
      <width>386</width>
-     <height>116</height>
+     <height>96</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -1173,54 +1173,272 @@ p, li { white-space: pre-wrap; }
      <string>...</string>
     </property>
    </widget>
-   <widget class="QLabel" name="aiDifficultyLabel">
+   <widget class="QLabel" name="ai1DifficultyLabel">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>90</y>
-      <width>91</width>
+      <width>96</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
-     <string>AI Difficulty:</string>
+     <string>AI 1 Difficulty:</string>
     </property>
    </widget>
-   <widget class="QSlider" name="difficultySlider">
+   <widget class="QLabel" name="ai2DifficultyLabel">
     <property name="geometry">
      <rect>
-      <x>110</x>
-      <y>90</y>
-      <width>186</width>
-      <height>19</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>4</number>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Horizontal</enum>
-    </property>
-   </widget>
-   <widget class="QLabel" name="aiDifficultyText">
-    <property name="geometry">
-     <rect>
-      <x>305</x>
-      <y>90</y>
-      <width>76</width>
+      <x>10</x>
+      <y>110</y>
+      <width>96</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
-     <string>Very Easy</string>
+     <string>AI 2 Difficulty:</string>
     </property>
    </widget>
+   <widget class="QLabel" name="ai4DifficultyLabel">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>150</y>
+      <width>96</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>AI 4 Difficulty:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="ai5DifficultyLabel">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>170</y>
+      <width>96</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>AI 5 Difficulty:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="ai3DifficultyLabel">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>130</y>
+      <width>96</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>AI 3 Difficulty:</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="ai1Difficulty">
+    <property name="geometry">
+     <rect>
+      <x>115</x>
+      <y>90</y>
+      <width>216</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>Very Easy</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Easy</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Medium</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Hard</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Expert</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="ai2Difficulty">
+    <property name="geometry">
+     <rect>
+      <x>115</x>
+      <y>110</y>
+      <width>216</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>Very Easy</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Easy</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Medium</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Hard</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Expert</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="ai3Difficulty">
+    <property name="geometry">
+     <rect>
+      <x>115</x>
+      <y>130</y>
+      <width>216</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>Very Easy</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Easy</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Medium</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Hard</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Expert</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="ai4Difficulty">
+    <property name="geometry">
+     <rect>
+      <x>115</x>
+      <y>150</y>
+      <width>216</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>Very Easy</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Easy</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Medium</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Hard</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Expert</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="ai5Difficulty">
+    <property name="geometry">
+     <rect>
+      <x>115</x>
+      <y>170</y>
+      <width>216</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>Very Easy</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Easy</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Medium</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Hard</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Expert</string>
+     </property>
+    </item>
+   </widget>
+   <zorder>humanPlayersSpin</zorder>
+   <zorder>localPlayOption</zorder>
+   <zorder>humanPlayersLabel</zorder>
+   <zorder>networkedPlayOption</zorder>
+   <zorder>computerPlayersLabel</zorder>
+   <zorder>gameHostCheck</zorder>
+   <zorder>computerPlayersSpin</zorder>
+   <zorder>hostIPLabel</zorder>
+   <zorder>hostIPEdit</zorder>
+   <zorder>ai1DifficultyLabel</zorder>
+   <zorder>ai2DifficultyLabel</zorder>
+   <zorder>errorMessageLabel</zorder>
+   <zorder>ai4DifficultyLabel</zorder>
+   <zorder>ai5DifficultyLabel</zorder>
+   <zorder>ai3DifficultyLabel</zorder>
+   <zorder>ai1Difficulty</zorder>
+   <zorder>ai2Difficulty</zorder>
+   <zorder>ai3Difficulty</zorder>
+   <zorder>ai4Difficulty</zorder>
+   <zorder>ai5Difficulty</zorder>
   </widget>
   <widget class="QPushButton" name="startGameButton">
    <property name="geometry">
     <rect>
      <x>890</x>
-     <y>210</y>
+     <y>190</y>
      <width>95</width>
      <height>27</height>
     </rect>
@@ -1397,13 +1615,13 @@ p, li { white-space: pre-wrap; }
     <string>Help</string>
    </property>
   </widget>
-  <zorder>actionOptionsFrame</zorder>
+  <zorder>errorMessageLabel</zorder>
   <zorder>gameBoard</zorder>
+  <zorder>actionOptionsFrame</zorder>
   <zorder>startGameButton</zorder>
   <zorder>gameWelcomeLabel</zorder>
   <zorder>currentTurnText</zorder>
   <zorder>gameSetupFrame</zorder>
-  <zorder>errorMessageLabel</zorder>
   <zorder>okayButton</zorder>
   <zorder>rollInfoText</zorder>
   <zorder>selectActionLabel</zorder>

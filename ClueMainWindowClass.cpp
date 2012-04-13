@@ -30,8 +30,6 @@ ClueMainWindowClass::ClueMainWindowClass() : QWidget()
   //Set up the GUI
   setupUi(this);
 
-  difficultySlider->setTickPosition(QSlider::TicksBothSides);
-
   //Signals and slots
   connect(networkedPlayOption, SIGNAL(clicked()), this,
       SLOT(setNetworkOptVis()));
@@ -41,9 +39,9 @@ ClueMainWindowClass::ClueMainWindowClass() : QWidget()
       SLOT(toggleLeaveRoomOpt()));
   connect(okayButton, SIGNAL(clicked()), this, SLOT(submitMove()));
   connect(startGameButton, SIGNAL(clicked()), this, SLOT(startGame()));
-  connect(difficultySlider, SIGNAL(valueChanged(int)), this,
-      SLOT(updateDifficultyText(int)));
   connect(helpButton, SIGNAL(clicked()), this, SLOT(openClueRules()));
+  connect(computerPlayersSpin, SIGNAL(valueChanged(int)), this, SLOT(
+      updateNumberOfAis(int)));
 
   //Setup the board
   setupNewBoard();
@@ -89,6 +87,14 @@ void ClueMainWindowClass::setupNewBoard()
   greenNameLabel->setVisible(false);
   peacockNameLabel->setVisible(false);
   plumNameLabel->setVisible(false);
+
+  ai1Difficulty->setCurrentIndex(0);
+  ai2Difficulty->setCurrentIndex(0);
+  ai3Difficulty->setCurrentIndex(0);
+  ai4Difficulty->setCurrentIndex(0);
+  ai5Difficulty->setCurrentIndex(0);
+  computerPlayersSpin->setValue(0);
+  updateNumberOfAis(0);
 }
 
 //Function used by all human players; only applies to member variables for THIS
@@ -794,6 +800,7 @@ void ClueMainWindowClass::setupGame()
   SuspectEnum randomCharacter;
   DeckClass cardDeck;
   bool suspectAvailableFlag;
+  int aiDifficulty = 0;
 
   aiMoveDelay = AI_DELAY;
 
@@ -824,15 +831,37 @@ void ClueMainWindowClass::setupGame()
 
       if(availableCharacters.find(randomCharacter) != availableCharacters.end())
       {
-        gameParticipants.insert(pair<SuspectEnum, PlayerClass>(randomCharacter,
-            PlayerClass(i >= humanPlayersSpin->value(), i == 0,
-            STARTING_LOCATIONS[randomCharacter], DifficultyEnum(
-            difficultySlider->value()))));
-
         if(i == 0)
         {
           thisSuspect = randomCharacter;
         }
+        else if(i >= humanPlayersSpin->value())
+        {
+          switch(i - humanPlayersSpin->value())
+          {
+            case 0:
+              aiDifficulty = ai1Difficulty->currentIndex();
+              break;
+            case 1:
+              aiDifficulty = ai2Difficulty->currentIndex();
+              break;
+            case 2:
+              aiDifficulty = ai3Difficulty->currentIndex();
+              break;
+            case 3:
+              aiDifficulty = ai4Difficulty->currentIndex();
+              break;
+            case 4:
+              aiDifficulty = ai5Difficulty->currentIndex();
+              break;
+          }
+        }
+
+        gameParticipants.insert(pair<SuspectEnum, PlayerClass>(randomCharacter,
+            PlayerClass(i >= humanPlayersSpin->value(), i == 0,
+            STARTING_LOCATIONS[randomCharacter],
+            DifficultyEnum(aiDifficulty))));
+
         suspectAvailableFlag = true;
         availableCharacters.erase(randomCharacter);
       }
@@ -1865,11 +1894,19 @@ void ClueMainWindowClass::setNetworkOptVis()
     computerPlayersLabel->setVisible(true);
     humanPlayersSpin->setVisible(true);
     humanPlayersLabel->setVisible(true);
-    difficultySlider->setVisible(true);
-    aiDifficultyLabel->setVisible(true);
-
+    ai1Difficulty->setVisible(true);
+    ai1DifficultyLabel->setVisible(true);
+    ai2Difficulty->setVisible(true);
+    ai2DifficultyLabel->setVisible(true);
+    ai3Difficulty->setVisible(true);
+    ai3DifficultyLabel->setVisible(true);
+    ai4Difficulty->setVisible(true);
+    ai4DifficultyLabel->setVisible(true);
+    ai5Difficulty->setVisible(true);
+    ai5DifficultyLabel->setVisible(true);
     humanPlayersSpin->setEnabled(true);
     computerPlayersSpin->setEnabled(true);
+    updateNumberOfAis(computerPlayersSpin->value());
   }
   else
   {
@@ -1879,8 +1916,18 @@ void ClueMainWindowClass::setNetworkOptVis()
     computerPlayersLabel->setVisible(false);
     humanPlayersSpin->setVisible(false);
     humanPlayersLabel->setVisible(false);
-    difficultySlider->setVisible(false);
-    aiDifficultyLabel->setVisible(false);
+    ai1Difficulty->setVisible(false);
+    ai1DifficultyLabel->setVisible(false);
+    ai2Difficulty->setVisible(false);
+    ai2DifficultyLabel->setVisible(false);
+    ai3Difficulty->setVisible(false);
+    ai3DifficultyLabel->setVisible(false);
+    ai4Difficulty->setVisible(false);
+    ai4DifficultyLabel->setVisible(false);
+    ai5Difficulty->setVisible(false);
+    ai5DifficultyLabel->setVisible(false);
+    ai1DifficultyLabel->setVisible(false);
+    updateNumberOfAis(0);
   }
 }
 
@@ -1893,39 +1940,77 @@ void ClueMainWindowClass::setLocalOptVis()
   computerPlayersLabel->setVisible(true);
   humanPlayersSpin->setVisible(true);
   humanPlayersLabel->setVisible(true);
-  difficultySlider->setVisible(true);
+  ai1Difficulty->setVisible(true);
+  ai1DifficultyLabel->setVisible(true);
+  ai2Difficulty->setVisible(true);
+  ai2DifficultyLabel->setVisible(true);
+  ai3Difficulty->setVisible(true);
+  ai3DifficultyLabel->setVisible(true);
+  ai4Difficulty->setVisible(true);
+  ai4DifficultyLabel->setVisible(true);
+  ai5Difficulty->setVisible(true);
+  ai5DifficultyLabel->setVisible(true);
 
   computerPlayersSpin->setEnabled(true);
   humanPlayersSpin->setEnabled(false);
   humanPlayersSpin->setValue(1);
-  aiDifficultyLabel->setVisible(true);
+  ai1DifficultyLabel->setVisible(true);
+  updateNumberOfAis(computerPlayersSpin->value());
 }
 
-void ClueMainWindowClass::updateDifficultyText(int sliderPosition)
+void ClueMainWindowClass::updateNumberOfAis(int numberOfAis)
 {
-  switch(DifficultyEnum(sliderPosition))
+  bool aiActive[MAX_AIS];
+  QLabel *difficultyLabel;
+  QComboBox *difficultySelector;
+
+  for(int i = 0; i < MAX_AIS; i++)
   {
-    case VERY_EASY:
-      aiDifficultyText->setText("Very Easy");
-      break;
-    case EASY:
-      aiDifficultyText->setText("Easy");
-      break;
-    case MEDIUM:
-      aiDifficultyText->setText("Medium");
-      break;
-    case HARD:
-      aiDifficultyText->setText("Hard");
-      break;
-    case EXPERT:
-      aiDifficultyText->setText("Expert");
-      break;
+    aiActive[i] = (i < numberOfAis);
   }
+
+  for(int i = 0; i < MAX_AIS; i++)
+  {
+    switch(i)
+    {
+      case 0:
+        difficultyLabel = ai1DifficultyLabel;
+        difficultySelector = ai1Difficulty;
+        break;
+      case 1:
+        difficultyLabel = ai2DifficultyLabel;
+        difficultySelector = ai2Difficulty;
+        break;
+      case 2:
+        difficultyLabel = ai3DifficultyLabel;
+        difficultySelector = ai3Difficulty;
+        break;
+      case 3:
+        difficultyLabel = ai4DifficultyLabel;
+        difficultySelector = ai4Difficulty;
+        break;
+      case 4:
+        difficultyLabel = ai5DifficultyLabel;
+        difficultySelector = ai5Difficulty;
+        break;
+    }
+
+    difficultyLabel->setVisible(aiActive[i]);
+    difficultySelector->setVisible(aiActive[i]);
+  }
+
+  gameSetupFrame->setGeometry(gameSetupFrame->x(), gameSetupFrame->y(),
+      gameSetupFrame->width(), GAME_SETUP_FRAME_WIDTH + VERTICAL_GUI_SPACING *
+      numberOfAis);
+  startGameButton->setGeometry(startGameButton->x(), START_GAME_BUTTON_Y +
+      VERTICAL_GUI_SPACING * numberOfAis, startGameButton->width(),
+      startGameButton->height());
+
 }
 
 void ClueMainWindowClass::setClientSocket(ClientSocket &cliSock, int ipAddress, int portNumber)
-  {
-    //ClientSocket *newSocket = new ClientSocket("localhost", 30000)
-    //cliSock("localhost", 30000);
-    return;
-  }
+{
+  //ClientSocket *newSocket = new ClientSocket("localhost", 30000)
+  //cliSock("localhost", 30000);
+  return;
+}

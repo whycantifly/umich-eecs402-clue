@@ -268,9 +268,6 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     //play.
     void setLocalOptVis();
 
-    //Updates the difficulty text in the main window.
-    void updateDifficultyText(int sliderPosition);
-
     //Toggles the option to leave the room.
     void toggleLeaveRoomOpt()
     {
@@ -289,6 +286,8 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
       QDesktopServices::openUrl(QUrl("files/clueins.pdf"));
     }
     
+    void updateNumberOfAis(int numberOfAis);
+
     void setClientSocket(ClientSocket &cliSock, int ipAddress, int portNumber);
 };
 

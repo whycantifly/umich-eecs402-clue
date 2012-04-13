@@ -9,6 +9,14 @@
 
 #include "BoardLocationClass.h"
 
+const int MAX_AIS = 5;
+
+const int VERTICAL_GUI_SPACING = 20;
+
+const int START_GAME_BUTTON_Y = 190;
+
+const int GAME_SETUP_FRAME_WIDTH = 96;
+
 //Ai move delay when all human players have been eliminated
 const int AI_ONLY_DELAY = 5;
 

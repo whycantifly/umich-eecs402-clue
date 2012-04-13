@@ -145,6 +145,12 @@ class PlayerClass
 
     //Inline Functions
 
+    //Sets the Ai difficulty.
+    void setAiDifficulty(const DifficultyEnum newDifficulty)
+    {
+      aiDifficulty = newDifficulty;
+    }
+
     //Adds the indicated BoardLocationClass object to the list of locations
     //the player has visited this turn.
     void addToLocationsThisTurn(BoardLocationClass location)

@@ -1,4 +1,5 @@
 #include <list>
+#include <map>
 #include <queue>
 #include <set>
 
@@ -395,11 +396,6 @@ map<CardEnum, set<SuspectEnum> > PlayerClass::getSuggestionMatches(
   return cardMatches;
 }
 
-
-
-
-
-
 //AI CODE STARTS HERE
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -409,6 +405,7 @@ BoardLocationClass PlayerClass::getAiTargetDoor() const
   multimap<int, BoardLocationClass> targetDoorList = getTargetDoors();
   multimap<int, BoardLocationClass>::iterator doorIter = targetDoorList.begin();
   multimap<int, BoardLocationClass> unknownDoorList;
+  map<CardEnum, set<SuspectEnum> >::const_iterator handIter;
   set<RoomEnum> unknownRooms;
   bool gotTargetFlag = false;
   int randomNumber = targetDoorList.size();
@@ -416,32 +413,47 @@ BoardLocationClass PlayerClass::getAiTargetDoor() const
 
   if(aiDifficulty != VERY_EASY)
   {
-    //Look through detective notes for all unknown rooms
-    for(int i = 0; i < NUMBER_OF_ROOMS; i++)
+    if(aiAccusation.getRoom() == UNKNOWN_ROOM)
     {
-      if (detectiveNotes[getCard(RoomEnum(i))].second == UNKNOWN_SUSPECT)
+      //Look through detective notes for all unknown rooms
+      for(int i = 0; i < NUMBER_OF_ROOMS; i++)
       {
-        unknownRooms.insert(RoomEnum(i));
-      }
-    }
-    //At least one unknown room
-    if(unknownRooms.empty() == false)
-    {
-      //Get rid of all doors to known rooms from targetDoorList
-      for(doorIter = targetDoorList.begin(); doorIter != targetDoorList.end();
-          doorIter++)
-      {
-        //Door is not a door to an unknown room
-        if(unknownRooms.find(doorIter->second.getRoomDoor()) !=
-            unknownRooms.end())
+        if (detectiveNotes[getCard(RoomEnum(i))].second == UNKNOWN_SUSPECT)
         {
-          unknownDoorList.insert(*doorIter);
+          unknownRooms.insert(RoomEnum(i));
         }
       }
-      if(unknownDoorList.empty() == false)
+    }
+    else
+    {
+      unknownRooms.insert(aiAccusation.getRoom());
+      for(handIter = hand.begin(); handIter != hand.end(); handIter++)
       {
-        targetDoorList = unknownDoorList;
+        try
+        {
+          unknownRooms.insert(getRoom(handIter->first));
+        }
+        catch(ExceptionClass notARoom)
+        {
+          //Do nothing
+        }
       }
+    }
+
+    //Add all doors to unknown rooms to unknownDoorList.
+    for(doorIter = targetDoorList.begin(); doorIter != targetDoorList.end();
+        doorIter++)
+    {
+      //Door is a door to an unknown room
+      if(unknownRooms.find(doorIter->second.getRoomDoor()) !=
+          unknownRooms.end())
+      {
+        unknownDoorList.insert(*doorIter);
+      }
+    }
+    if(unknownDoorList.empty() == false)
+    {
+      targetDoorList = unknownDoorList;
     }
   }
 
@@ -476,6 +488,7 @@ BoardLocationClass PlayerClass::getAiTargetDoor() const
         doorIter++;
       }
       target = doorIter->second;
+      break;
     default:
       target = targetDoorList.begin()->second;
       break;
@@ -654,11 +667,10 @@ CardEnum PlayerClass::handleSuggestionAi(SuggestionClass suggestion, SuspectEnum
       getSuggestionMatches(suggestion);
   map<CardEnum, set<SuspectEnum> >::iterator cardMatchesIter;
   map<CardEnum, set<SuspectEnum> > alreadyShownCards;
-  int playersShown = -1;
+  int playersShown;
   int cardIndex;
   bool cardPickedFlag = false;
   CardEnum cardToReveal;
-
 
   switch(aiDifficulty)
   {
@@ -672,80 +684,87 @@ CardEnum PlayerClass::handleSuggestionAi(SuggestionClass suggestion, SuspectEnum
       }
       cardToReveal = cardMatchesIter->first;
     break;
-    case MEDIUM:
+    default:
       //Look at current player's detective notes.  If one or more cards that
       //match the suggestion has already been shown, then show one of those
       //cards.  Otherwise, show a random card.
       cardMatchesIter = cardMatches.begin();
 
-      if(cardMatches.size() > 1)
+      while(cardMatchesIter != cardMatches.end())
       {
-        while(cardMatchesIter != cardMatches.end())
+        if(cardMatchesIter->second.empty() == false)
         {
-          if(cardMatchesIter->second.empty() == true)
-          {
-            alreadyShownCards.insert(*cardMatchesIter);
-          }
-          cardMatchesIter++;
+          alreadyShownCards.insert(*cardMatchesIter);
         }
+        cardMatchesIter++;
+      }
 
-        if(alreadyShownCards.empty() == false)
+      //Some of the matches have been shown to other players
+      if(alreadyShownCards.empty() == false)
+      {
+        switch(aiDifficulty)
         {
-          cardMatchesIter = alreadyShownCards.begin();
-
-          switch(aiDifficulty)
-          {
-            case MEDIUM:
-              cardIndex = rand() % alreadyShownCards.size();
-              break;
-            default:
-              //Show the first card the player has already seen
-              cardIndex = 0;
-              while(cardMatchesIter != alreadyShownCards.end() &&
-                  cardPickedFlag == false)
+          case MEDIUM:
+            cardIndex = rand() % alreadyShownCards.size();
+            break;
+          default:
+            //Show the first card the player has already seen
+            cardIndex = 0;
+            cardMatchesIter = alreadyShownCards.begin();
+            while(cardMatchesIter != alreadyShownCards.end() &&
+                cardPickedFlag == false)
+            {
+              //Card has been shown to the current player
+              if(cardMatchesIter->second.find(currentSuspect) !=
+                  cardMatchesIter->second.end())
               {
-                if(cardMatchesIter->second.find(currentSuspect) !=
-                    cardMatchesIter->second.end())
-                {
-                  cardPickedFlag = true;
-                }
-                else
-                {
-                  cardIndex++;
-                  cardMatchesIter++;
-                }
+                cardPickedFlag = true;
               }
+              else
+              {
+                cardIndex++;
+                cardMatchesIter++;
+              }
+            }
 
-              //Player has not seen any matching cards, so pick the first
-              //card that players have seen the most.
+            //Player has not seen any matching cards, so pick the first
+            //card that players have seen the most.
+            if(cardPickedFlag == false)
+            {
               cardMatchesIter = alreadyShownCards.begin();
-              if(cardPickedFlag == false)
+              for(int i = 0; i < alreadyShownCards.size(); i++)
               {
-                for(int i = 0; i < alreadyShownCards.size(); i++)
+                if(cardMatchesIter->second.size() > playersShown ||
+                    cardMatchesIter == alreadyShownCards.begin())
                 {
-                  if(cardMatchesIter->second.size() > playersShown)
-                  {
-                    playersShown = cardMatchesIter->second.size();
-                    cardIndex = i;
-                  }
+                  playersShown = cardMatchesIter->second.size();
+                  cardIndex = i;
                 }
               }
-              break;
-          }
+            }
+            break;
         }
-        else
-        {
-          cardMatchesIter = cardMatches.begin();
-          cardIndex = rand() % cardMatches.size();
-        }
-
+        cardMatchesIter = alreadyShownCards.begin();
         for(int i = 0; i < cardIndex; i++)
         {
           cardMatchesIter++;
         }
+        cardToReveal = cardMatchesIter->first;
+        break;
       }
-      cardToReveal = cardMatchesIter->first;
-      break;
+      //None of the cards have been shown yet; show a random matching card
+      else
+      {
+        cardIndex = rand() % cardMatches.size();
+        cardMatchesIter = cardMatches.begin();
+        for(int i = 0; i < cardIndex; i++)
+        {
+          cardMatchesIter++;
+        }
+        cardToReveal = cardMatchesIter->first;
+      }
+
+    break;
   }
   return cardToReveal;
 }
@@ -758,6 +777,28 @@ ActionEnum PlayerClass::handlePrerollAi()
   set<RoomEnum> unknownRooms;
   int randomNumber;
   ActionEnum aiAction = END_TURN;
+  RoomEnum secretPassageRoom;
+
+  if(currentLocation.checkCornerRoom() == true)
+  {
+    switch(currentLocation.getRoom())
+    {
+      case LOUNGE:
+        secretPassageRoom = CONSERVATORY;
+        break;
+      case CONSERVATORY:
+        secretPassageRoom = LOUNGE;
+        break;
+      case KITCHEN:
+        secretPassageRoom = STUDY;
+        break;
+      case STUDY:
+        secretPassageRoom = KITCHEN;
+        break;
+      default:
+        break;
+    }
+  }
 
   //Get all unknown rooms
   for(int i = 0; i < NUMBER_OF_ROOMS; i++)
@@ -789,15 +830,10 @@ ActionEnum PlayerClass::handlePrerollAi()
       {
         aiAction = SUGGEST;
       }
-      else if(validMoves.find(USE_SECRET_PASSAGE) != validMoves.end() &&
-          ((currentLocation.getRoom() == LOUNGE &&
-          unknownRooms.find(CONSERVATORY) != unknownRooms.end()) ||
-          (currentLocation.getRoom() == CONSERVATORY &&
-          unknownRooms.find(LOUNGE) != unknownRooms.end()) ||
-          (currentLocation.getRoom() == KITCHEN &&
-          unknownRooms.find(STUDY) != unknownRooms.end()) ||
-          (currentLocation.getRoom() == STUDY &&
-          unknownRooms.find(KITCHEN) != unknownRooms.end())))
+      else if(currentLocation.checkCornerRoom() == true && (detectiveNotes
+          [getCard(secretPassageRoom)].second == UNKNOWN_SUSPECT ||
+          (aiAccusation.getRoom() != UNKNOWN_ROOM && hand.find(getCard
+          (secretPassageRoom)) != hand.end())))
       {
         aiAction = USE_SECRET_PASSAGE;
       }
@@ -841,31 +877,17 @@ SuggestionClass PlayerClass::makeAiSuggestion() const
         }
       }
 
-      if(unknownSuspects.empty() == false)
-      {
-        do
-        {
-          suspect = SuspectEnum(rand() % NUMBER_OF_SUSPECTS);
-        }
-        while(unknownSuspects.find(suspect) == unknownSuspects.end());
-      }
-      else
+      do
       {
         suspect = SuspectEnum(rand() % NUMBER_OF_SUSPECTS);
       }
+      while(unknownSuspects.find(suspect) == unknownSuspects.end());
 
-      if(unknownWeapons.empty() == false)
-      {
-        do
-        {
-          weapon = WeaponEnum(rand() % NUMBER_OF_WEAPONS);
-        }
-        while(unknownWeapons.find(weapon) == unknownWeapons.end());
-      }
-      else
+      do
       {
         weapon = WeaponEnum(rand() % NUMBER_OF_WEAPONS);
       }
+      while(unknownWeapons.find(weapon) == unknownWeapons.end());
       break;
   }
 
