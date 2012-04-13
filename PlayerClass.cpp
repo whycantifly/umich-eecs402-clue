@@ -1,3 +1,8 @@
+//Name:       Elaine Pang, Taylor Tappe, Colin Zarzycki
+//Date:       04/13/2012
+//Assignment: EECS402 Project 5
+//Purpose:    PlayerClass member function definitions
+
 #include <list>
 #include <map>
 #include <queue>
@@ -81,7 +86,8 @@ string PlayerClass::printPlayerToString()
       numLocsIter != locationsThisTurn.end();
       numLocsIter++)
       {
-      ss << (*numLocsIter).getXCoord() << " " << (*numLocsIter).getYCoord() << " ";
+      ss << (*numLocsIter).getXCoord() << " " << (*numLocsIter).getYCoord() <<
+          " ";
       }
     
     // Print detective cards
@@ -185,7 +191,8 @@ void PlayerClass::stringToPlayer(string wrappedString)
   {
     iss >> detectCardInt;
     iss >> detectSuspInt;
-    detectiveNotes[i] = make_pair(CardEnum(detectCardInt), SuspectEnum(detectSuspInt));
+    detectiveNotes[i] = make_pair(CardEnum(detectCardInt), SuspectEnum(
+        detectSuspInt));
   }
   
   // Get ai Difficulty - NOT SET
@@ -942,7 +949,6 @@ void PlayerClass::makeAiAccusation()
         aiAccusation = SuggestionClass(suspect, weapon, room);
       }
       break;
-
     default:
       i = 0;
       oneUnknownFlag = true;

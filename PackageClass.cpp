@@ -1,6 +1,12 @@
+//Name:       Elaine Pang, Taylor Tappe, Colin Zarzycki
+//Date:       04/13/2012
+//Assignment: EECS402 Project 5
+//Purpose:    PackageClass class definition
+
 #include "PackageClass.h"
 
-string PackageClass::wrapSetupPkg(std::map<SuspectEnum, PlayerClass> gameParticipants)
+string PackageClass::wrapSetupPkg(std::map<SuspectEnum, PlayerClass>
+    gameParticipants)
 { 
   PlayerClass player;
   int suspNum;
@@ -35,7 +41,8 @@ string PackageClass::wrapCaseFilePkg(SuggestionClass caseFile)
   stringstream ss;
   
   // Put info into a stream
-  ss << caseFile.getSuspect() << " " << caseFile.getWeapon() << " " << caseFile.getRoom() << endl;
+  ss << caseFile.getSuspect() << " " << caseFile.getWeapon() << " " <<
+      caseFile.getRoom() << endl;
 
   return(ss.str());
 }
@@ -53,7 +60,8 @@ SuggestionClass PackageClass::unwrapCaseFilePkg(string caseFilePkg)
   iss >> weapon;
   iss >> room;
   
-  caseFile = SuggestionClass(SuspectEnum(suspect), WeaponEnum(weapon), RoomEnum(room));
+  caseFile = SuggestionClass(SuspectEnum(suspect), WeaponEnum(weapon),
+      RoomEnum(room));
 
   return(caseFile);
 }
@@ -82,7 +90,8 @@ SuspectEnum PackageClass::unwrapSuspectEnum(string suspectNumStr)
 }
 
 // Here we unwrap the gameParticipants string which was passed
-std::map<SuspectEnum, PlayerClass> PackageClass::unwrapSetupPkg(string wrappedPackage)
+std::map<SuspectEnum, PlayerClass> PackageClass::unwrapSetupPkg(string
+    wrappedPackage)
 {
   std::map<SuspectEnum, PlayerClass> gameParticipants;
   map< SuspectEnum, PlayerClass >::iterator partIter;

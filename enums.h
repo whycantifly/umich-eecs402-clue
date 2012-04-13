@@ -1,3 +1,8 @@
+//Name:       Elaine Pang, Taylor Tappe, Colin Zarzycki
+//Date:       04/13/2012
+//Assignment: EECS402 Project 5
+//Purpose:    Enums
+
 #ifndef _ENUMS_H_
 #define _ENUMS_H_
 
@@ -10,7 +15,8 @@ enum CardEnum{SCARLET_CARD, MUSTARD_CARD, WHITE_CARD, GREEN_CARD, PEACOCK_CARD,
 
 enum DifficultyEnum{VERY_EASY, EASY, MEDIUM, HARD, EXPERT};
 
-enum SuspectEnum{SCARLET, MUSTARD, WHITE, GREEN, PEACOCK, PLUM, UNKNOWN_SUSPECT};
+enum SuspectEnum{SCARLET, MUSTARD, WHITE, GREEN, PEACOCK, PLUM,
+    UNKNOWN_SUSPECT};
 
 enum WeaponEnum{KNIFE, CANDLESTICK, REVOLVER, ROPE, LEAD_PIPE, WRENCH,
     UNKNOWN_WEAPON};

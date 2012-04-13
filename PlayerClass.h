@@ -1,3 +1,8 @@
+//Name:       Elaine Pang, Taylor Tappe, Colin Zarzycki
+//Date:       04/13/2012
+//Assignment: EECS402 Project 5
+//Purpose:    PlayerClass class definition
+
 #ifndef _PLAYERCLASS_H_
 #define _PLAYERCLASS_H_
 
@@ -114,12 +119,13 @@ class PlayerClass
     //Gets the Ai target door.
     BoardLocationClass getAiTargetDoor() const;
 
-    //Gets the Ai exit door based on its location on the board and the target location.
+    //Gets the Ai exit door based on its location on the board and the target
+    //location.
     BoardLocationClass getAiExitDoor(QImage &currentBoard, BoardLocationClass
         &target) const;
 
-    //Gets the next Ai move direction based on its location on the board and the target
-    //location
+    //Gets the next Ai move direction based on its location on the board and the
+    //target location
     DirectionEnum getAiMove(QImage &currentBoard, BoardLocationClass &target)
         const;
 
@@ -238,7 +244,8 @@ class PlayerClass
       return currentLocation;
     }
 
-    //Rolls the die and sets the die roll and moves left this turn to the die roll.
+    //Rolls the die and sets the die roll and moves left this turn to the die
+    //roll.
     void rollDie()
     {
       dieRollThisTurn = ((rand() % 6) + 1);

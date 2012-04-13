@@ -1,3 +1,8 @@
+//Name:       Elaine Pang, Taylor Tappe, Colin Zarzycki
+//Date:       04/13/2012
+//Assignment: EECS402 Project 5
+//Purpose:    BoardLocationClass class definition
+
 #ifndef _BOARDLOCATIONCLASS_H_
 #define _BOARDLOCATIONCLASS_H_
 

@@ -1,3 +1,8 @@
+//Name:       Elaine Pang, Taylor Tappe, Colin Zarzycki
+//Date:       04/13/2012
+//Assignment: EECS402 Project 5
+//Purpose:    SuggestionClass member function definitions
+
 #include <list>
 
 #include "SuggestionClass.h"
@@ -6,7 +11,8 @@
 
 using namespace std;
 
-bool SuggestionClass::operator==(const map<CardEnum, set<SuspectEnum> > &playerHand)
+bool SuggestionClass::operator==(const map<CardEnum, set<SuspectEnum> >
+    &playerHand)
     const
 {
   if(playerHand.find(getCard(suspect)) == playerHand.end() &&
@@ -21,7 +27,8 @@ bool SuggestionClass::operator==(const map<CardEnum, set<SuspectEnum> > &playerH
   }
 }
 
-bool SuggestionClass::operator!=(const map<CardEnum, set<SuspectEnum> > &playerHand)
+bool SuggestionClass::operator!=(const map<CardEnum, set<SuspectEnum> >
+    &playerHand)
     const
 {
   return !(*this == playerHand);

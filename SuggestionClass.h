@@ -1,3 +1,8 @@
+//Name:       Elaine Pang, Taylor Tappe, Colin Zarzycki
+//Date:       04/13/2012
+//Assignment: EECS402 Project 5
+//Purpose:    SuggestionClass class definition
+
 #ifndef _SUGGESTIONCLASS_H_
 #define _SUGGESTIONCLASS_H_
 
@@ -44,11 +49,11 @@ class SuggestionClass
       return !(*this == rhs);
     }
 
-    bool operator==(const std::map<CardEnum, std::set<SuspectEnum> > &playerHand)
-        const;
+    bool operator==(const std::map<CardEnum, std::set<SuspectEnum> >
+        &playerHand) const;
 
-    bool operator!=(const std::map<CardEnum, std::set<SuspectEnum> > &playerHand)
-        const;
+    bool operator!=(const std::map<CardEnum, std::set<SuspectEnum> >
+        &playerHand) const;
 
     bool operator==(const CardEnum card) const;
 

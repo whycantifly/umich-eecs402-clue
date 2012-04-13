@@ -1,3 +1,8 @@
+//Name:       Elaine Pang, Taylor Tappe, Colin Zarzycki
+//Date:       04/13/2012
+//Assignment: EECS402 Project 5
+//Purpose:    getWeapon global function definition
+
 #ifndef _GETWEAPON_H_
 #define _GETWEAPON_H_
 

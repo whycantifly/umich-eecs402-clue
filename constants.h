@@ -1,3 +1,8 @@
+//Name:       Elaine Pang, Taylor Tappe, Colin Zarzycki
+//Date:       04/13/2012
+//Assignment: EECS402 Project 5
+//Purpose:    Global constants
+
 #ifndef _CONSTANTS_H_
 #define _CONSTANTS_H_
 
@@ -8,6 +13,8 @@
 #include "SuggestionClass.h"
 
 #include "BoardLocationClass.h"
+
+const int AI_GOD_MODE_ROLL = 10;
 
 const int MAX_CARDS_IN_HAND = 6;
 

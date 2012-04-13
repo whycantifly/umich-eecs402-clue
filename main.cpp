@@ -1,3 +1,8 @@
+//Name:       Elaine Pang, Taylor Tappe, Colin Zarzycki
+//Date:       04/13/2012
+//Assignment: EECS402 Project 5
+//Purpose:    main file for Clue game
+
 #include <QApplication>
 #include <time.h>
 #include <stdlib.h>

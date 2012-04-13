@@ -1,5 +1,10 @@
-#ifndef ACCUSATIONDIALOGCLASS_H_
-#define ACCUSATIONDIALOGCLASS_H_
+//Name:       Elaine Pang, Taylor Tappe, Colin Zarzycki
+//Date:       04/13/2012
+//Assignment: EECS402 Project 5
+//Purpose:    AccusationDialogClass member function definitions
+
+#ifndef _ACCUSATIONDIALOGCLASS_H_
+#define _ACCUSATIONDIALOGCLASS_H_
 
 #include <QtGui>
 #include "ui_AccusationDialogClass.h"

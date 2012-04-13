@@ -1,3 +1,8 @@
+//Name:       Elaine Pang, Taylor Tappe, Colin Zarzycki
+//Date:       04/13/2012
+//Assignment: EECS402 Project 5
+//Purpose:    getCardType global function definition
+
 #ifndef _GETCARDTYPE_H_
 #define _GETCARDTYPE_H_
 

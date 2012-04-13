@@ -1,3 +1,8 @@
+//Name:       Elaine Pang, Taylor Tappe, Colin Zarzycki
+//Date:       04/13/2012
+//Assignment: EECS402 Project 5
+//Purpose:    Socket member function definitions
+
 // Implementation of the Socket class.
 
 #include "socketConstants.h"
@@ -16,7 +21,7 @@
 #include <cstdlib>
 using namespace std;
 
-bool Socket::swapBytesForNetworkOrder = (12345 != htonl(12345));
+//bool Socket::swapBytesForNetworkOrder = (12345 != htonl(12345));
 
 Socket::Socket(
      ):m_sock(-1)

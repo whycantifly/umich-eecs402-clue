@@ -1,3 +1,8 @@
+//Name:       Elaine Pang, Taylor Tappe, Colin Zarzycki
+//Date:       04/13/2012
+//Assignment: EECS402 Project 5
+//Purpose:    ServerSocket member function definitions
+
 // Implementation of the ServerSocket class
 #include <iostream>
 #include <errno.h>

@@ -1,3 +1,8 @@
+//Name:       Elaine Pang, Taylor Tappe, Colin Zarzycki
+//Date:       04/13/2012
+//Assignment: EECS402 Project 5
+//Purpose:    BoardLocationClass member function definitions
+
 #include <cmath>
 #include <queue>
 #include <set>
@@ -132,7 +137,8 @@ const RoomEnum BoardLocationClass::getRoom() const
 
 bool BoardLocationClass::checkBoardBounds() const
 {
-  if(xCoord < 0 || xCoord >= BOARD_WIDTH || yCoord < 0 || yCoord >= BOARD_HEIGHT)
+  if(xCoord < 0 || xCoord >= BOARD_WIDTH || yCoord < 0 || yCoord >=
+      BOARD_HEIGHT)
   {
     return false;
   }
