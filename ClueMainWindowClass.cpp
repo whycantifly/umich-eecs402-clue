@@ -706,8 +706,6 @@ void ClueMainWindowClass::makePlayerSuggestion()
   SuggestionDialogClass suggestionDialog(    //Suggestion dialog
       &suggestion, this);
 
-  suggestionDialog.setWindowModality(Qt::NonModal);
-
   disableAllControls();
   if(suggestionDialog.exec() == QDialog::Accepted)
   {
@@ -908,7 +906,7 @@ void ClueMainWindowClass::handleSuggestion(const SuggestionClass
       
   if(currentPlayerIter->first == thisSuspect)
   {
-    suggesterName = "you";
+    suggesterName = "You";
   }
 
   //Set window flags for the player suggestion dialog.
@@ -940,6 +938,17 @@ void ClueMainWindowClass::handleSuggestion(const SuggestionClass
           " with the " + CARD_VALUES[getCard(suggestion.getWeapon())]);
       suggestionMessage.exec();
     }
+
+    personalNotes->appendPlainText(suggesterName + " suggested:  " +
+        CARD_VALUES[getCard(suggestion.getSuspect())] + ", " +
+        CARD_VALUES[getCard(suggestion.getWeapon())] + ", " +
+        CARD_VALUES[getCard(suggestion.getRoom())]);
+
+    if(currentPlayerIter->first == thisSuspect)
+    {
+      suggesterName = suggesterName.toLower();
+    }
+
     moveSuggestedSuspect(suggestion.getSuspect());
     if(suggestion.getSuspect() == thisSuspect)
     {
@@ -1032,6 +1041,9 @@ void ClueMainWindowClass::handleSuggestion(const SuggestionClass
         updateDetectiveNotes(revealedCard);
       }
 
+      personalNotes->appendPlainText(playerName + " revealed:  " +
+          CARD_VALUES[revealedCard]);
+
       playerIter = gameParticipants.end();
       finishMove();
     }
@@ -1076,6 +1088,11 @@ void ClueMainWindowClass::handleAccusation(const SuggestionClass
     playerName = "You";
     haveTense = "have";
   }
+
+  personalNotes->appendPlainText(playerName + " accused:  " +
+      CARD_VALUES[getCard(playerAccusation.getSuspect())] + ", " +
+      CARD_VALUES[getCard(playerAccusation.getWeapon())] + ", " +
+      CARD_VALUES[getCard(playerAccusation.getRoom())]);
 
   accusationMessage.setWindowTitle("Game Over");
 
@@ -1144,6 +1161,7 @@ void ClueMainWindowClass::handleAccusation(const SuggestionClass
 
     currentPlayerIter->second.setAiFlag(true);
     currentPlayerIter->second.setGameOverFlag(true);
+    currentPlayerIter->second.setAiDifficulty(EXPERT);
 
     accusationMessage.exec();
 
