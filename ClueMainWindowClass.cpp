@@ -1036,14 +1036,17 @@ void ClueMainWindowClass::handleSuggestion(const SuggestionClass
           playerIter->first);
       playerIter->second.addSuspectShowed(revealedCard, currentPlayerIter->
           first);
-      if(currentPlayerIter->first == thisSuspect)
+      if(currentPlayerIter->first == thisSuspect || playerIter->first == 
+          thisSuspect)
       {
         updateDetectiveNotes(revealedCard);
+        personalNotes->appendPlainText(playerName + " revealed:  " +
+            CARD_VALUES[revealedCard]);
       }
-
-      personalNotes->appendPlainText(playerName + " revealed:  " +
-          CARD_VALUES[revealedCard]);
-
+      else
+      {
+        personalNotes->appendPlainText(playerName + " revealed a card");
+      }
       playerIter = gameParticipants.end();
       finishMove();
     }
