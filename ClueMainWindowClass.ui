@@ -1480,19 +1480,6 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline;&quot;&gt;Your Cards:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
-  <widget class="QLabel" name="mrGreenLabel_2">
-   <property name="geometry">
-    <rect>
-     <x>490</x>
-     <y>615</y>
-     <width>71</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
   <widget class="QLabel" name="mustardNameLabel">
    <property name="geometry">
     <rect>
@@ -1506,7 +1493,7 @@ p, li { white-space: pre-wrap; }
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>../../../../.designer/backup/images/col_mustard_name.png</pixmap>
+    <pixmap>images/col_mustard_name.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="peacockNameLabel">
@@ -1522,7 +1509,7 @@ p, li { white-space: pre-wrap; }
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>../../../../.designer/backup/images/mrs_peacock_name.png</pixmap>
+    <pixmap>images/mrs_peacock_name.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="plumNameLabel">
@@ -1538,7 +1525,7 @@ p, li { white-space: pre-wrap; }
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>../../../../.designer/backup/images/prof_plum_name.png</pixmap>
+    <pixmap>images/prof_plum_name.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="scarletNameLabel">
@@ -1554,7 +1541,7 @@ p, li { white-space: pre-wrap; }
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>../../../../.designer/backup/images/miss_scarlet_name.png</pixmap>
+    <pixmap>images/miss_scarlet_name.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="whiteNameLabel">
@@ -1570,7 +1557,7 @@ p, li { white-space: pre-wrap; }
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>../../../../.designer/backup/images/mrs_white_name.png</pixmap>
+    <pixmap>images/mrs_white_name.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="greenNameLabel">
@@ -1586,7 +1573,7 @@ p, li { white-space: pre-wrap; }
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>../../../../.designer/backup/images/mr_green_name.png</pixmap>
+    <pixmap>images/mr_green_name.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="youAreText">
@@ -1636,7 +1623,6 @@ p, li { white-space: pre-wrap; }
   <zorder>detectiveNotesLabel</zorder>
   <zorder>personalNotesLabel</zorder>
   <zorder>label_2</zorder>
-  <zorder>mrGreenLabel_2</zorder>
   <zorder>mustardNameLabel</zorder>
   <zorder>peacockNameLabel</zorder>
   <zorder>plumNameLabel</zorder>

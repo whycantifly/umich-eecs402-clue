@@ -18,6 +18,7 @@
 #include "SuggestionDialogClass.h"
 #include "SuggestionClass.h"
 #include "getCard.h"
+#include "getCardType.h"
 #include "getStartingDoorIndex.h"
 
 // These are used for building two binaries to keep sockets in scope
@@ -53,6 +54,10 @@ ClueMainWindowClass::ClueMainWindowClass() : QWidget()
 //Function used by all human players
 void ClueMainWindowClass::setupNewBoard()
 {
+  //Variable Declarations
+  QString aiNumber;
+  QString cardNumber;
+
   //Reset and show game board picture
   inProgressBoardImage = CLUE_BOARD_IMAGE;
   gameBoard->setPixmap(QPixmap::fromImage(inProgressBoardImage));
@@ -84,18 +89,24 @@ void ClueMainWindowClass::setupNewBoard()
   hostIPEdit->setVisible(false);
   hostIPLabel->setVisible(false);
 
-  scarletNameLabel->setVisible(false);
-  mustardNameLabel->setVisible(false);
-  whiteNameLabel->setVisible(false);
-  greenNameLabel->setVisible(false);
-  peacockNameLabel->setVisible(false);
-  plumNameLabel->setVisible(false);
+  for(int i = 0; i < NUMBER_OF_SUSPECTS; i++)
+  {
+    findChildren<QLabel*>(CARD_VALUES[i].split(" ").last().toLower() +
+        "NameLabel").first()->setVisible(false);
+  }
 
-  ai1Difficulty->setCurrentIndex(0);
-  ai2Difficulty->setCurrentIndex(0);
-  ai3Difficulty->setCurrentIndex(0);
-  ai4Difficulty->setCurrentIndex(0);
-  ai5Difficulty->setCurrentIndex(0);
+  for(int i = 0; i < MAX_CARDS_IN_HAND; i++)
+  {
+    cardNumber.setNum(i + 1);
+    findChildren<QLabel*>("cardInHand" + cardNumber).first()->setVisible(false);
+  }
+
+  for(int i = 0; i < MAX_AIS; i++)
+  {
+    aiNumber.setNum(i + 1);
+    findChildren<QComboBox*>("ai" + aiNumber + "Difficulty").first()->
+        setCurrentIndex(0);
+  }
   computerPlayersSpin->setValue(0);
   updateNumberOfAis(0);
 }
@@ -108,37 +119,13 @@ void ClueMainWindowClass::displayCardsInHand()
   map<CardEnum, set<SuspectEnum> > hand = gameParticipants.find(thisSuspect)->
       second.getHand();     //THIS player's hand
   map<CardEnum, set<SuspectEnum> >::iterator currentCardIter = hand.begin();
-                            //Iterator used to progress through the hand
-  QLabel *cardPtr;          //Pointer to the QLabel on the form to show the card
+  QString cardNumber;
 
-  //Display the cards in THIS player's hand
-  for(int i = 1; currentCardIter != hand.end(); i++, currentCardIter++)
+  for(int i = 0; i < hand.size(); i++, currentCardIter++)
   {
-    switch(i)
-    {
-      case 1:
-        cardPtr = cardInHand1;
-        break;
-      case 2:
-        cardPtr = cardInHand2;
-        break;
-      case 3:
-        cardPtr = cardInHand3;
-        break;
-      case 4:
-        cardPtr = cardInHand4;
-        break;
-      case 5:
-        cardPtr = cardInHand5;
-        break;
-      case 6:
-        cardPtr = cardInHand6;
-        break;
-    }
-
-    cardPtr->setPixmap(QPixmap::fromImage(CARD_IMAGES[currentCardIter->first]));
-
-    //Updates the detective notes on the screen for the cards in THIS player's hand
+    cardNumber.setNum(i + 1);
+    findChildren<QLabel*>("cardInHand" + cardNumber).first()->setPixmap
+        (QPixmap::fromImage(CARD_IMAGES[currentCardIter->first]));
     updateDetectiveNotes(currentCardIter->first);
   }
 }
@@ -172,29 +159,8 @@ void ClueMainWindowClass::drawStartingPieces()
     drawPieceToBoard(playerIterator->first,
         STARTING_LOCATIONS[playerIterator->first]);
     gameBoard->setPixmap(QPixmap::fromImage(inProgressBoardImage));
-    switch(playerIterator->first)
-    {
-      case SCARLET:
-        scarletNameLabel->setVisible(true);
-        break;
-      case MUSTARD:
-        mustardNameLabel->setVisible(true);
-        break;
-      case WHITE:
-        whiteNameLabel->setVisible(true);
-        break;
-      case GREEN:
-        greenNameLabel->setVisible(true);
-        break;
-      case PEACOCK:
-        peacockNameLabel->setVisible(true);
-        break;
-      case PLUM:
-        plumNameLabel->setVisible(true);
-        break;
-      default:
-        break;
-    }
+    findChildren<QLabel*>(CARD_VALUES[getCard(playerIterator->first)].split(" ")
+        .last().toLower() + "NameLabel").first()->setVisible(true);
   }
 }
 
@@ -323,6 +289,9 @@ void ClueMainWindowClass::clearVisitedTiles()
 //Function used for all human players
 void ClueMainWindowClass::displayGameInterface()
 {
+  //Variable Declarations
+  QString cardNumber;
+
   youAreText->setText("You are " + CARD_VALUES[thisSuspect] + ".");
 
   //Make gameplay interface visible
@@ -335,12 +304,12 @@ void ClueMainWindowClass::displayGameInterface()
   detectiveNotesFrame->setVisible(true);
   personalNotesLabel->setVisible(true);
   personalNotes->setVisible(true);
-  cardInHand1->setVisible(true);
-  cardInHand2->setVisible(true);
-  cardInHand3->setVisible(true);
-  cardInHand4->setVisible(true);
-  cardInHand5->setVisible(true);
-  cardInHand6->setVisible(true);
+  for(int i = 0; i < MAX_CARDS_IN_HAND; i++)
+  {
+    cardNumber.setNum(i + 1);
+    findChildren<QLabel*>("cardInHand" + cardNumber).first()->setVisible(true);
+  }
+
   youAreText->setVisible(true);
 
   //Make game setup interface invisible
@@ -557,77 +526,31 @@ void ClueMainWindowClass::updateRollInfoText()
 void ClueMainWindowClass::updateDetectiveNotes(CardEnum updatedCard)
 {
   //Variable Declarations
+  QStringList cardWords = CARD_VALUES[updatedCard].split(" ");
+  QString labelName;
+
   QLabel *textToUpdatePtr;        //Pointer to the label on the gui to update
 
-  switch(updatedCard)
+  if(getCardType(updatedCard) == SUSPECT_CARD)
   {
-    case SCARLET_CARD:
-      textToUpdatePtr = scarletText;
-      break;
-    case MUSTARD_CARD:
-      textToUpdatePtr = mustardText;
-      break;
-    case WHITE_CARD:
-      textToUpdatePtr = whiteText;
-      break;
-    case GREEN_CARD:
-      textToUpdatePtr = greenText;
-      break;
-    case PEACOCK_CARD:
-      textToUpdatePtr = peacockText;
-      break;
-    case PLUM_CARD:
-      textToUpdatePtr = plumText;
-      break;
-    case KNIFE_CARD:
-      textToUpdatePtr = knifeText;
-      break;
-    case CANDLESTICK_CARD:
-      textToUpdatePtr = candlestickText;
-      break;
-    case REVOLVER_CARD:
-      textToUpdatePtr = revolverText;
-      break;
-    case ROPE_CARD:
-      textToUpdatePtr = ropeText;
-      break;
-    case LEAD_PIPE_CARD:
-      textToUpdatePtr = leadPipeText;
-      break;
-    case WRENCH_CARD:
-      textToUpdatePtr = wrenchText;
-      break;
-    case HALL_CARD:
-      textToUpdatePtr = hallText;
-      break;
-    case LOUNGE_CARD:
-      textToUpdatePtr = loungeText;
-      break;
-    case DINING_ROOM_CARD:
-      textToUpdatePtr = diningRoomText;
-      break;
-    case KITCHEN_CARD:
-      textToUpdatePtr = kitchenText;
-      break;
-    case BALLROOM_CARD:
-      textToUpdatePtr = ballroomText;
-      break;
-    case CONSERVATORY_CARD:
-      textToUpdatePtr = conservatoryText;
-      break;
-    case BILLIARD_ROOM_CARD:
-      textToUpdatePtr = billiardRoomText;
-      break;
-    case LIBRARY_CARD:
-      textToUpdatePtr = libraryText;
-      break;
-    case STUDY_CARD:
-      textToUpdatePtr = studyText;
-      break;
+    labelName = cardWords.last().toLower() + "Text";
   }
-  textToUpdatePtr->setText("<span style='color:#ff0000;'>" +
-      CARD_VALUES[getCard(gameParticipants.find(thisSuspect)->second.
-      getDetectiveNotes(updatedCard))] + "</span>");
+  else
+  {
+    labelName = cardWords.first().toLower();
+    cardWords.pop_front();
+    while(cardWords.size() > 0)
+    {
+      labelName.append(cardWords.last());
+      cardWords.pop_front();
+    }
+    labelName.append("Text");
+  }
+
+  findChildren<QLabel*>(labelName).first()->
+      setText("<span style='color:#ff0000;'>" + CARD_VALUES[getCard(
+      gameParticipants.find(thisSuspect)->second.getDetectiveNotes(
+      updatedCard))] + "</span>");
 }
 
 //Function used for all human players; triggered only upon THIS player's turn
@@ -804,6 +727,7 @@ void ClueMainWindowClass::setupGame()
   DeckClass cardDeck;
   bool suspectAvailableFlag;
   int aiDifficulty = 0;
+  QString aiNumber;
 
   aiMoveDelay = AI_DELAY;
 
@@ -840,24 +764,9 @@ void ClueMainWindowClass::setupGame()
         }
         else if(i >= humanPlayersSpin->value())
         {
-          switch(i - humanPlayersSpin->value())
-          {
-            case 0:
-              aiDifficulty = ai1Difficulty->currentIndex();
-              break;
-            case 1:
-              aiDifficulty = ai2Difficulty->currentIndex();
-              break;
-            case 2:
-              aiDifficulty = ai3Difficulty->currentIndex();
-              break;
-            case 3:
-              aiDifficulty = ai4Difficulty->currentIndex();
-              break;
-            case 4:
-              aiDifficulty = ai5Difficulty->currentIndex();
-              break;
-          }
+          aiNumber.setNum(i - humanPlayersSpin->value() + 1);
+          aiDifficulty = findChildren<QComboBox*>("ai" + aiNumber +
+              "Difficulty").first()->currentIndex();
         }
 
         gameParticipants.insert(pair<SuspectEnum, PlayerClass>(randomCharacter,
@@ -2178,16 +2087,6 @@ void ClueMainWindowClass::setNetworkOptVis()
     computerPlayersLabel->setVisible(true);
     humanPlayersSpin->setVisible(true);
     humanPlayersLabel->setVisible(true);
-    ai1Difficulty->setVisible(true);
-    ai1DifficultyLabel->setVisible(true);
-    ai2Difficulty->setVisible(true);
-    ai2DifficultyLabel->setVisible(true);
-    ai3Difficulty->setVisible(true);
-    ai3DifficultyLabel->setVisible(true);
-    ai4Difficulty->setVisible(true);
-    ai4DifficultyLabel->setVisible(true);
-    ai5Difficulty->setVisible(true);
-    ai5DifficultyLabel->setVisible(true);
     humanPlayersSpin->setEnabled(true);
     computerPlayersSpin->setEnabled(true);
     updateNumberOfAis(computerPlayersSpin->value());
@@ -2200,17 +2099,6 @@ void ClueMainWindowClass::setNetworkOptVis()
     computerPlayersLabel->setVisible(false);
     humanPlayersSpin->setVisible(false);
     humanPlayersLabel->setVisible(false);
-    ai1Difficulty->setVisible(false);
-    ai1DifficultyLabel->setVisible(false);
-    ai2Difficulty->setVisible(false);
-    ai2DifficultyLabel->setVisible(false);
-    ai3Difficulty->setVisible(false);
-    ai3DifficultyLabel->setVisible(false);
-    ai4Difficulty->setVisible(false);
-    ai4DifficultyLabel->setVisible(false);
-    ai5Difficulty->setVisible(false);
-    ai5DifficultyLabel->setVisible(false);
-    ai1DifficultyLabel->setVisible(false);
     updateNumberOfAis(0);
   }
 }
@@ -2224,16 +2112,6 @@ void ClueMainWindowClass::setLocalOptVis()
   computerPlayersLabel->setVisible(true);
   humanPlayersSpin->setVisible(true);
   humanPlayersLabel->setVisible(true);
-  ai1Difficulty->setVisible(true);
-  ai1DifficultyLabel->setVisible(true);
-  ai2Difficulty->setVisible(true);
-  ai2DifficultyLabel->setVisible(true);
-  ai3Difficulty->setVisible(true);
-  ai3DifficultyLabel->setVisible(true);
-  ai4Difficulty->setVisible(true);
-  ai4DifficultyLabel->setVisible(true);
-  ai5Difficulty->setVisible(true);
-  ai5DifficultyLabel->setVisible(true);
 
   computerPlayersSpin->setEnabled(true);
   humanPlayersSpin->setEnabled(false);
@@ -2244,43 +2122,15 @@ void ClueMainWindowClass::setLocalOptVis()
 
 void ClueMainWindowClass::updateNumberOfAis(int numberOfAis)
 {
-  bool aiActive[MAX_AIS];
-  QLabel *difficultyLabel;
-  QComboBox *difficultySelector;
+  QString aiNumber;
 
   for(int i = 0; i < MAX_AIS; i++)
   {
-    aiActive[i] = (i < numberOfAis);
-  }
-
-  for(int i = 0; i < MAX_AIS; i++)
-  {
-    switch(i)
-    {
-      case 0:
-        difficultyLabel = ai1DifficultyLabel;
-        difficultySelector = ai1Difficulty;
-        break;
-      case 1:
-        difficultyLabel = ai2DifficultyLabel;
-        difficultySelector = ai2Difficulty;
-        break;
-      case 2:
-        difficultyLabel = ai3DifficultyLabel;
-        difficultySelector = ai3Difficulty;
-        break;
-      case 3:
-        difficultyLabel = ai4DifficultyLabel;
-        difficultySelector = ai4Difficulty;
-        break;
-      case 4:
-        difficultyLabel = ai5DifficultyLabel;
-        difficultySelector = ai5Difficulty;
-        break;
-    }
-
-    difficultyLabel->setVisible(aiActive[i]);
-    difficultySelector->setVisible(aiActive[i]);
+    aiNumber.setNum(i + 1);
+    findChildren<QLabel*>("ai" + aiNumber + "DifficultyLabel").first()->
+        setVisible(i < numberOfAis);
+    findChildren<QComboBox*>("ai" + aiNumber + "Difficulty").first()->
+        setVisible(i < numberOfAis);
   }
 
   gameSetupFrame->setGeometry(gameSetupFrame->x(), gameSetupFrame->y(),
@@ -2289,10 +2139,10 @@ void ClueMainWindowClass::updateNumberOfAis(int numberOfAis)
   startGameButton->setGeometry(startGameButton->x(), START_GAME_BUTTON_Y +
       VERTICAL_GUI_SPACING * numberOfAis, startGameButton->width(),
       startGameButton->height());
-
 }
 
-void ClueMainWindowClass::setClientSocket(ClientSocket &cliSock, int ipAddress, int portNumber)
+void ClueMainWindowClass::setClientSocket(ClientSocket &cliSock, int ipAddress,
+    int portNumber)
 {
   //ClientSocket *newSocket = new ClientSocket("localhost", 30000)
   //cliSock("localhost", 30000);

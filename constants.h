@@ -9,6 +9,8 @@
 
 #include "BoardLocationClass.h"
 
+const int MAX_CARDS_IN_HAND = 6;
+
 const int MAX_AIS = 5;
 
 const int VERTICAL_GUI_SPACING = 20;
