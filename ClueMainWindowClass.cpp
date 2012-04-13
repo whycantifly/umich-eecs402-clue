@@ -99,6 +99,7 @@ void ClueMainWindowClass::setupNewBoard()
   for(int i = 0; i < MAX_CARDS_IN_HAND; i++)
   {
     cardNumber.setNum(i + 1);
+    findChildren<QLabel*>("cardInHand" + cardNumber).first()->setPixmap(0);
     findChildren<QLabel*>("cardInHand" + cardNumber).first()->setVisible(false);
   }
 
@@ -405,6 +406,7 @@ void ClueMainWindowClass::refreshDisplay()
      }
      else
      {
+       disableMovementControls();
        makeSuggestionOption->setEnabled(false);
        endTurnOption->toggle();
        endTurnOption->setFocus();
@@ -413,7 +415,8 @@ void ClueMainWindowClass::refreshDisplay()
   }
   
   if((currentPlayerIter->second.getMovesLeft() <= 0 && currentPlayerIter->
-      second.getMovedThisTurnFlag() == true) || (currentPlayerIter->
+      second.getMovedThisTurnFlag() == true || currentPlayerIter->second.
+      getLastAction() == SUGGEST) || (currentPlayerIter->
       second.getPlayerLocation().getTileType(CLUE_BOARD_IMAGE) ==
       UNOCCUPIED_TILE && currentPlayerIter->second.getValidMoveDirections(
       inProgressBoardImage).empty()) || (currentPlayerIter->second.
@@ -703,6 +706,8 @@ void ClueMainWindowClass::makePlayerSuggestion()
   SuggestionDialogClass suggestionDialog(    //Suggestion dialog
       &suggestion, this);
 
+  suggestionDialog.setWindowModality(Qt::NonModal);
+
   disableAllControls();
   if(suggestionDialog.exec() == QDialog::Accepted)
   {
@@ -899,6 +904,7 @@ void ClueMainWindowClass::handleSuggestion(const SuggestionClass
                                                   //the suggestion
   QString suggesterName = CARD_VALUES[getCard(    //Name of the suspect who made
       currentPlayerIter->first)];                 //the suggestion
+  QString cardName;                               //Name of the card revealed
       
   if(currentPlayerIter->first == thisSuspect)
   {
@@ -996,12 +1002,21 @@ void ClueMainWindowClass::handleSuggestion(const SuggestionClass
           revealedCard = receiveRevealedCard();
         }
 
+        if(currentPlayerIter->first == thisSuspect)
+        {
+          cardName = QString("the " + CARD_VALUES[revealedCard]);
+        }
+        else
+        {
+          cardName = QString("a");
+        }
+
         if(gameParticipants.find(thisSuspect)->second.getGameOverFlag() ==
             false)
         {
           suggestionMessage.setWindowTitle("Card Revealed");
-          suggestionMessage.setText(playerName + " reveals a card to " +
-              suggesterName + ".");
+          suggestionMessage.setText(playerName + " reveals " + cardName +
+              " card to " + suggesterName + ".");
 
           suggestionMessage.exec();
         }
