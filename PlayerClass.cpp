@@ -94,6 +94,9 @@ string PlayerClass::printPlayerToString()
     
     // Print AI difficult
     ss << aiDifficulty << " ";
+    
+    // Print ai Suggestion flag
+    ss << correctAiSuggestionFlag << " ";
       
     // End stringstream
     ss << endl;
@@ -188,6 +191,9 @@ void PlayerClass::stringToPlayer(string wrappedString)
   iss >> aiDifficultyInt;
   cout << "aiDifficulty is " << aiDifficultyInt << endl;
   aiDifficulty = DifficultyEnum(aiDifficultyInt);
+  
+  iss >> correctAiSuggestionFlag;
+  cout << "correctAiSuggestionFlag is " << correctAiSuggestionFlag << endl;
 
   return;
 }

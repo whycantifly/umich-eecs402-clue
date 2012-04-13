@@ -24,6 +24,12 @@ class PackageClass
    SuggestionClass unwrapCaseFilePkg(string caseFilePkg);
    std::map<SuspectEnum, PlayerClass> unwrapSetupPkg(string wrappedPackage);
    
+   string wrapCurrentPlayerPackage(SuspectEnum suspEnum);
+   
+   SuspectEnum unwrapCurrentPlayerPackage(string inputString);
+   
+//   map< SuspectEnum, PlayerClass >::iterator unwrapCurrentPlayerPackage(string inputString, std::map<SuspectEnum, PlayerClass> gameParticipants);
+   
    string wrapSuspectEnum(SuspectEnum suspectNum);
    SuspectEnum unwrapSuspectEnum(string suspectNumStr);
    

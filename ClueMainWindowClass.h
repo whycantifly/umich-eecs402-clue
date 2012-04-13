@@ -216,6 +216,10 @@ class ClueMainWindowClass:public QWidget, private Ui::mainGameWindow
     
     void receiveInfoFromHost();
 
+    void sendInfoFromClient();
+    
+    void receiveInfoFromClient();
+
     //Receives turn information from any remote players.
     void receiveRemoteTurnInfo();
 

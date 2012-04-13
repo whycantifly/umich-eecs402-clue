@@ -91,8 +91,6 @@ SuspectEnum PackageClass::unwrapSuspectEnum(string suspectNumStr)
   return(SuspectEnum(suspectNum));
 }
 
-
-
 // Here we unwrap the gameParticipants string which was passed
 std::map<SuspectEnum, PlayerClass> PackageClass::unwrapSetupPkg(string wrappedPackage)
 {
@@ -108,8 +106,8 @@ std::map<SuspectEnum, PlayerClass> PackageClass::unwrapSetupPkg(string wrappedPa
   
   gameParticipants.clear();
   
-  cout << "The Wrapped Package is..." << endl;
-  cout << wrappedPackage << endl;
+//  cout << "The Wrapped Package is..." << endl;
+//  cout << wrappedPackage << endl;
   
   // Set wrapped package to iss
   iss.str(wrappedPackage);
@@ -136,6 +134,62 @@ std::map<SuspectEnum, PlayerClass> PackageClass::unwrapSetupPkg(string wrappedPa
   
   return(gameParticipants);
 }
+
+// Test to wrap a few things
+string PackageClass::wrapCurrentPlayerPackage(SuspectEnum suspEnum)
+{
+  stringstream ss;
+  ss << suspEnum << " " << endl;
+  
+  cout << ss.str() << endl;
+
+  return (ss.str());
+}
+
+SuspectEnum PackageClass::unwrapCurrentPlayerPackage(string inputString)
+{
+  SuspectEnum suspEnum;
+  istringstream iss;
+  int suspect;
+  
+  iss.str(inputString);
+  
+  iss >> suspect;
+  
+  suspEnum = SuspectEnum(suspect);
+
+  return(suspEnum);
+}
+
+// map< SuspectEnum, PlayerClass >::iterator PackageClass::unwrapCurrentPlayerPackage(string inputString, std::map<SuspectEnum, PlayerClass> gameParticipants)
+// {
+//   map< SuspectEnum, PlayerClass >::iterator currentPlayerIter, outputPlayerIter;
+//   SuspectEnum suspEnum;
+//   istringstream iss;
+//   int suspect;
+//   int i;
+//   int NUM_PLAYERS = 3;
+//   
+//   iss.str(inputString);
+//   
+//   iss >> suspect;
+//   
+//   suspEnum = SuspectEnum(suspect);
+//   
+//   currentPlayerIter = gameParticipants.begin();
+//   
+//   for (i = 0; i < NUM_PLAYERS; i++)
+//   {
+//     if (currentPlayerIter->first == suspEnum)
+//     {
+//       outputPlayerIter = currentPlayerIter;
+//     }
+//     currentPlayerIter++;
+//   }
+//   
+//   return(outputPlayerIter);
+// }
+
 
 
 /////// TEST FUNCTIONS
